@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Slot } from "@radix-ui/react-slot";
 import { cn } from "@/lib/utils";
 
-const containerVariants = cva("w-full px-16 py-8 lg:px-8 lg:py-40", {
+const containerVariants = cva("w-full px-16 py-8 lg:px-8 lg:py-4", {
   variants: {
     variant: {
       default: "",
