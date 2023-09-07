@@ -1,0 +1,27 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model user {
+  user_id         Int       @id @default(autoincrement())
+  username        String    @unique
+  name            String
+  email           String    @unique
+  password        String
+  profile_picture String?
+  phone_number    BigInt?
+  role            USER_ROLE @default(CUSTOMER)
+  createdAt       DateTime  @default(now())
+}
+
+enum USER_ROLE {
+  ADMIN
+  SELLER
+  CUSTOMER
+}
