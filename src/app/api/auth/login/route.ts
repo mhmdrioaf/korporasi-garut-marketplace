@@ -32,11 +32,10 @@ async function handler(request: NextRequest) {
     return new NextResponse(
       JSON.stringify(result, (_, v) =>
         typeof v === "bigint" ? v.toString() : v
-      ),
-      { status: 200 }
+      )
     );
   } else {
-    return new NextResponse(JSON.stringify(null), { status: 400 });
+    return new NextResponse(JSON.stringify(null));
   }
 }
 
