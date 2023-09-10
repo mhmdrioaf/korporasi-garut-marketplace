@@ -8,3 +8,10 @@ export const getAvatarInitial = (name: string): string => {
     );
   }
 };
+
+export const capitalizeFirstWord = (message: string): string => {
+  const firstWord = message.charAt(0).toUpperCase();
+  const restWord = message.slice(1, message.length);
+
+  return `${firstWord}${restWord}`;
+};

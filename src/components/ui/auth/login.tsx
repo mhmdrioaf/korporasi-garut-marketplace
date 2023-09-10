@@ -189,7 +189,7 @@ export default function AuthLogin() {
             <div className="w-full h-px bg-stone-200" />
           </div>
           <Link
-            href="/register"
+            href="/auth/register"
             className="w-full rounded-md bg-background border border-stone-200 hover:bg-stone-100 transition-colors px-4 py-2 grid place-items-center text-sm font-medium"
           >
             Daftar
