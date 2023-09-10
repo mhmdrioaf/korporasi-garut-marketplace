@@ -38,6 +38,7 @@ export default function AuthRegister() {
       password: "",
       password_confirmations: "",
     },
+    mode: "onBlur",
   });
 
   const router = useRouter();

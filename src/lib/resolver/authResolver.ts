@@ -16,7 +16,10 @@ export const authSchema = z.object({
 });
 
 export const registerSchema = z.object({
-  name: z.string(),
+  name: z.string().regex(new RegExp("^[A-Za-z+\\s]+$"), {
+    message:
+      "Harap isi nama hanya menggunakan huruf dan tanpa menggunakan simbol apapun.",
+  }),
   username: z.string().regex(new RegExp("^[A-Za-z0-9]+$"), {
     message:
       "Username hanya boleh mengandung huruf dan nomor saja dan tidak boleh mengandung spasi.",

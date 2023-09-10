@@ -15,3 +15,15 @@ export const capitalizeFirstWord = (message: string): string => {
 
   return `${firstWord}${restWord}`;
 };
+
+export const properizeWords = (words: string): string => {
+  const allWords = words.split(" ");
+  let properized: string[] = [];
+  allWords.forEach((word) => {
+    const firstWord = word.charAt(0).toUpperCase();
+    const restWords = word.slice(1, word.length).toLowerCase();
+    properized.push(`${firstWord}${restWords}`);
+  });
+
+  return properized.join(" ");
+};

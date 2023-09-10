@@ -15,12 +15,12 @@ async function handler(request: NextRequest) {
       OR: [
         {
           username: {
-            equals: body.username,
+            equals: body.username.toLowerCase(),
           },
         },
         {
           email: {
-            equals: body.username,
+            equals: body.username.toLowerCase(),
           },
         },
       ],

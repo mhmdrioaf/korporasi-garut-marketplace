@@ -6,14 +6,23 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "./button";
 import { signOut, useSession } from "next-auth/react";
-import { Menu, User2Icon } from "lucide-react";
+import {
+  GanttChartSquareIcon,
+  Loader2Icon,
+  LogIn,
+  LogOut,
+  Menu,
+  User2Icon,
+} from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { getAvatarInitial } from "@/lib/helper";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 import { Separator } from "./separator";
@@ -24,13 +33,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./sheet";
-import { cn } from "@/lib/utils";
+import { Session } from "next-auth";
+import { useToast } from "./use-toast";
 
-export default function Header() {
+export default function Header({ session }: { session: Session | null }) {
   const pathname = usePathname();
   const router = useRouter();
-
-  const { data: session, status } = useSession();
+  const { toast } = useToast();
 
   const activeStyles = "font-bold text-primary";
   const baseLinkStyles =
@@ -46,6 +55,18 @@ export default function Header() {
     } else {
       router.push("/auth/register");
     }
+  };
+
+  const signOutHandler = async () => {
+    return await signOut()
+      .then(() => {
+        toast({
+          title: "Berhasil keluar.",
+          description: "Berhasil mengeluarkan akun.",
+          variant: "success",
+        });
+      })
+      .catch((err) => console.error(err));
   };
 
   return (
@@ -65,13 +86,9 @@ export default function Header() {
       <span className="justify-self-start lg:hidden">
         <Sheet>
           <SheetTrigger>
-            <Button
-              variant="outline"
-              className="lg:hidden justify-self-start"
-              size="icon"
-            >
-              <Menu className="w-4 h-4" />
-            </Button>
+            <div className="p-2 rounded-md border border-stone-200 grid place-items-center">
+              <Menu className="w-6 h-6" />
+            </div>
           </SheetTrigger>
 
           <SheetContent className="w-full flex flex-col gap-8" side="left">
@@ -126,22 +143,22 @@ export default function Header() {
       </div>
 
       <div className="gap-4 justify-self-end inline-flex">
-        {status === "unauthenticated" && (
+        {session === null ? (
           <>
             <span className="hidden lg:inline-flex gap-4">
-              <Button
-                variant="default"
-                onClick={() => onButtonLinkClickHandler("LOGIN")}
+              <Link
+                href="/auth/login"
+                className="px-4 py-2 rounded-md bg-primary bg-opacity-25 text-primary-foreground hover:bg-opacity-100 transition-colors grid place-items-center"
               >
                 Login
-              </Button>
+              </Link>
               <div className="w-px min-h-full bg-stone-300" />
-              <Button
-                variant="outline"
-                onClick={() => onButtonLinkClickHandler("REGISTER")}
+              <Link
+                href="/auth/register"
+                className="px-4 py-2 rounded-md bg-background text-foreground hover:bg-stone-100 transition-colors grid place-items-center border border-stone-200"
               >
                 Daftar
-              </Button>
+              </Link>
             </span>
 
             <span className="block lg:hidden">
@@ -154,33 +171,31 @@ export default function Header() {
                   </Avatar>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="mr-4">
-                  <DropdownMenuItem>
-                    <Button
-                      variant="default"
+                <DropdownMenuContent className="w-52 mr-4">
+                  <DropdownMenuLabel>Akun</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup className="flex flex-col gap-2">
+                    <DropdownMenuItem
+                      className="bg-primary text-primary-foreground cursor-pointer"
                       onClick={() => onButtonLinkClickHandler("LOGIN")}
-                      className="w-full"
                     >
-                      Login
-                    </Button>
-                  </DropdownMenuItem>
+                      <LogIn className="mr-2 h-2 w-2" />
+                      <span>Login</span>
+                    </DropdownMenuItem>
 
-                  <DropdownMenuItem>
-                    <Button
-                      variant="outline"
+                    <DropdownMenuItem
+                      className="cursor-pointer hover:bg-stone-100 transition-colors"
                       onClick={() => onButtonLinkClickHandler("REGISTER")}
-                      className="w-full"
                     >
-                      Daftar
-                    </Button>
-                  </DropdownMenuItem>
+                      <GanttChartSquareIcon className="mr-2 h-2 w-2" />
+                      <span>Daftar</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>
             </span>
           </>
-        )}
-
-        {status === "authenticated" && (
+        ) : (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Avatar className="w-12 h-12 cursor-pointer">
@@ -194,17 +209,17 @@ export default function Header() {
               </Avatar>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="mr-4">
-              <DropdownMenuLabel>{session.user.username}</DropdownMenuLabel>
-              <Separator />
-              <DropdownMenuItem>
-                <Button
-                  variant="destructive"
-                  onClick={() => signOut()}
-                  className="w-full"
-                >
-                  Keluar
-                </Button>
+            <DropdownMenuContent className="w-52 mr-4">
+              <DropdownMenuLabel>
+                <span>{session.user.username}</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
+                onClick={signOutHandler}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Keluar</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
