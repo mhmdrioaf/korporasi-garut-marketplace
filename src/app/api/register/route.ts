@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import * as bcrypt from "bcrypt";
 import { Prisma } from "@prisma/client";
+import { properizeWords } from "@/lib/helper";
 
 interface RegisterRequestBody {
   phone_number: string;
@@ -17,10 +18,10 @@ async function handler(request: NextRequest) {
   try {
     const newUser = await db.user.create({
       data: {
-        email: body.email,
-        username: body.username,
+        email: body.email.toLowerCase(),
+        username: body.username.toLowerCase(),
         password: await bcrypt.hash(body.password, 10),
-        name: body.name,
+        name: properizeWords(body.name),
         phone_number: body.phone_number,
       },
     });
