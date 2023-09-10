@@ -20,6 +20,7 @@ import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { Separator } from "../separator";
 import { useToast } from "../use-toast";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 type LoginOptions = "username" | "email";
 
@@ -30,6 +31,7 @@ export default function AuthLogin() {
   const [loginOptions, setLoginOptions] = useState<LoginOptions>("username");
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -71,10 +73,15 @@ export default function AuthLogin() {
               "Username/email atau password yang anda masukkan salah.",
             variant: "destructive",
           });
+        } else {
+          toast({
+            title: "Berhasil masuk.",
+            description: "Selamat datang kembali.",
+            variant: "success",
+          });
+          form.reset();
+          router.refresh();
         }
-
-        console.log(res);
-
         setLoading(false);
       })
       .catch((err) => {
@@ -167,7 +174,7 @@ export default function AuthLogin() {
           <Button type="submit" variant="default" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="mr-2 w-4 h-4 animate-spin" />
                 Loading...
               </>
             ) : (
@@ -178,6 +185,7 @@ export default function AuthLogin() {
           <Button
             type="button"
             variant="outline"
+            disabled={loading}
             onClick={() => loginMethodChangeHandler()}
           >
             Masuk dengan menggunakan{" "}
