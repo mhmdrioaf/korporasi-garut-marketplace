@@ -5,3 +5,12 @@ type ICarouselAssets = {
   title: string;
   descriptions: string | null;
 };
+
+type IProduct = {
+  id: number;
+  title: string;
+  descriptions: string;
+  price: number;
+  seller_id: number;
+  images: string[];
+};

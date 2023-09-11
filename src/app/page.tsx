@@ -1,15 +1,14 @@
 import Carousel from "@/components/ui/carousel";
 import { Container } from "@/components/ui/container";
+import ProductsList from "@/components/ui/products-list";
 import { CarouselAssets } from "@/lib/constants";
 
 export default function Home() {
   return (
     <Container variant="column">
       <Carousel className="h-96" assets={CarouselAssets} />
-      {/* TODO: Add products catalogue */}
+      <ProductsList />
       {/* TODO: Add sidebar containing product categories */}
-
-      <p>Hello home page</p>
     </Container>
   );
 }
