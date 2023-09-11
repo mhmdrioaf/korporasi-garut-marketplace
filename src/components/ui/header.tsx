@@ -35,8 +35,11 @@ import {
 } from "./sheet";
 import { Session } from "next-auth";
 import { useToast } from "./use-toast";
+import { useState } from "react";
 
 export default function Header({ session }: { session: Session | null }) {
+  const [showSheet, setShowSheet] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
   const { toast } = useToast();
@@ -70,21 +73,45 @@ export default function Header({ session }: { session: Session | null }) {
   };
 
   return (
-    <div className="w-full px-16 lg:px-8 py-2 border-b border-b-stone-300 sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
+    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
       <div className="gap-4 justify-self-start hidden lg:inline-flex">
-        <Link className={pathname === "/" ? activeStyles : ""} href="/">
+        <Link
+          className={
+            pathname === "/"
+              ? activeStyles
+              : "hover:text-primary hover:underline hover:underline-offset-8"
+          }
+          href="/"
+        >
           Marketplace
         </Link>
-        <Link className={pathname === "/ee" ? activeStyles : ""} href="#">
+        <Link
+          className={
+            pathname === "/ee"
+              ? activeStyles
+              : "hover:text-primary hover:underline hover:underline-offset-8"
+          }
+          href="#"
+        >
           Kategori
         </Link>
-        <Link className={pathname === "/rr" ? activeStyles : ""} href="#">
+        <Link
+          className={
+            pathname === "/rr"
+              ? activeStyles
+              : "hover:text-primary hover:underline hover:underline-offset-8"
+          }
+          href="#"
+        >
           FAQs
         </Link>
       </div>
 
       <span className="justify-self-start lg:hidden">
-        <Sheet>
+        <Sheet
+          open={showSheet}
+          onOpenChange={() => setShowSheet((prev) => !prev)}
+        >
           <SheetTrigger>
             <div className="p-2 rounded-md border border-stone-200 grid place-items-center">
               <Menu className="w-6 h-6" />
@@ -98,6 +125,7 @@ export default function Header({ session }: { session: Session | null }) {
 
             <div className="w-full flex flex-col gap-4">
               <Link
+                onClick={() => setShowSheet(false)}
                 className={
                   pathname === "/"
                     ? baseLinkStyles + linkStyles.active
@@ -108,6 +136,7 @@ export default function Header({ session }: { session: Session | null }) {
                 Marketplace
               </Link>
               <Link
+                onClick={() => setShowSheet(false)}
                 className={
                   pathname === "#"
                     ? baseLinkStyles + linkStyles.active
@@ -118,6 +147,7 @@ export default function Header({ session }: { session: Session | null }) {
                 Kategori
               </Link>
               <Link
+                onClick={() => setShowSheet(false)}
                 className={
                   pathname === "#"
                     ? baseLinkStyles + linkStyles.active
@@ -132,7 +162,7 @@ export default function Header({ session }: { session: Session | null }) {
         </Sheet>
       </span>
 
-      <div className="w-16 h-16 relative">
+      <Link className="w-16 h-16 relative" href="/">
         <Image
           src={logo}
           alt="smk logo"
@@ -140,7 +170,7 @@ export default function Header({ session }: { session: Session | null }) {
           className="object-center"
           sizes="100vw"
         />
-      </div>
+      </Link>
 
       <div className="gap-4 justify-self-end inline-flex">
         {session === null ? (
