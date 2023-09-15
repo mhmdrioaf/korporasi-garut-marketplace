@@ -1,5 +1,6 @@
 import { IProduct } from "@/lib/globals";
 import Image from "next/image";
+import Link from "next/link";
 
 type ProductCardProps = {
   product: IProduct;
@@ -7,7 +8,10 @@ type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <div className="w-full border border-stone-200 p-2 min-h-full max-h-96 overflow-hidden flex flex-col gap-2 rounded-lg">
+    <Link
+      href={`/product/${product.id}`}
+      className="w-full border border-stone-200 p-2 min-h-full max-h-96 overflow-hidden flex flex-col gap-2 rounded-lg"
+    >
       <div className="w-full h-32 bg-stone-200 shrink-0 rounded-md overflow-hidden relative">
         <Image
           src={product.images[0]}
@@ -52,6 +56,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-sm text-stone-500">4.5</p>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

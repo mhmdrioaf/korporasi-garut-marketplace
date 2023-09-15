@@ -1,3 +1,6 @@
+import { ProductsAssets } from "./constants";
+import { IProduct } from "./globals";
+
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
   if (slicedName.length > 2) {
@@ -26,4 +29,12 @@ export const properizeWords = (words: string): string => {
   });
 
   return properized.join(" ");
+};
+
+export const getProductDetail = (id: string) => {
+  const productId = parseInt(id);
+  const product: IProduct | null =
+    ProductsAssets.find((product) => product.id === productId) ?? null;
+
+  return product;
 };
