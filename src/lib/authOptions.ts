@@ -48,10 +48,13 @@ const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       const loggedInUser = await db.user.findFirst({
         where: { email: token.email! },
+        include: {
+          account: true,
+        },
       });
       if (loggedInUser) {
         token.user_id = loggedInUser.user_id.toString();
-        token.name = loggedInUser.name;
+        token.name = loggedInUser.account?.user_name;
         token.email = loggedInUser.email;
         token.role = loggedInUser.role;
         token.username = loggedInUser.username;

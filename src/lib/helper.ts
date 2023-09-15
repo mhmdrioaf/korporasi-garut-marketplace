@@ -38,3 +38,10 @@ export const getProductDetail = (id: string) => {
 
   return product;
 };
+
+export const accountIdGenerator = (maxValue: number) => {
+  const decimals =
+    maxValue < 10 ? `00${maxValue}` : maxValue > 9 ? `0${maxValue}` : maxValue;
+  const prefix = "A-";
+  return prefix + decimals;
+};
