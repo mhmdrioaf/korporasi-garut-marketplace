@@ -48,10 +48,12 @@ export default class Users {
     });
   }
 
-  async getUserDetail(user_id: string) {
+  async getUserDetail(username: string) {
     const userDetail = await this.prismaUser.findFirst({
       where: {
-        user_id: parseInt(user_id),
+        username: {
+          equals: username,
+        },
       },
       select: {
         account: true,

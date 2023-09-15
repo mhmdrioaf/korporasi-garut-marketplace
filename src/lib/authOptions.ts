@@ -36,7 +36,7 @@ const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
-        session.user.user_id = token.user_id;
+        session.user.id = token.user_id;
         session.user.name = token.name;
         session.user.email = token.email;
         session.user.username = token.username;

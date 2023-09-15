@@ -81,6 +81,7 @@ export default function AuthLogin() {
           });
           form.reset();
           router.refresh();
+          router.push("/user/dashboard");
         }
         setLoading(false);
       })

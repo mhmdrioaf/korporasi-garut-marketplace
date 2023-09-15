@@ -73,7 +73,7 @@ export default function Header({ session }: { session: Session | null }) {
   };
 
   return (
-    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
+    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 relative lg:sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
       <div className="gap-4 justify-self-start hidden lg:inline-flex">
         <Link
           className={
