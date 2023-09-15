@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import * as bcrypt from "bcrypt";
 import { db } from "@/lib/db";
+import Users from "@/lib/prisma-classes/User";
 
 interface LoginRequestBody {
   username: string;
@@ -10,33 +10,10 @@ interface LoginRequestBody {
 async function handler(request: NextRequest) {
   const body: LoginRequestBody = await request.json();
 
-  const user = await db.user.findFirst({
-    where: {
-      OR: [
-        {
-          username: {
-            equals: body.username.toLowerCase(),
-          },
-        },
-        {
-          email: {
-            equals: body.username.toLowerCase(),
-          },
-        },
-      ],
-    },
-  });
+  const users = new Users(db.user);
+  const user = await users.login(body);
 
-  if (user && (await bcrypt.compare(body.password, user.password))) {
-    const { password, ...result } = user;
-    return new NextResponse(
-      JSON.stringify(result, (_, v) =>
-        typeof v === "bigint" ? v.toString() : v
-      )
-    );
-  } else {
-    return new NextResponse(JSON.stringify(null));
-  }
+  return new NextResponse(JSON.stringify(user));
 }
 
 export { handler as POST };
