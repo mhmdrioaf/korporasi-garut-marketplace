@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="w-full flex flex-col lg:flex-row items-start">
-      <div className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen sticky lg:fixed top-0 lg:top-20 left-0 border-b border-r-0 border-b-input lg:border-b-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal">
+      <div className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen fixed bottom-0 lg:top-20 left-0 border-t border-r-0 border-t-input lg:border-t-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal">
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
           href="/user/dashboard"

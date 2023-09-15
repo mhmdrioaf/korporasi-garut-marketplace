@@ -78,7 +78,7 @@ export default function UserDashboardComponent({
               <td>
                 <p className="font-bold">Nama</p>
               </td>
-              <td>:</td>
+              <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.account?.user_name}</p>
                 <Button variant="ghost" className="text-primary font-bold">
@@ -91,7 +91,7 @@ export default function UserDashboardComponent({
               <td>
                 <p className="font-bold">Email</p>
               </td>
-              <td>:</td>
+              <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.email}</p>
               </td>
@@ -101,7 +101,7 @@ export default function UserDashboardComponent({
               <td>
                 <p className="font-bold">Nama Pengguna</p>
               </td>
-              <td>:</td>
+              <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.username}</p>
                 <Button variant="ghost" className="text-primary font-bold">
@@ -114,7 +114,7 @@ export default function UserDashboardComponent({
               <td>
                 <p className="font-bold">Nomor Telepon</p>
               </td>
-              <td>:</td>
+              <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.phone_number}</p>
                 <Button variant="ghost" className="text-primary font-bold">
@@ -125,7 +125,7 @@ export default function UserDashboardComponent({
           </tbody>
         </table>
 
-        <div className="w-full p-2 flex flex-col gap-4 rounded-md border border-input">
+        <div className="w-full p-2 mb-20 lg:mb-0 flex flex-col gap-4 rounded-md border border-input">
           <p className="text-xl text-red-700 font-bold">Aksi Berbahaya</p>
           <p className="text-sm text-stone-700">{ACCOUNT_DELETE_NOTES}</p>
           <Button variant="destructive">
