@@ -1,33 +1,30 @@
 import Loading from "@/app/loading";
 import { Container } from "@/components/ui/container";
-import { db } from "@/lib/db";
+import authOptions from "@/lib/authOptions";
 import { IUser } from "@/lib/globals";
-import Users from "@/lib/prisma-classes/User";
 import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
 import { Suspense, lazy } from "react";
 
 const UserDashboard = lazy(() => import("@/components/ui/dashboard"));
 
+async function getUserDetail(id: string) {
+  const fetchUser = await fetch(process.env.NEXT_PUBLIC_API_GET_USER! + id, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+
+  const response = await fetchUser.json();
+  return response.result as IUser;
+}
+
 export default async function DashboardPage() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
-  if (!session)
-    return (
-      <div className="w-full h-screen grid place-items-center">
-        Anda harus login terlebih dahulu untuk mengakses halaman ini!
-      </div>
-    );
+  if (!session) redirect("/auth/login");
 
-  const users = new Users(db.user);
-  const user: IUser | null = await users.getUserDetail(session.user.username!);
-
-  if (!user)
-    return (
-      <div className="w-full h-screen grid place-items-center">
-        Maaf, user ini tidak tersedia.
-      </div>
-    );
-
+  const user = await getUserDetail(session.user.id);
   return (
     <Container>
       <Suspense fallback={<Loading />}>

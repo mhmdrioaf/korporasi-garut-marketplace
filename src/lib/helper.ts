@@ -5,6 +5,8 @@ export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
   if (slicedName.length > 2) {
     return slicedName[0].charAt(0) + slicedName[1].charAt(0);
+  } else if (slicedName.length === 1) {
+    return slicedName[0].charAt(0);
   } else {
     return (
       slicedName[0].charAt(0) + slicedName[slicedName.length - 1].charAt(0)
@@ -44,4 +46,17 @@ export const accountIdGenerator = (maxValue: number) => {
     maxValue < 10 ? `00${maxValue}` : maxValue > 9 ? `0${maxValue}` : maxValue;
   const prefix = "A-";
   return prefix + decimals;
+};
+
+export const phoneNumberGenerator = (value: string) => {
+  if (!value.startsWith("0", 0) && !value.startsWith("6")) {
+    const prefix = "0";
+    return prefix + value;
+  } else if (value.startsWith("6", 0) && !value.startsWith("0")) {
+    const prefix = "0";
+    const restWords = value.slice(2, value.length);
+    return prefix + restWords;
+  } else {
+    return value;
+  }
 };

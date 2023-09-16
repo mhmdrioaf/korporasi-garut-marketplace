@@ -1,5 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import { accountIdGenerator, properizeWords } from "../helper";
+import { Prisma, PrismaClient } from "@prisma/client";
+import {
+  accountIdGenerator,
+  capitalizeFirstWord,
+  properizeWords,
+} from "../helper";
 import * as bcrypt from "bcrypt";
 
 type Register = {
@@ -48,11 +52,11 @@ export default class Users {
     });
   }
 
-  async getUserDetail(username: string) {
+  async getUserDetail(id: string) {
     const userDetail = await this.prismaUser.findFirst({
       where: {
-        username: {
-          equals: username,
+        user_id: {
+          equals: parseInt(id),
         },
       },
       select: {
@@ -95,6 +99,67 @@ export default class Users {
       return result;
     } else {
       return null;
+    }
+  }
+
+  async updateUser(dataToChange: string, value: string, username: string) {
+    const dataChanged =
+      dataToChange === "name"
+        ? "nama"
+        : dataToChange === "username"
+        ? "nama pengguna"
+        : "nomor telepon";
+    try {
+      const updateUser = await this.prismaUser.update({
+        where: {
+          username: username,
+        },
+        data:
+          dataToChange !== "name"
+            ? {
+                [dataToChange]: value,
+              }
+            : {
+                account: {
+                  update: {
+                    user_name: value,
+                  },
+                },
+              },
+      });
+
+      if (updateUser) {
+        return {
+          status: "success",
+          message: `Berhasil mengubah data ${dataChanged}`,
+        };
+      } else {
+        return {
+          status: "failed",
+          message: `Gagal mengubah informasi ${dataChanged}, silahkan coba lagi nanti.`,
+        };
+      }
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        if (err.code === "P2002") {
+          return {
+            status: "failed",
+            message: `${capitalizeFirstWord(dataChanged)} telah terdaftar.`,
+          };
+        } else {
+          return {
+            status: "failed",
+            message:
+              "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
+          };
+        }
+      } else {
+        return {
+          status: "failed",
+          message:
+            "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
+        };
+      }
     }
   }
 }

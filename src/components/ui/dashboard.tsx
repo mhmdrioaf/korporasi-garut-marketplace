@@ -5,30 +5,49 @@ import { Trash2Icon, User2Icon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
 import { Input } from "./input";
-import { useRef } from "react";
 import { Label } from "./label";
 import { ACCOUNT_DELETE_NOTES, IMAGE_UPLOAD_NOTES } from "@/lib/constants";
+import { useState } from "react";
+import UserDetailModals from "@/components/ui/modals/user-detail";
 
 interface UserDashboardComponentProps {
   user: IUser;
 }
 
+type UserDetailsChangeOptions = "name" | "username" | "phone_number" | null;
+
 export default function UserDashboardComponent({
   user,
 }: UserDashboardComponentProps) {
-  const imageUploadInputRef = useRef<HTMLInputElement | null>(null);
-  const onUploadImageClickHandler = () => {
-    if (imageUploadInputRef.current) {
-      imageUploadInputRef.current.click();
-    } else {
-      return;
-    }
-  };
+  const [modalOptions, setModalOptions] =
+    useState<UserDetailsChangeOptions | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [modalValue, setModalValue] = useState<string | null>(null);
 
   const onImageInputChangesHandler = () => {};
+  const onUserDetailChanges = (
+    options: UserDetailsChangeOptions,
+    defaultValue: string
+  ) => {
+    setModalOptions(options);
+    setModalValue(defaultValue);
+    setIsModalOpen(true);
+  };
+  const onModalCloses = () => {
+    setModalOptions(null);
+    setIsModalOpen(false);
+    setModalValue(null);
+  };
 
   return (
     <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <UserDetailModals
+        options={modalOptions}
+        username={user.username}
+        defaultValue={modalValue ?? ""}
+        isOpen={isModalOpen}
+        onClose={onModalCloses}
+      />
       <div className="w-full p-2 rounded-md overflow-hidden flex flex-col gap-4 border border-input">
         <div className="w-full h-auto aspect-square rounded-md border border-input overflow-hidden relative">
           {user.account?.profile_picture ? (
@@ -81,7 +100,13 @@ export default function UserDashboardComponent({
               <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.account?.user_name}</p>
-                <Button variant="ghost" className="text-primary font-bold">
+                <Button
+                  variant="ghost"
+                  className="text-primary font-bold"
+                  onClick={() =>
+                    onUserDetailChanges("name", user.account?.user_name ?? "")
+                  }
+                >
                   Ubah
                 </Button>
               </td>
@@ -104,7 +129,11 @@ export default function UserDashboardComponent({
               <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.username}</p>
-                <Button variant="ghost" className="text-primary font-bold">
+                <Button
+                  variant="ghost"
+                  className="text-primary font-bold"
+                  onClick={() => onUserDetailChanges("username", user.username)}
+                >
                   Ubah
                 </Button>
               </td>
@@ -117,7 +146,13 @@ export default function UserDashboardComponent({
               <td className="ml-1 mr-1">:</td>
               <td className="flex flex-row items-center gap-1">
                 <p>{user.phone_number}</p>
-                <Button variant="ghost" className="text-primary font-bold">
+                <Button
+                  variant="ghost"
+                  className="text-primary font-bold"
+                  onClick={() =>
+                    onUserDetailChanges("phone_number", user.phone_number ?? "")
+                  }
+                >
                   Ubah
                 </Button>
               </td>
