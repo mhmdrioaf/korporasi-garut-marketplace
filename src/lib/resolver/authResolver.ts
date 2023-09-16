@@ -48,3 +48,35 @@ export const registerSchema = z.object({
     message: "Password setidaknya harus berjumlah 8 karakter atau lebih.",
   }),
 });
+
+export const updateUserSchema = z.object({
+  name: z
+    .string()
+    .regex(new RegExp("^[A-Za-z+\\s]+$"), {
+      message:
+        "Harap isi nama hanya menggunakan huruf dan tanpa menggunakan simbol apapun.",
+    })
+    .optional(),
+  phone_number: z
+    .string()
+    .startsWith("0", {
+      message:
+        "Harap masukkan nomor telepon yang benar. Nomor telepon di awali dengan '0'",
+    })
+    .regex(new RegExp("^[0-9]+$"), {
+      message:
+        "Harap masukkan nomor telepon yang benar. Nomor telepon di awali dengan '0'",
+    })
+    .min(10, {
+      message:
+        "Harap masukkan nomor telepon yang benar. Nomor telepon setidaknya harus berjumlah 10 karakter",
+    })
+    .optional(),
+  username: z
+    .string()
+    .regex(new RegExp("^[A-Za-z0-9]+$"), {
+      message:
+        "Username hanya boleh mengandung huruf dan nomor saja dan tidak boleh mengandung spasi.",
+    })
+    .optional(),
+});

@@ -8,6 +8,7 @@ import { Button } from "./button";
 import { signOut, useSession } from "next-auth/react";
 import {
   GanttChartSquareIcon,
+  LayoutDashboardIcon,
   Loader2Icon,
   LogIn,
   LogOut,
@@ -73,7 +74,7 @@ export default function Header({ session }: { session: Session | null }) {
   };
 
   return (
-    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
+    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 relative lg:sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
       <div className="gap-4 justify-self-start hidden lg:inline-flex">
         <Link
           className={
@@ -244,13 +245,21 @@ export default function Header({ session }: { session: Session | null }) {
                 <span>{session.user.username}</span>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
-                onClick={signOutHandler}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Keluar</span>
-              </DropdownMenuItem>
+              <DropdownMenuGroup>
+                <DropdownMenuItem>
+                  <Link href="/user/dashboard" className="w-full flex flex-row">
+                    <LayoutDashboardIcon className="w-4 h-4 mr-2" />
+                    <span>Dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
+                  onClick={signOutHandler}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Keluar</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </DropdownMenuContent>
           </DropdownMenu>
         )}

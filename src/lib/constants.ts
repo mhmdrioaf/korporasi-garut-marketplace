@@ -96,3 +96,9 @@ export const ProductsAssets: IProduct[] = [
     seller_id: 3,
   },
 ];
+
+export const IMAGE_UPLOAD_NOTES =
+  "Perlu di ingat bahwa mengunggah gambar dapat memakan waktu hingga paling lama 5 menit untuk menerapkan perubahan pada semua platform. Untuk itu, ketika anda telah menunggah foto profil baru, namun foto profil belum berubah, harap login kembali ke akun anda untuk melihat perubahannya.";
+
+export const ACCOUNT_DELETE_NOTES =
+  "Perlu di ingat bahwa aksi ini tidak bisa di batalkan, ketika anda menghapus akun anda, akun tersebut selamanya terhapus dan tidak bisa di kembalikan. Harap muat ulang halaman ketika anda telah menghapus akun anda.";
