@@ -1,13 +1,14 @@
 import AuthRegister from "@/components/ui/auth/register";
 import { Container } from "@/components/ui/container";
 import authOptions from "@/lib/authOptions";
+import { ROUTES } from "@/lib/constants";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 export default async function RegisterPage() {
   const session = await getServerSession(authOptions);
 
-  if (session) redirect("/user/dashboard");
+  if (session) redirect(ROUTES.USER.DASHBOARD);
   else
     return (
       <Container className="min-h-[85vh] flex flex-col gap-8">

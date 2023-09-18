@@ -1,3 +1,4 @@
+import { ROUTES } from "@/lib/constants";
 import { LayoutDashboardIcon, MapPinIcon, ShoppingBagIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -17,7 +18,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen fixed bottom-0 lg:top-20 left-0 border-t border-r-0 border-t-input lg:border-t-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal">
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
-          href="/user/dashboard"
+          href={ROUTES.USER.DASHBOARD}
           title="Detail Profil"
         >
           <LayoutDashboardIcon className="w-6 h-6" />
@@ -26,7 +27,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
-          href="/user/dashboard/orders"
+          href={ROUTES.USER.ORDERS}
           title="Pesanan"
         >
           <ShoppingBagIcon className="w-6 h-6" />

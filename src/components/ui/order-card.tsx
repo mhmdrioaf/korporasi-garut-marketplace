@@ -4,6 +4,7 @@ import { ICustomerOrder } from "@/lib/globals";
 import Image from "next/image";
 import { Button } from "./button";
 import Link from "next/link";
+import { ROUTES } from "@/lib/constants";
 
 interface OrderCardProps {
   order: ICustomerOrder;
@@ -76,7 +77,7 @@ export default function OrderCard({ order }: OrderCardProps) {
 
           <p className="font-bold self-center">Rp. {product.price}</p>
           <Link
-            href={`/product/${product.id}`}
+            href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
             className="font-bold text-primary self-center place-self-end"
           >
             Lihat Produk

@@ -8,7 +8,6 @@ async function handler(
 ) {
   const headerLists = headers();
   const date = headerLists.get("date");
-  console.log(params.id);
 
   const userOrders = CUSTOMER_ORDERS.filter(
     (order) => order.customer_id === params.id

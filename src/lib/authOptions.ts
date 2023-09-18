@@ -2,6 +2,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { db } from "./db";
+import { ROUTES } from "./constants";
 
 const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -74,7 +75,7 @@ const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/login",
+    signIn: ROUTES.AUTH.LOGIN,
   },
 };
 

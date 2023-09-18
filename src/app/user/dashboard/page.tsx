@@ -1,6 +1,7 @@
 import Loading from "@/app/loading";
 import { Container } from "@/components/ui/container";
 import authOptions from "@/lib/authOptions";
+import { ROUTES } from "@/lib/constants";
 import { IUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
@@ -22,7 +23,7 @@ async function getUserDetail(id: string) {
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
-  if (!session) redirect("/auth/login");
+  if (!session) redirect(ROUTES.AUTH.LOGIN);
 
   const user = await getUserDetail(session.user.id);
   return (

@@ -1,6 +1,7 @@
 import { Container } from "@/components/ui/container";
 import CustomerOrderList from "@/components/ui/customer-order-list";
 import authOptions from "@/lib/authOptions";
+import { ROUTES } from "@/lib/constants";
 import { ICustomerOrder } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -28,7 +29,7 @@ async function getUserOrders(id: string) {
 export default async function UserOrders() {
   const session = await getServerSession(authOptions);
 
-  if (!session) redirect("/auth/login");
+  if (!session) redirect(ROUTES.AUTH.LOGIN);
 
   const userOrders = await getUserOrders(session.user.id);
 
@@ -50,7 +51,7 @@ export default async function UserOrders() {
       <Container variant="column">
         <p className="text-sm">
           Anda belum melakukan pesanan apapun,{" "}
-          <Link href="/" className="font-bold text-primary">
+          <Link href={ROUTES.LANDING_PAGE} className="font-bold text-primary">
             Klik disini untuk mencari produk.
           </Link>
         </p>

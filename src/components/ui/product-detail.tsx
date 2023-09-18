@@ -21,6 +21,7 @@ import {
 } from "./accordion";
 import { Separator } from "./separator";
 import { Input } from "./input";
+import { ROUTES } from "@/lib/constants";
 
 interface ProductDetailComponentProps {
   product: IProduct | null;
@@ -109,7 +110,7 @@ export default function ProductDetail({
 
         <div className="w-full flex flex-col gap-8">
           <Link
-            href="/"
+            href={ROUTES.LANDING_PAGE}
             className="text-primary font-bold flex flex-row items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />

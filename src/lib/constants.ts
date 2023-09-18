@@ -114,3 +114,18 @@ export const CUSTOMER_ORDERS: ICustomerOrder[] = [
     products: [ProductsAssets[0], ProductsAssets[1], ProductsAssets[2]],
   },
 ];
+
+export const ROUTES = {
+  LANDING_PAGE: "/",
+  AUTH: {
+    REGISTER: "/auth/register",
+    LOGIN: "/auth/login",
+  },
+  USER: {
+    DASHBOARD: "/user/dashboard",
+    ORDERS: "/user/dashboard/orders",
+  },
+  PRODUCT: {
+    DETAIL: (id: string) => `/product/${id}`,
+  },
+};
