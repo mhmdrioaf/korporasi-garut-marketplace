@@ -30,3 +30,20 @@ type IAccount = {
   user_name: string;
   profile_picture: string | null;
 };
+
+type ICustomerOrder = {
+  order_id: string;
+  order_status:
+    | "PENDING"
+    | "PAID"
+    | "PACKED"
+    | "SHIPPED"
+    | "DELIVERED"
+    | "FINISHED";
+  order_date: Date;
+  order_total_amount: number;
+  customer_id: string;
+  order_items_id: string[];
+
+  products: IProduct[];
+};

@@ -2,7 +2,7 @@ import csl1 from "/public/csl-1.jpg";
 import csl2 from "/public/csl-2.jpg";
 import csl3 from "/public/csl-3.jpg";
 
-import { ICarouselAssets, IProduct } from "./globals";
+import { ICarouselAssets, ICustomerOrder, IProduct } from "./globals";
 
 export const CarouselAssets: ICarouselAssets[] = [
   {
@@ -102,3 +102,15 @@ export const IMAGE_UPLOAD_NOTES =
 
 export const ACCOUNT_DELETE_NOTES =
   "Perlu di ingat bahwa aksi ini tidak bisa di batalkan, ketika anda menghapus akun anda, akun tersebut selamanya terhapus dan tidak bisa di kembalikan. Harap muat ulang halaman ketika anda telah menghapus akun anda.";
+
+export const CUSTOMER_ORDERS: ICustomerOrder[] = [
+  {
+    customer_id: "1",
+    order_date: new Date(),
+    order_id: "ORD1001",
+    order_items_id: ["1", "2", "3"],
+    order_status: "PENDING",
+    order_total_amount: 30000,
+    products: [ProductsAssets[0], ProductsAssets[1], ProductsAssets[2]],
+  },
+];

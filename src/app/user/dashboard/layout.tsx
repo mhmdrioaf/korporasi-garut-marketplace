@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { LayoutDashboardIcon, MapPinIcon, ShoppingBagIcon } from "lucide-react";
 import { Metadata } from "next";
 import Link from "next/link";
@@ -27,7 +26,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
-          href="#"
+          href="/user/dashboard/orders"
           title="Pesanan"
         >
           <ShoppingBagIcon className="w-6 h-6" />
