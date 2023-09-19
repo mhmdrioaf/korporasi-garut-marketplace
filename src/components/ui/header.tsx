@@ -37,6 +37,7 @@ import {
 import { Session } from "next-auth";
 import { useToast } from "./use-toast";
 import { useState } from "react";
+import { ROUTES } from "@/lib/constants";
 
 export default function Header({ session }: { session: Session | null }) {
   const [showSheet, setShowSheet] = useState(false);
@@ -55,9 +56,9 @@ export default function Header({ session }: { session: Session | null }) {
 
   const onButtonLinkClickHandler = (options: "LOGIN" | "REGISTER") => {
     if (options === "LOGIN") {
-      router.push("/auth/login");
+      router.push(ROUTES.AUTH.LOGIN);
     } else {
-      router.push("/auth/register");
+      router.push(ROUTES.AUTH.REGISTER);
     }
   };
 
@@ -78,11 +79,11 @@ export default function Header({ session }: { session: Session | null }) {
       <div className="gap-4 justify-self-start hidden lg:inline-flex">
         <Link
           className={
-            pathname === "/"
+            pathname === ROUTES.LANDING_PAGE
               ? activeStyles
               : "hover:text-primary hover:underline hover:underline-offset-8"
           }
-          href="/"
+          href={ROUTES.LANDING_PAGE}
         >
           Marketplace
         </Link>
@@ -128,11 +129,11 @@ export default function Header({ session }: { session: Session | null }) {
               <Link
                 onClick={() => setShowSheet(false)}
                 className={
-                  pathname === "/"
+                  pathname === ROUTES.LANDING_PAGE
                     ? baseLinkStyles + linkStyles.active
                     : baseLinkStyles
                 }
-                href="/"
+                href={ROUTES.LANDING_PAGE}
               >
                 Marketplace
               </Link>
@@ -163,7 +164,7 @@ export default function Header({ session }: { session: Session | null }) {
         </Sheet>
       </span>
 
-      <Link className="w-16 h-16 relative" href="/">
+      <Link className="w-16 h-16 relative" href={ROUTES.LANDING_PAGE}>
         <Image
           src={logo}
           alt="smk logo"
@@ -178,14 +179,14 @@ export default function Header({ session }: { session: Session | null }) {
           <>
             <span className="hidden lg:inline-flex gap-4">
               <Link
-                href="/auth/login"
+                href={ROUTES.AUTH.LOGIN}
                 className="px-4 py-2 rounded-md bg-primary bg-opacity-25 text-primary-foreground hover:bg-opacity-100 transition-colors grid place-items-center"
               >
                 Login
               </Link>
               <div className="w-px min-h-full bg-stone-300" />
               <Link
-                href="/auth/register"
+                href={ROUTES.AUTH.REGISTER}
                 className="px-4 py-2 rounded-md bg-background text-foreground hover:bg-stone-100 transition-colors grid place-items-center border border-stone-200"
               >
                 Daftar
@@ -247,7 +248,10 @@ export default function Header({ session }: { session: Session | null }) {
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuItem>
-                  <Link href="/user/dashboard" className="w-full flex flex-row">
+                  <Link
+                    href={ROUTES.USER.DASHBOARD}
+                    className="w-full flex flex-row"
+                  >
                     <LayoutDashboardIcon className="w-4 h-4 mr-2" />
                     <span>Dashboard</span>
                   </Link>

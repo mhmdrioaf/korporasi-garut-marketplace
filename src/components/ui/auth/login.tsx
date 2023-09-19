@@ -21,6 +21,7 @@ import { Separator } from "../separator";
 import { useToast } from "../use-toast";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/constants";
 
 type LoginOptions = "username" | "email";
 
@@ -81,7 +82,7 @@ export default function AuthLogin() {
           });
           form.reset();
           router.refresh();
-          router.push("/user/dashboard");
+          router.push(ROUTES.USER.DASHBOARD);
         }
         setLoading(false);
       })
@@ -198,7 +199,7 @@ export default function AuthLogin() {
             <div className="w-full h-px bg-stone-200" />
           </div>
           <Link
-            href="/auth/register"
+            href={ROUTES.AUTH.REGISTER}
             className="w-full rounded-md bg-background border border-stone-200 hover:bg-stone-100 transition-colors px-4 py-2 grid place-items-center text-sm font-medium"
           >
             Daftar

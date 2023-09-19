@@ -1,4 +1,6 @@
+import { ROUTES } from "@/lib/constants";
 import { IProduct } from "@/lib/globals";
+import { rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,7 +11,7 @@ type ProductCardProps = {
 export default function ProductCard({ product }: ProductCardProps) {
   return (
     <Link
-      href={`/product/${product.id}`}
+      href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
       className="w-full border border-stone-200 p-2 min-h-full max-h-96 overflow-hidden flex flex-col gap-2 rounded-lg"
     >
       <div className="w-full h-32 bg-stone-200 shrink-0 rounded-md overflow-hidden relative">
@@ -37,7 +39,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-xs font-medium line-through text-red-950">
             Rp. 25.000,.
           </p>
-          <p className="text-sm font-bold text-green-950">{product.price}</p>
+          <p className="text-sm font-bold text-green-950">
+            {rupiahConverter(product.price)}
+          </p>
         </div>
 
         <div className="hidden w-full md:flex items-center justify-between gap-2">

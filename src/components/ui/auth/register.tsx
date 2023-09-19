@@ -23,6 +23,7 @@ import Link from "next/link";
 import { capitalizeFirstWord } from "@/lib/helper";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/constants";
 
 export default function AuthRegister() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -94,10 +95,8 @@ export default function AuthRegister() {
             });
             setLoading(false);
             form.reset();
-            router.push("/");
-            {
-              /* TODO: Redirect to user dashboard page */
-            }
+            router.refresh();
+            router.push(ROUTES.USER.DASHBOARD);
           })
           .catch((err) => {
             console.error(err);
@@ -270,7 +269,7 @@ export default function AuthRegister() {
         <Separator />
 
         <Link
-          href="/auth/login"
+          href={ROUTES.AUTH.LOGIN}
           className="w-full rounded-md bg-background border border-stone-200 hover:bg-stone-100 transition-colors px-4 py-2 grid place-items-center text-sm font-medium"
         >
           Login

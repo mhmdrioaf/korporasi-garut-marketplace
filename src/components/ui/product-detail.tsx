@@ -21,6 +21,8 @@ import {
 } from "./accordion";
 import { Separator } from "./separator";
 import { Input } from "./input";
+import { ROUTES } from "@/lib/constants";
+import { rupiahConverter } from "@/lib/helper";
 
 interface ProductDetailComponentProps {
   product: IProduct | null;
@@ -53,6 +55,7 @@ export default function ProductDetail({
   };
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
+    // TODO: Increase total amount based on quantity
     if (option === "increase") {
       setProductQuantity((prev) => (prev === tempStock ? prev : prev + 1));
     } else {
@@ -109,7 +112,7 @@ export default function ProductDetail({
 
         <div className="w-full flex flex-col gap-8">
           <Link
-            href="/"
+            href={ROUTES.LANDING_PAGE}
             className="text-primary font-bold flex flex-row items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -205,7 +208,7 @@ export default function ProductDetail({
           <div className="flex flex-col gap-1">
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
-              <p className="text-xl font-bold">Rp. {totalPrice}</p>
+              <p className="text-xl font-bold">{rupiahConverter(totalPrice)}</p>
               {withPot && (
                 <p className="text-sm font-bold text-green-950">+ Harga Pot</p>
               )}
