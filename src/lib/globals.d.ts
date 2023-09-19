@@ -33,17 +33,25 @@ type IAccount = {
 
 type ICustomerOrder = {
   order_id: string;
-  order_status:
-    | "PENDING"
-    | "PAID"
-    | "PACKED"
-    | "SHIPPED"
-    | "DELIVERED"
-    | "FINISHED";
+  order_status: ORDER_STATUS;
   order_date: Date;
-  order_total_amount: number;
+  order_delivered_date: Date | null;
   customer_id: string;
-  order_items_id: string[];
 
-  products: IProduct[];
+  order_items: IOrderItem[];
 };
+
+type IOrderItem = {
+  order_item_id: string;
+  order_quantity: number;
+  customer_id: string;
+  product: IProduct;
+};
+
+type ORDER_STATUS =
+  | "PENDING"
+  | "PAID"
+  | "PACKED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "FINISHED";

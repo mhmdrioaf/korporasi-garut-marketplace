@@ -1,5 +1,5 @@
 import { ProductsAssets } from "./constants";
-import { IProduct } from "./globals";
+import { IProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -58,5 +58,51 @@ export const phoneNumberGenerator = (value: string) => {
     return prefix + restWords;
   } else {
     return value;
+  }
+};
+
+export const getTotalAmount = (price: number, quantity: number) => {
+  return price * quantity;
+};
+
+export const decimalDate = (num: number) => {
+  return num < 9 ? `0${num}` : num;
+};
+
+export const getDateString = (value: any) => {
+  const date = new Date(value);
+  const day = decimalDate(date.getDay());
+  const month = decimalDate(date.getMonth());
+  const years = date.getFullYear();
+  const hours = decimalDate(date.getHours());
+  const minutes = decimalDate(date.getMinutes());
+  const fullDate = `${day}/${month}/${years}, ${hours}:${minutes}`;
+  return fullDate;
+};
+
+export function rupiahConverter(value: number) {
+  const leadingText = "Rp.";
+  const number = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  const rupiah = leadingText + " " + number;
+
+  return rupiah;
+}
+
+export const orderStatusConverter = (status: ORDER_STATUS) => {
+  switch (status) {
+    case "PENDING":
+      return "Menunggu Pembayaran";
+    case "PAID":
+      return "Menunggu Pengiriman";
+    case "PACKED":
+      return "Sedang Dikemas";
+    case "SHIPPED":
+      return "Sedang Dikirim";
+    case "DELIVERED":
+      return "Telah Dikirim";
+    case "FINISHED":
+      return "Telah Diterima";
+    default:
+      return "Tidak Diketahui";
   }
 };

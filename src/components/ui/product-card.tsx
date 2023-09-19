@@ -1,5 +1,6 @@
 import { ROUTES } from "@/lib/constants";
 import { IProduct } from "@/lib/globals";
+import { rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -38,7 +39,9 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-xs font-medium line-through text-red-950">
             Rp. 25.000,.
           </p>
-          <p className="text-sm font-bold text-green-950">{product.price}</p>
+          <p className="text-sm font-bold text-green-950">
+            {rupiahConverter(product.price)}
+          </p>
         </div>
 
         <div className="hidden w-full md:flex items-center justify-between gap-2">
