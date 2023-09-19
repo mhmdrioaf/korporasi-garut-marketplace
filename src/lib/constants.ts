@@ -3,6 +3,7 @@ import csl2 from "/public/csl-2.jpg";
 import csl3 from "/public/csl-3.jpg";
 
 import {
+  IAddress,
   ICarouselAssets,
   ICustomerOrder,
   IOrderItem,
@@ -135,8 +136,33 @@ export const ROUTES = {
   USER: {
     DASHBOARD: "/user/dashboard",
     ORDERS: "/user/dashboard/orders",
+    ADDRESSES: "/user/dashboard/address",
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,
   },
 };
+
+export const USER_ADDRESS: IAddress[] = [
+  {
+    address_id: "ADR101",
+    city: "Garut",
+    full_address: "Kp. Blok Sawo RT002/RW002",
+    user_id: 2,
+    address_label: "HOME",
+  },
+  {
+    address_id: "ADR201",
+    city: "Garut",
+    full_address: "Kp. Blok Sawo RT002/RW002",
+    user_id: 2,
+    address_label: "HOME",
+  },
+  {
+    address_id: "ADR102",
+    city: "Garut",
+    full_address: "Kp. Blok Sawo RT002/RW002",
+    user_id: 1,
+    address_label: "HOME",
+  },
+];

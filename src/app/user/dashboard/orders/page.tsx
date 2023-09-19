@@ -37,7 +37,7 @@ export default async function UserOrders() {
     return (
       <Container variant="column">
         <div className="w-full flex flex-col gap-2">
-          <p className="text-xl text-primary font-bold">Pesanan Anda</p>
+          <p className="text-2xl text-primary font-bold">Pesanan Anda</p>
           <p className="text-sm">
             Berikut adalah data-data pesanan yang telah anda lakukan.
           </p>

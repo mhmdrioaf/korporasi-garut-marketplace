@@ -1,5 +1,5 @@
 import { ProductsAssets } from "./constants";
-import { IProduct, ORDER_STATUS } from "./globals";
+import { AddressLabel, IProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -104,5 +104,16 @@ export const orderStatusConverter = (status: ORDER_STATUS) => {
       return "Telah Diterima";
     default:
       return "Tidak Diketahui";
+  }
+};
+
+export const addressLabelConverter = (label: AddressLabel) => {
+  switch (label) {
+    case "HOME":
+      return "RUMAH";
+    case "OFFICE":
+      return "KANTOR";
+    default:
+      return null;
   }
 };

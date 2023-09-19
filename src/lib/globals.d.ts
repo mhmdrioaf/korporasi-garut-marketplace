@@ -29,6 +29,8 @@ type IAccount = {
   user_id: number;
   user_name: string;
   profile_picture: string | null;
+  addresses: IAddress[];
+  primary_address: string | null;
 };
 
 type ICustomerOrder = {
@@ -55,3 +57,13 @@ type ORDER_STATUS =
   | "SHIPPED"
   | "DELIVERED"
   | "FINISHED";
+
+type IAddress = {
+  address_id: string;
+  city: string;
+  full_address: string;
+  address_label: AddressLabel;
+  user_id: number;
+};
+
+type AddressLabel = "HOME" | "OFFICE";

@@ -36,7 +36,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
-          href="#"
+          href={ROUTES.USER.ADDRESSES}
           title="Alamat"
         >
           <MapPinIcon className="w-6 h-6" />
