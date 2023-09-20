@@ -1,5 +1,5 @@
 import { ProductsAssets } from "./constants";
-import { AddressLabel, IProduct, ORDER_STATUS } from "./globals";
+import { IAddress, IProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -41,11 +41,39 @@ export const getProductDetail = (id: string) => {
   return product;
 };
 
+const decimalsNumber = (value: number, approximateNumber: 10 | 100) => {
+  switch (approximateNumber) {
+    case 10:
+      if (value < 10) {
+        return `0${value}`;
+      } else {
+        return value.toString();
+      }
+    case 100:
+      if (value < 10) {
+        return `00${value}`;
+      } else if (value < 100) {
+        return `0${value}`;
+      } else {
+        return value.toString();
+      }
+    default:
+      return "0";
+  }
+};
+
 export const accountIdGenerator = (maxValue: number) => {
-  const decimals =
-    maxValue < 10 ? `00${maxValue}` : maxValue > 9 ? `0${maxValue}` : maxValue;
   const prefix = "A-";
-  return prefix + decimals;
+  return prefix + decimalsNumber(maxValue, 100);
+};
+
+export const addressIdGenerator = (maxValue: number, user_id: string) => {
+  const prefix = "ADR";
+  return (
+    prefix +
+    decimalsNumber(parseInt(user_id), 10) +
+    decimalsNumber(maxValue, 100)
+  );
 };
 
 export const phoneNumberGenerator = (value: string) => {
@@ -107,13 +135,10 @@ export const orderStatusConverter = (status: ORDER_STATUS) => {
   }
 };
 
-export const addressLabelConverter = (label: AddressLabel) => {
-  switch (label) {
-    case "HOME":
-      return "RUMAH";
-    case "OFFICE":
-      return "KANTOR";
-    default:
-      return null;
+export const sortAddress = (address: IAddress, primaryAddressId: string) => {
+  if (address.address_id === primaryAddressId) {
+    return -1;
+  } else {
+    return 0;
   }
 };

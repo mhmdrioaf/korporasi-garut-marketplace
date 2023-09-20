@@ -102,17 +102,19 @@ export default class Users {
     }
   }
 
-  async updateUser(dataToChange: string, value: string, username: string) {
+  async updateUser(dataToChange: string, value: string, userId: string) {
     const dataChanged =
       dataToChange === "name"
         ? "nama"
         : dataToChange === "username"
         ? "nama pengguna"
-        : "nomor telepon";
+        : dataToChange === "phone_number"
+        ? "nomor telepon"
+        : "alamat utama";
     try {
       const updateUser = await this.prismaUser.update({
         where: {
-          username: username,
+          user_id: parseInt(userId),
         },
         data:
           dataToChange !== "name"

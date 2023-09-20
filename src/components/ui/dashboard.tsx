@@ -43,7 +43,7 @@ export default function UserDashboardComponent({
     <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
       <UserDetailModals
         options={modalOptions}
-        username={user.username}
+        userId={user.user_id.toString()}
         defaultValue={modalValue ?? ""}
         isOpen={isModalOpen}
         onClose={onModalCloses}

@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { CUSTOMER_ORDERS } from "@/lib/constants";
+import { db } from "@/lib/db";
 
 async function handler(
   request: NextRequest,
@@ -9,9 +9,16 @@ async function handler(
   const headerLists = headers();
   const date = headerLists.get("date");
 
-  const userOrders = CUSTOMER_ORDERS.filter(
-    (order) => order.customer_id === params.id
-  );
+  const userOrders = await db.orders.findMany({
+    where: {
+      user_id: {
+        equals: parseInt(params.id),
+      },
+    },
+    include: {
+      order_item: true,
+    },
+  });
 
   if (userOrders) {
     return NextResponse.json({ ok: true, result: userOrders });
