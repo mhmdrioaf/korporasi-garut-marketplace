@@ -8,15 +8,19 @@ datasource db {
 }
 
 model user {
-  user_id      Int       @id @default(autoincrement())
-  username     String    @unique
-  email        String    @unique
-  password     String
-  phone_number String?   @unique
-  role         USER_ROLE @default(CUSTOMER)
-  createdAt    DateTime  @default(now())
+  user_id            Int       @id @default(autoincrement())
+  username           String    @unique
+  email              String    @unique
+  password           String
+  phone_number       String?   @unique
+  role               USER_ROLE @default(CUSTOMER)
+  createdAt          DateTime  @default(now())
+  primary_address_id String?
 
-  account account?
+  account  account?
+  address  address[]
+  orders   orders[]
+  products product[]
 }
 
 model account {
@@ -25,11 +29,65 @@ model account {
   profile_picture String?
 
   user_id Int  @unique
-  user    user @relation(fields: [user_id], references: [user_id])
+  user    user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+model address {
+  address_id   String @id
+  user_id      Int
+  city         String
+  full_address String
+
+  user user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+model orders {
+  order_id             String       @id
+  order_status         ORDER_STATUS @default(PENDING)
+  order_date           DateTime     @default(now())
+  order_delivered_date DateTime
+  user_id              Int
+
+  user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  order_item order_item[]
+}
+
+model order_item {
+  order_item_id  String @id
+  order_quantity Int
+  order_id       String
+  product_id     Int
+
+  orders  orders  @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product product @relation(fields: [product_id], references: [id], onDelete: Cascade)
+}
+
+model product {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Int
+  images      String[]
+  unit        String
+  weight      Int
+  stock       Int      @default(1)
+  seller_id   Int
+
+  seller      user         @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
+  order_items order_item[]
 }
 
 enum USER_ROLE {
   ADMIN
   SELLER
   CUSTOMER
+}
+
+enum ORDER_STATUS {
+  PENDING
+  PAID
+  PACKED
+  SHIPPED
+  DELIVERED
+  FINISHED
 }
