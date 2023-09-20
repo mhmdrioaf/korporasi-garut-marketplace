@@ -33,10 +33,13 @@ model account {
 }
 
 model address {
-  address_id   String @id
-  user_id      Int
-  city         String
-  full_address String
+  address_id             String @id
+  user_id                Int
+  city                   String
+  full_address           String
+  label                  String
+  recipient_name         String
+  recipient_phone_number String
 
   user user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 }

@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { USER_ADDRESS } from "@/lib/constants";
+import Address from "@/lib/prisma-classes/Address";
 
 async function handler(
   request: NextRequest,
@@ -10,12 +10,15 @@ async function handler(
   const headerLists = headers();
   const date = headerLists.get("date");
 
-  const userAddress = USER_ADDRESS.filter(
-    (address) => address.user_id === parseInt(params.id)
-  );
+  const userAddressData = new Address(null, db.user);
+  const userAddress = await userAddressData.listAddresses(params.id);
 
   if (userAddress) {
-    return NextResponse.json({ ok: true, result: userAddress });
+    return NextResponse.json({
+      ok: true,
+      result: userAddress,
+      requestTime: date,
+    });
   } else {
     return NextResponse.json({ ok: false, result: null });
   }

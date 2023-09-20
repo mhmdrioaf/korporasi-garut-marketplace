@@ -62,8 +62,8 @@ type IAddress = {
   address_id: string;
   city: string;
   full_address: string;
-  address_label: AddressLabel;
+  label: string;
   user_id: number;
+  recipient_name: string;
+  recipient_phone_number: string;
 };
-
-type AddressLabel = "HOME" | "OFFICE";

@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface UpdateUserBody {
   dataToChange: string;
   dataValue: string;
-  username: string;
+  userId: string;
 }
 
 async function handler(request: NextRequest) {
@@ -18,12 +18,14 @@ async function handler(request: NextRequest) {
         ? properizeWords(body.dataValue)
         : body.dataToChange === "username"
         ? body.dataValue.toLowerCase()
-        : phoneNumberGenerator(body.dataValue);
+        : body.dataToChange === "phone_number"
+        ? phoneNumberGenerator(body.dataValue)
+        : body.dataValue;
     const users = new Users(db.user);
     const updateUser = await users.updateUser(
       body.dataToChange,
       valueToSubmit,
-      body.username
+      body.userId
     );
     return NextResponse.json({
       ok: updateUser.status === "success",

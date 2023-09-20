@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/container";
 import UserAddressList from "@/components/ui/user-address";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { IAddress } from "@/lib/globals";
+import { IAddress, IUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -18,9 +18,15 @@ async function getUserAddresses(id: string) {
 
   const addressResponse = await fetchAddress.json();
   if (!addressResponse.ok) {
-    return [] as IAddress[];
+    return {
+      address: [],
+      primary_address_id: null,
+    };
   } else {
-    return addressResponse.result as IAddress[];
+    return addressResponse.result as {
+      address: IAddress[];
+      primary_address_id: string | null;
+    };
   }
 }
 
@@ -40,13 +46,16 @@ export default async function UserAddress() {
           </p>
         </div>
         <Link
-          href="#"
+          href={ROUTES.USER.ADD_ADDRESS}
           className="p-2 text-sm font-bold rounded-md bg-primary text-primary-foreground"
         >
           Tambah Alamat
         </Link>
       </div>
-      <UserAddressList addresses={userAddress} />
+      <UserAddressList
+        addresses={userAddress.address}
+        primaryAddressId={userAddress.primary_address_id}
+      />
     </Container>
   );
 }

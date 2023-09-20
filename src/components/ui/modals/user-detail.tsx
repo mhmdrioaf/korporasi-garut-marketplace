@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 interface UserDetailModalProps {
   options: "name" | "username" | "phone_number" | null;
-  username: string;
+  userId: string;
   defaultValue: string;
   isOpen: boolean;
   onClose: () => void;
@@ -20,7 +20,7 @@ interface UserDetailModalProps {
 export default function UserDetailsModal({
   options,
   isOpen,
-  username,
+  userId,
   defaultValue,
   onClose,
 }: UserDetailModalProps) {
@@ -48,7 +48,7 @@ export default function UserDetailsModal({
         body: JSON.stringify({
           dataToChange: options,
           dataValue: value,
-          username: username,
+          userId: userId,
         }),
       });
 
