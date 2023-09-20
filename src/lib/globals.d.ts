@@ -22,6 +22,8 @@ type IUser = {
   email: string;
   phone_number: string | null;
   role: string;
+  addresses: IAddress[];
+  primary_address: string | null;
 };
 
 type IAccount = {
@@ -29,8 +31,6 @@ type IAccount = {
   user_id: number;
   user_name: string;
   profile_picture: string | null;
-  addresses: IAddress[];
-  primary_address: string | null;
 };
 
 type ICustomerOrder = {
