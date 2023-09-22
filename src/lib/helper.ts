@@ -1,4 +1,3 @@
-import { ProductsAssets } from "./constants";
 import { TAddress, TProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
