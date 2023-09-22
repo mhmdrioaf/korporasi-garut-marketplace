@@ -1,15 +1,15 @@
 "use client";
 
-import { IAddress } from "@/lib/globals";
+import { TAddress } from "@/lib/globals";
 import { phoneNumberGenerator, properizeWords } from "@/lib/helper";
 import { CheckIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
 
-interface UserAddressCardProps {
-  address: IAddress;
+interface IUserAddressCardProps {
+  address: TAddress;
   isPrimary: boolean;
-  setAddressToEdit: React.Dispatch<React.SetStateAction<IAddress | null>>;
+  setAddressToEdit: React.Dispatch<React.SetStateAction<TAddress | null>>;
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
   setIsDelete: React.Dispatch<React.SetStateAction<boolean>>;
   setAddressIdToDelete: React.Dispatch<React.SetStateAction<string | null>>;
@@ -22,8 +22,8 @@ export default function UserAddressCard({
   setIsEdit,
   setIsDelete,
   setAddressIdToDelete,
-}: UserAddressCardProps) {
-  const onAddressEdit = (address: IAddress) => {
+}: IUserAddressCardProps) {
+  const onAddressEdit = (address: TAddress) => {
     setAddressToEdit(null);
     setAddressToEdit(address);
     setIsEdit(true);

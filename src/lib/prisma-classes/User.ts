@@ -6,7 +6,7 @@ import {
 } from "../helper";
 import * as bcrypt from "bcrypt";
 
-type Register = {
+type TRegisterData = {
   phone_number: string;
   name: string;
   username: string;
@@ -14,7 +14,7 @@ type Register = {
   password: string;
 };
 
-type Login = {
+type TLoginData = {
   username: string;
   password: string;
 };
@@ -22,7 +22,7 @@ type Login = {
 export default class Users {
   constructor(private readonly prismaUser: PrismaClient["user"]) {}
 
-  async register(data: Register) {
+  async register(data: TRegisterData) {
     const prismaUsers = this.prismaUser.aggregate({
       _max: {
         user_id: true,
@@ -72,7 +72,7 @@ export default class Users {
     return userDetail;
   }
 
-  async login(data: Login) {
+  async login(data: TLoginData) {
     const user = await this.prismaUser.findFirst({
       where: {
         OR: [

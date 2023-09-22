@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/container";
 import UserAddressList from "@/components/ui/user-address";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { IAddress, IUser } from "@/lib/globals";
+import { TAddress, TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -24,7 +24,7 @@ async function getUserAddresses(id: string) {
     };
   } else {
     return addressResponse.result as {
-      address: IAddress[];
+      address: TAddress[];
       primary_address_id: string | null;
     };
   }

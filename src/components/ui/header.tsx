@@ -4,12 +4,10 @@ import Image from "next/image";
 import logo from "../../../public/smk_logo.png";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "./button";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 import {
   GanttChartSquareIcon,
   LayoutDashboardIcon,
-  Loader2Icon,
   LogIn,
   LogOut,
   Menu,
@@ -26,7 +24,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-import { Separator } from "./separator";
 import {
   Sheet,
   SheetContent,

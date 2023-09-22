@@ -3,14 +3,14 @@ import csl2 from "/public/csl-2.jpg";
 import csl3 from "/public/csl-3.jpg";
 
 import {
-  IAddress,
-  ICarouselAssets,
-  ICustomerOrder,
-  IOrderItem,
-  IProduct,
+  TAddress,
+  TCarouselAssets,
+  TCustomerOrder,
+  TOrderItem,
+  TProduct,
 } from "./globals";
 
-export const CarouselAssets: ICarouselAssets[] = [
+export const CarouselAssets: TCarouselAssets[] = [
   {
     title: "SMKS Korporasi Garut",
     image: csl1,
@@ -28,7 +28,7 @@ export const CarouselAssets: ICarouselAssets[] = [
   },
 ];
 
-export const ProductsAssets: IProduct[] = [
+export const ProductsAssets: TProduct[] = [
   {
     id: 1,
     title: "Bunga Mawar",
@@ -109,14 +109,14 @@ export const IMAGE_UPLOAD_NOTES =
 export const ACCOUNT_DELETE_NOTES =
   "Perlu di ingat bahwa aksi ini tidak bisa di batalkan, ketika anda menghapus akun anda, akun tersebut selamanya terhapus dan tidak bisa di kembalikan. Harap muat ulang halaman ketika anda telah menghapus akun anda.";
 
-const ORDERS_ITEM: IOrderItem = {
+const ORDERS_ITEM: TOrderItem = {
   customer_id: "1",
   order_item_id: "IORD1001",
   order_quantity: 2,
   product: ProductsAssets[0],
 };
 
-export const CUSTOMER_ORDERS: ICustomerOrder[] = [
+export const CUSTOMER_ORDERS: TCustomerOrder[] = [
   {
     customer_id: "1",
     order_date: new Date(),

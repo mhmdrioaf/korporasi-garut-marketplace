@@ -1,6 +1,6 @@
 "use client";
 
-import { IUser } from "@/lib/globals";
+import { TUser } from "@/lib/globals";
 import { Trash2Icon, User2Icon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
@@ -10,23 +10,23 @@ import { ACCOUNT_DELETE_NOTES, IMAGE_UPLOAD_NOTES } from "@/lib/constants";
 import { useState } from "react";
 import UserDetailModals from "@/components/ui/modals/user-detail";
 
-interface UserDashboardComponentProps {
-  user: IUser;
+interface IUserDashboardComponentProps {
+  user: TUser;
 }
 
-type UserDetailsChangeOptions = "name" | "username" | "phone_number" | null;
+type TUserDetailChangeOptions = "name" | "username" | "phone_number" | null;
 
 export default function UserDashboardComponent({
   user,
-}: UserDashboardComponentProps) {
+}: IUserDashboardComponentProps) {
   const [modalOptions, setModalOptions] =
-    useState<UserDetailsChangeOptions | null>(null);
+    useState<TUserDetailChangeOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalValue, setModalValue] = useState<string | null>(null);
 
   const onImageInputChangesHandler = () => {};
   const onUserDetailChanges = (
-    options: UserDetailsChangeOptions,
+    options: TUserDetailChangeOptions,
     defaultValue: string
   ) => {
     setModalOptions(options);

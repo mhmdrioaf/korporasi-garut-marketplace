@@ -1,14 +1,14 @@
 import { ROUTES } from "@/lib/constants";
-import { IProduct } from "@/lib/globals";
+import { TProduct } from "@/lib/globals";
 import { rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 
-type ProductCardProps = {
-  product: IProduct;
+type TProductCardProps = {
+  product: TProduct;
 };
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product }: TProductCardProps) {
   return (
     <Link
       href={ROUTES.PRODUCT.DETAIL(product.id.toString())}

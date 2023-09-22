@@ -18,13 +18,13 @@ const containerVariants = cva("w-full px-4 py-8 md:px-16 md:py-4", {
   },
 });
 
-export interface ContainerProps
+export interface IContainerProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof containerVariants> {
   asChild?: boolean;
 }
 
-const Container = React.forwardRef<HTMLDivElement, ContainerProps>(
+const Container = React.forwardRef<HTMLDivElement, IContainerProps>(
   ({ className, variant, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "div";
     return (

@@ -1,14 +1,13 @@
 import { PrismaClient } from "@prisma/client";
-import { IProductVariant } from "../globals";
 import { variantIdGenerator } from "../helper";
 
-type IProductVariantInput = {
+type TProductVariantInput = {
   variant_title: string;
   variant_price: number;
   variant_value: string;
 };
 
-interface ProductData {
+interface IProductData {
   title: string;
   description: string;
   images: string[];
@@ -17,7 +16,7 @@ interface ProductData {
   weight: number;
   stock: number;
   seller_id: string;
-  variant: IProductVariantInput[] | null;
+  variant: TProductVariantInput[] | null;
 }
 
 export default class Product {
@@ -28,7 +27,7 @@ export default class Product {
       | null
   ) {}
 
-  async addProduct(data: ProductData) {
+  async addProduct(data: IProductData) {
     const products = this.prismaProduct.aggregate({
       _max: {
         id: true,

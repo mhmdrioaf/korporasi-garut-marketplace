@@ -4,7 +4,7 @@ import { Suspense, lazy } from "react";
 
 const ProductDetail = lazy(() => import("@/components/ui/product-detail"));
 
-interface ProductDetailPageProps {
+interface IProductDetailPageProps {
   params: {
     id: string;
   };
@@ -12,7 +12,7 @@ interface ProductDetailPageProps {
 
 export default async function ProductDetailPage({
   params,
-}: ProductDetailPageProps) {
+}: IProductDetailPageProps) {
   const product = await getProductDetail(params.id);
   if (!product)
     return (

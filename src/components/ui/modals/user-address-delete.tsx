@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useToast } from "../use-toast";
 import { useRouter } from "next/navigation";
 import Modal from "../modal";
-import { Container } from "../container";
 import { Button } from "../button";
 
-interface UserDeleteProps {
+interface IUserDeleteProps {
   addressId: string;
   isOpen: boolean;
   onClose: () => void;
@@ -17,7 +16,7 @@ export default function DeleteAddressModal({
   addressId,
   isOpen,
   onClose,
-}: UserDeleteProps) {
+}: IUserDeleteProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const { toast } = useToast();

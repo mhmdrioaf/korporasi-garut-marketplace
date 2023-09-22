@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import Address from "@/lib/prisma-classes/Address";
 import { NextRequest, NextResponse } from "next/server";
 
-interface AddressBody {
+interface IAddressBody {
   user_id: string;
   city: string;
   fullAddress: string;
@@ -12,7 +12,7 @@ interface AddressBody {
 }
 
 async function handler(request: NextRequest) {
-  const body: AddressBody = await request.json();
+  const body: IAddressBody = await request.json();
 
   try {
     const address = new Address(db.address, db.user);

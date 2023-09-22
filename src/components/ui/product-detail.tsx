@@ -1,6 +1,6 @@
 "use client";
 
-import { IProduct } from "@/lib/globals";
+import { TProduct } from "@/lib/globals";
 import { Container } from "./container";
 import Image from "next/image";
 import Link from "next/link";
@@ -19,13 +19,13 @@ import { ROUTES } from "@/lib/constants";
 import { rupiahConverter } from "@/lib/helper";
 import ProductVariantsHandler from "./product-variant";
 
-interface ProductDetailComponentProps {
-  product: IProduct;
+interface IProductDetailComponentProps {
+  product: TProduct;
 }
 
 export default function ProductDetail({
   product,
-}: ProductDetailComponentProps) {
+}: IProductDetailComponentProps) {
   const [totalPrice, setTotalPrice] = useState<number>(product.price);
   const [productQuantity, setProductQuantity] = useState(0);
 

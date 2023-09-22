@@ -3,13 +3,13 @@ import Product from "@/lib/prisma-classes/Product";
 import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-type IProductVariantInput = {
+type TProductVariantInput = {
   variant_title: string;
   variant_price: number;
   variant_value: string;
 };
 
-interface ProductRequestBody {
+interface IProductRequestBody {
   title: string;
   description: string;
   images: string[];
@@ -18,11 +18,11 @@ interface ProductRequestBody {
   weight: number;
   stock: number;
   seller_id: string;
-  variant: IProductVariantInput[] | null;
+  variant: TProductVariantInput[] | null;
 }
 
 async function handler(request: NextRequest) {
-  const body: ProductRequestBody = await request.json();
+  const body: IProductRequestBody = await request.json();
   const headersList = headers();
   const key = headersList.get("Seller_Key");
 

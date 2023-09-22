@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface UserDetailModalProps {
+interface IUserDetailModalProps {
   options: "name" | "username" | "phone_number" | null;
   userId: string;
   defaultValue: string;
@@ -23,7 +23,7 @@ export default function UserDetailsModal({
   userId,
   defaultValue,
   onClose,
-}: UserDetailModalProps) {
+}: IUserDetailModalProps) {
   const [value, setValue] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 

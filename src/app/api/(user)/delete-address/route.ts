@@ -2,12 +2,12 @@ import { db } from "@/lib/db";
 import Address from "@/lib/prisma-classes/Address";
 import { NextRequest, NextResponse } from "next/server";
 
-interface DeleteAddressBody {
+interface IDeleteAddressBody {
   address_id: string;
 }
 
 async function handler(request: NextRequest) {
-  const body: DeleteAddressBody = await request.json();
+  const body: IDeleteAddressBody = await request.json();
 
   try {
     const address = new Address(db.address, null);

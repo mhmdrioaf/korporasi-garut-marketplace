@@ -1,6 +1,6 @@
 "use client";
 
-import { IAddress } from "@/lib/globals";
+import { TAddress } from "@/lib/globals";
 import UserAddressCard from "./user-address-card";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
@@ -9,19 +9,19 @@ import UpdateAddressModal from "./modals/user-address-update";
 import { sortAddress } from "@/lib/helper";
 import DeleteAddressModal from "./modals/user-address-delete";
 
-interface UserAddressListProps {
-  addresses: IAddress[];
+interface IUserAddressListProps {
+  addresses: TAddress[];
   primaryAddressId: string | null;
 }
 
 export default function UserAddressList({
   addresses,
   primaryAddressId,
-}: UserAddressListProps) {
+}: IUserAddressListProps) {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isDelete, setIsDelete] = useState<boolean>(false);
 
-  const [addressToEdit, setAddressToEdit] = useState<IAddress | null>(null);
+  const [addressToEdit, setAddressToEdit] = useState<TAddress | null>(null);
   const [addressIdToDelete, setAddressIdToDelete] = useState<string | null>(
     null
   );

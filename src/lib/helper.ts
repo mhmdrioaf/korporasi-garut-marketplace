@@ -1,5 +1,5 @@
 import { ProductsAssets } from "./constants";
-import { IAddress, IProduct, ORDER_STATUS } from "./globals";
+import { TAddress, TProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -47,7 +47,7 @@ export const getProductDetail = async (id: string) => {
   if (!response.ok) {
     return null;
   } else {
-    return response.result as IProduct;
+    return response.result as TProduct;
   }
 };
 
@@ -145,7 +145,7 @@ export const orderStatusConverter = (status: ORDER_STATUS) => {
   }
 };
 
-export const sortAddress = (address: IAddress, primaryAddressId: string) => {
+export const sortAddress = (address: TAddress, primaryAddressId: string) => {
   if (address.address_id === primaryAddressId) {
     return -1;
   } else {

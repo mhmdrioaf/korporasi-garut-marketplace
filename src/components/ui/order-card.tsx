@@ -1,6 +1,6 @@
 "use client";
 
-import { ICustomerOrder } from "@/lib/globals";
+import { TCustomerOrder } from "@/lib/globals";
 import Image from "next/image";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
@@ -12,11 +12,11 @@ import {
 } from "@/lib/helper";
 import ShowOrderButton from "@/lib/renderer/order-button";
 
-interface OrderCardProps {
-  order: ICustomerOrder;
+interface IOrderCardProps {
+  order: TCustomerOrder;
 }
 
-export default function OrderCard({ order }: OrderCardProps) {
+export default function OrderCard({ order }: IOrderCardProps) {
   return (
     <div className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input">
       <div className="w-full flex flex-row items-start justify-between">

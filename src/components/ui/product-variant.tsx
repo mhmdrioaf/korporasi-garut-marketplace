@@ -1,13 +1,13 @@
 "use client";
 
-import { IProduct, IProductVariant } from "@/lib/globals";
+import { TProduct, TProductVariant } from "@/lib/globals";
 import { useState } from "react";
 import { Button } from "./button";
 import { CheckIcon } from "lucide-react";
 
-interface ProductVariantProps {
-  product: IProduct;
-  variants: IProductVariant[] | null;
+interface IProductVariantProps {
+  product: TProduct;
+  variants: TProductVariant[] | null;
   setTotalPrice: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -15,7 +15,7 @@ export default function ProductVariantsHandler({
   product,
   variants,
   setTotalPrice,
-}: ProductVariantProps) {
+}: IProductVariantProps) {
   const [withVariants, setWithVariants] = useState<boolean>(false);
   const [variantsValue, setVariantsValue] = useState<string | null>(null);
 

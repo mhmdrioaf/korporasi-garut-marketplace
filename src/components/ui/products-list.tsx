@@ -1,4 +1,4 @@
-import { IProduct } from "@/lib/globals";
+import { TProduct } from "@/lib/globals";
 import ProductCard from "./product-card";
 
 async function listProdudcts() {
@@ -14,7 +14,7 @@ async function listProdudcts() {
   if (!response.ok) {
     return [];
   } else {
-    return response.result as IProduct[];
+    return response.result as TProduct[];
   }
 }
 
@@ -22,7 +22,7 @@ export default async function ProductsList() {
   const products = await listProdudcts();
   return (
     <div className="w-full grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 md:place-items-center overflow-auto">
-      {products.map((product: IProduct) => (
+      {products.map((product: TProduct) => (
         <ProductCard product={product} key={product.id} />
       ))}
     </div>

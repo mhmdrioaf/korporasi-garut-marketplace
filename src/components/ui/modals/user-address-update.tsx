@@ -1,6 +1,6 @@
 "use client";
 
-import { IAddress } from "@/lib/globals";
+import { TAddress } from "@/lib/globals";
 import { addressSchema } from "@/lib/resolver/addressResolver";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -23,8 +23,8 @@ import { Button } from "../button";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface UpdateAddressProps {
-  address: IAddress | null;
+interface IUpdateAddressProps {
+  address: TAddress | null;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -33,7 +33,7 @@ export default function UpdateAddressModal({
   address,
   isOpen,
   onClose,
-}: UpdateAddressProps) {
+}: IUpdateAddressProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<z.infer<typeof addressSchema>>({
     defaultValues: {

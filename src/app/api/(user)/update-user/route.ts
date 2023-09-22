@@ -3,14 +3,14 @@ import { phoneNumberGenerator, properizeWords } from "@/lib/helper";
 import Users from "@/lib/prisma-classes/User";
 import { NextRequest, NextResponse } from "next/server";
 
-interface UpdateUserBody {
+interface IUpdateUserBody {
   dataToChange: string;
   dataValue: string;
   userId: string;
 }
 
 async function handler(request: NextRequest) {
-  const body: UpdateUserBody = await request.json();
+  const body: IUpdateUserBody = await request.json();
 
   try {
     const valueToSubmit =
