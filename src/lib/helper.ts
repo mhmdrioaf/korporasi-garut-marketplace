@@ -158,3 +158,13 @@ export const variantIdGenerator = (productId: number, variantId: number) => {
   const prefix = "PV";
   return prefix + product + variant;
 };
+
+export const variantItemsIdGenerator = (
+  productId: number,
+  variantId: number
+) => {
+  const product = decimalsNumber(productId, 100);
+  const variant = decimalsNumber(variantId, 100);
+  const prefix = "PVI";
+  return prefix + product + variant;
+};

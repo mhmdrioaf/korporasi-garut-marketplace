@@ -1,10 +1,18 @@
 import { PrismaClient } from "@prisma/client";
-import { variantIdGenerator } from "../helper";
+import {
+  properizeWords,
+  variantIdGenerator,
+  variantItemsIdGenerator,
+} from "../helper";
 
 type TProductVariantInput = {
   variant_title: string;
-  variant_price: number;
+};
+
+type TProductVariantItemInput = {
+  variant_name: string;
   variant_value: string;
+  variant_price: number;
 };
 
 interface IProductData {
@@ -17,6 +25,7 @@ interface IProductData {
   stock: number;
   seller_id: string;
   variant: TProductVariantInput[] | null;
+  variant_items: TProductVariantItemInput[] | null;
 }
 
 export default class Product {
@@ -24,6 +33,9 @@ export default class Product {
     private readonly prismaProduct: PrismaClient["product"],
     private readonly prismaProductVariant:
       | PrismaClient["product_variant"]
+      | null,
+    private readonly prismaProductVariantItems:
+      | PrismaClient["product_variant_item"]
       | null
   ) {}
 
@@ -40,9 +52,16 @@ export default class Product {
       },
     });
 
-    const [maxProduct, maxVariants] = await Promise.all([
+    const productVariantItems = this.prismaProductVariantItems!.aggregate({
+      _max: {
+        variant_item_id: true,
+      },
+    });
+
+    const [maxProduct, maxVariants, maxVariantItems] = await Promise.all([
       products,
       productVariants,
+      productVariantItems,
     ]);
 
     const productId = maxProduct._max.id ? maxProduct._max.id + 1 : 1;
@@ -51,16 +70,39 @@ export default class Product {
       maxVariantId?.slice(maxVariantId.length - 3, maxVariantId.length) ?? 0
     );
 
+    const maxVariantItemId = maxVariantItems._max.variant_item_id;
+    const variantItemId = Number(
+      maxVariantItemId?.slice(
+        maxVariantItemId.length - 3,
+        maxVariantItemId.length
+      ) ?? 0
+    );
+
+    const variantItems = data.variant_items
+      ? data.variant_items.map((items, index) => ({
+          variant_item_id: variantItemsIdGenerator(
+            productId,
+            variantItemId + (index + 1)
+          ),
+          variant_name: properizeWords(items.variant_name),
+          variant_value: items.variant_value,
+          variant_price: items.variant_price,
+        }))
+      : [];
+
     const variants = data.variant
       ? data.variant.map((variant, index) => ({
           variant_id: variantIdGenerator(productId, variantId + (index + 1)),
           variant_title: variant.variant_title,
-          variant_price: variant.variant_price,
-          variant_value: variant.variant_value,
+          variant_item: {
+            createMany: {
+              data: variantItems,
+            },
+          },
         }))
       : [];
 
-    return this.prismaProduct.create({
+    return await this.prismaProduct.create({
       data: {
         id: productId,
         description: data.description,
@@ -72,9 +114,7 @@ export default class Product {
         images: data.images,
         stock: data.stock,
         variant: {
-          createMany: {
-            data: variants,
-          },
+          create: variants,
         },
       },
     });
@@ -84,7 +124,11 @@ export default class Product {
     return await this.prismaProduct.findMany({
       include: {
         seller: true,
-        variant: true,
+        variant: {
+          include: {
+            variant_item: true,
+          },
+        },
       },
     });
   }
@@ -98,7 +142,11 @@ export default class Product {
       },
       include: {
         seller: true,
-        variant: true,
+        variant: {
+          include: {
+            variant_item: true,
+          },
+        },
       },
     });
   }

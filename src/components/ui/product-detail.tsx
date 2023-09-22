@@ -17,7 +17,8 @@ import { Separator } from "./separator";
 import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
 import { rupiahConverter } from "@/lib/helper";
-import ProductVariantsHandler from "./product-variant";
+import ProductVariants from "./product-variant";
+import { useToast } from "./use-toast";
 
 interface IProductDetailComponentProps {
   product: TProduct;
@@ -26,15 +27,19 @@ interface IProductDetailComponentProps {
 export default function ProductDetail({
   product,
 }: IProductDetailComponentProps) {
+  const [withVariants, setWithVariants] = useState<boolean>(false);
+  const [variantsValue, setVariantsValue] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<number>(product.price);
-  const [productQuantity, setProductQuantity] = useState(0);
+  const [productQuantity, setProductQuantity] = useState(1);
+
+  const { toast } = useToast();
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
     // TODO: Increase total amount based on quantity
     if (option === "increase") {
       setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
     } else {
-      setProductQuantity((prev) => (prev === 0 ? 0 : prev - 1));
+      setProductQuantity((prev) => (prev === 1 ? 1 : prev - 1));
     }
   };
 
@@ -43,10 +48,38 @@ export default function ProductDetail({
 
     if (value > product.stock) {
       setProductQuantity(product.stock);
-    } else if (value < 0) {
-      setProductQuantity(0);
+    } else if (value < 1) {
+      setProductQuantity(1);
     } else {
       setProductQuantity(value);
+    }
+  };
+
+  const onAddToCart = () => {
+    if (product.variant.length > 0 && !withVariants)
+      toast({
+        variant: "destructive",
+        title: "Gagal menambahkan produk ke keranjang.",
+        description:
+          "Harap memilih salah satu variant untuk menambahkan ke keranjang.",
+      });
+    else {
+      setWithVariants(false);
+      setVariantsValue(null);
+      setProductQuantity(1);
+      setTotalPrice(product.price);
+      toast({
+        variant: "success",
+        title: "Berhasil menambahkan produk ke keranjang.",
+        description: "Produk telah berhasil ditambahkan ke keranjang anda.",
+      });
+      console.log({
+        totalPrice: totalPrice,
+        variantsValue: variantsValue,
+        withVariants: withVariants,
+        quantity: productQuantity,
+        productId: product.id,
+      });
     }
   };
 
@@ -112,10 +145,14 @@ export default function ProductDetail({
             <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
           </div>
 
-          <ProductVariantsHandler
+          <ProductVariants
             product={product}
             setTotalPrice={setTotalPrice}
             variants={product.variant}
+            setVariantsValue={setVariantsValue}
+            variantsValue={variantsValue}
+            withVariants={withVariants}
+            setWithVariants={setWithVariants}
           />
 
           <Accordion
@@ -147,10 +184,11 @@ export default function ProductDetail({
               </Button>
               <Input
                 type="number"
+                min={1}
                 max={product.stock}
                 value={productQuantity}
                 onChange={onQuantityInputChangeHandler}
-                className="w-[6ch] text-center appearance-none"
+                className="w-[9ch] text-center appearance-none"
               />
               <Button
                 variant="default"
@@ -167,7 +205,11 @@ export default function ProductDetail({
               <Button variant="default" className="w-full">
                 Beli Sekarang
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={onAddToCart}
+              >
                 Tambahkan ke Keranjang
               </Button>
             </div>

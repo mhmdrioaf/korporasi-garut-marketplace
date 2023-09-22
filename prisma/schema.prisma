@@ -62,9 +62,9 @@ model order_item {
   product_id         Int
   product_variant_id String?
 
-  orders  orders           @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  product product          @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  variant product_variant? @relation(fields: [product_variant_id], references: [variant_id], onDelete: Cascade)
+  orders  orders                @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product product               @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  variant product_variant_item? @relation(fields: [product_variant_id], references: [variant_item_id], onDelete: Cascade)
 }
 
 model product {
@@ -86,12 +86,21 @@ model product {
 model product_variant {
   variant_id    String @id
   variant_title String
-  variant_value String
-  variant_price Int
 
-  product_id Int
-  product    product      @relation(fields: [product_id], references: [id], onDelete: Cascade)
-  order_item order_item[]
+  product_id   Int?
+  product      product?               @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  variant_item product_variant_item[]
+}
+
+model product_variant_item {
+  variant_item_id String @id
+  variant_name    String
+  variant_value   String
+  variant_price   Int    @default(0)
+
+  variant_id  String
+  variant     product_variant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
+  order_items order_item[]
 }
 
 enum USER_ROLE {

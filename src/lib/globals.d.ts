@@ -21,11 +21,17 @@ type TProduct = {
 type TProductVariant = {
   variant_id: string;
   variant_title: string;
-  variant_value: string;
-  variant_price: number;
 
   product_id: number;
   product: TProduct;
+  variant_item: TProductVariantItem[];
+};
+
+type TProductVariantItem = {
+  variant_item_id: string;
+  variant_name: string;
+  variant_value: string;
+  variant_price: number;
 };
 
 type TUser = {

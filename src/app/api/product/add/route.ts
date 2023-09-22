@@ -5,8 +5,12 @@ import { NextRequest, NextResponse } from "next/server";
 
 type TProductVariantInput = {
   variant_title: string;
-  variant_price: number;
+};
+
+type TProductVariantItemInput = {
+  variant_name: string;
   variant_value: string;
+  variant_price: number;
 };
 
 interface IProductRequestBody {
@@ -19,6 +23,7 @@ interface IProductRequestBody {
   stock: number;
   seller_id: string;
   variant: TProductVariantInput[] | null;
+  variant_items: TProductVariantItemInput[] | null;
 }
 
 async function handler(request: NextRequest) {
@@ -28,7 +33,11 @@ async function handler(request: NextRequest) {
 
   if (key && key === process.env.SELLER_SECRET!) {
     try {
-      const products = new Product(db.product, db.product_variant);
+      const products = new Product(
+        db.product,
+        db.product_variant,
+        db.product_variant_item
+      );
       const newProduct = await products.addProduct(body);
 
       if (newProduct) {
