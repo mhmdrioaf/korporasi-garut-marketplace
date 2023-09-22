@@ -33,12 +33,22 @@ export const properizeWords = (words: string): string => {
   return properized.join(" ");
 };
 
-export const getProductDetail = (id: string) => {
-  const productId = parseInt(id);
-  const product: IProduct | null =
-    ProductsAssets.find((product) => product.id === productId) ?? null;
+export const getProductDetail = async (id: string) => {
+  const fetchProduct = await fetch(
+    process.env.NEXT_PUBLIC_API_GET_PRODUCT! + id,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    }
+  );
 
-  return product;
+  const response = await fetchProduct.json();
+  if (!response.ok) {
+    return null;
+  } else {
+    return response.result as IProduct;
+  }
 };
 
 const decimalsNumber = (value: number, approximateNumber: 10 | 100) => {
@@ -141,4 +151,11 @@ export const sortAddress = (address: IAddress, primaryAddressId: string) => {
   } else {
     return 0;
   }
+};
+
+export const variantIdGenerator = (productId: number, variantId: number) => {
+  const product = decimalsNumber(productId, 100);
+  const variant = decimalsNumber(variantId, 100);
+  const prefix = "PV";
+  return prefix + product + variant;
 };

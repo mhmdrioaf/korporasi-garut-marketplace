@@ -9,10 +9,23 @@ type ICarouselAssets = {
 type IProduct = {
   id: number;
   title: string;
-  descriptions: string;
+  description: string;
   price: number;
-  seller_id: number;
   images: string[];
+  unit: string;
+  weight: number;
+  stock: number;
+  variant: IProductVariant[];
+};
+
+type IProductVariant = {
+  variant_id: string;
+  variant_title: string;
+  variant_value: string;
+  variant_price: number;
+
+  product_id: number;
+  product: IProduct;
 };
 
 type IUser = {

@@ -32,7 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.title}
         </p>
         <p className="text-sm overflow-hidden text-ellipsis whitespace-nowrap">
-          {product.descriptions}
+          {product.description}
         </p>
 
         <div className="w-full items-center flex flex-row gap-2 justify-evenly md:justify-center">
