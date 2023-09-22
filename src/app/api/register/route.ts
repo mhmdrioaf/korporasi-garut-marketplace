@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import Users from "@/lib/prisma-classes/User";
 
-interface RegisterRequestBody {
+interface IRegisterRequestBody {
   phone_number: string;
   name: string;
   username: string;
@@ -12,7 +12,7 @@ interface RegisterRequestBody {
 }
 
 async function handler(request: NextRequest) {
-  const body: RegisterRequestBody = await request.json();
+  const body: IRegisterRequestBody = await request.json();
 
   try {
     const users = new Users(db.user);

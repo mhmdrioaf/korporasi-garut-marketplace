@@ -19,17 +19,16 @@ import { Button } from "../button";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { Separator } from "../separator";
 import { useToast } from "../use-toast";
-import Link from "next/link";
 import Modal from "../modal";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "../scroll-area";
 
-type LoginOptions = "username" | "email";
+type TLoginOptions = "username" | "email";
 
 export default function LoginModal() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [loginOptions, setLoginOptions] = useState<LoginOptions>("username");
+  const [loginOptions, setLoginOptions] = useState<TLoginOptions>("username");
 
   const { toast } = useToast();
   const router = useRouter();

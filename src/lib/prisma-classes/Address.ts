@@ -5,7 +5,7 @@ import {
   properizeWords,
 } from "../helper";
 
-type AddAddress = {
+type TAddAddress = {
   user_id: string;
   city: string;
   fullAddress: string;
@@ -20,7 +20,7 @@ export default class Address {
     private readonly prismaUser: PrismaClient["user"] | null
   ) {}
 
-  async addAddress(data: AddAddress) {
+  async addAddress(data: TAddAddress) {
     const userAddresses = await this.prismaAddress?.aggregate({
       _max: {
         address_id: true,
@@ -102,7 +102,7 @@ export default class Address {
     });
   }
 
-  async updateAddress(data: AddAddress & { address_id: string }) {
+  async updateAddress(data: TAddAddress & { address_id: string }) {
     return await this.prismaAddress?.update({
       where: {
         address_id: data.address_id,

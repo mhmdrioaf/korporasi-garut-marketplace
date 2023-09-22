@@ -1,12 +1,12 @@
 "use client";
 
-import { ICarouselAssets } from "@/lib/globals";
+import { TCarouselAssets } from "@/lib/globals";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { HTMLAttributes, useCallback, useEffect, useState } from "react";
 
-interface CarouselProps extends HTMLAttributes<HTMLDivElement> {
-  assets: ICarouselAssets[];
+interface ICarouselProps extends HTMLAttributes<HTMLDivElement> {
+  assets: TCarouselAssets[];
   autoplay?: boolean;
   duration?: number;
 }
@@ -16,7 +16,7 @@ export default function Carousel({
   autoplay = true,
   duration = 3000,
   className,
-}: CarouselProps) {
+}: ICarouselProps) {
   const [activeImage, setActiveImage] = useState<number>(0);
 
   const handleNextPicture = useCallback(() => {

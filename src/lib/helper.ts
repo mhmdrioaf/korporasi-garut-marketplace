@@ -1,5 +1,4 @@
-import { ProductsAssets } from "./constants";
-import { IAddress, IProduct, ORDER_STATUS } from "./globals";
+import { TAddress, TProduct, ORDER_STATUS } from "./globals";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -33,12 +32,22 @@ export const properizeWords = (words: string): string => {
   return properized.join(" ");
 };
 
-export const getProductDetail = (id: string) => {
-  const productId = parseInt(id);
-  const product: IProduct | null =
-    ProductsAssets.find((product) => product.id === productId) ?? null;
+export const getProductDetail = async (id: string) => {
+  const fetchProduct = await fetch(
+    process.env.NEXT_PUBLIC_API_GET_PRODUCT! + id,
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    }
+  );
 
-  return product;
+  const response = await fetchProduct.json();
+  if (!response.ok) {
+    return null;
+  } else {
+    return response.result as TProduct;
+  }
 };
 
 const decimalsNumber = (value: number, approximateNumber: 10 | 100) => {
@@ -135,10 +144,27 @@ export const orderStatusConverter = (status: ORDER_STATUS) => {
   }
 };
 
-export const sortAddress = (address: IAddress, primaryAddressId: string) => {
+export const sortAddress = (address: TAddress, primaryAddressId: string) => {
   if (address.address_id === primaryAddressId) {
     return -1;
   } else {
     return 0;
   }
+};
+
+export const variantIdGenerator = (productId: number, variantId: number) => {
+  const product = decimalsNumber(productId, 100);
+  const variant = decimalsNumber(variantId, 100);
+  const prefix = "PV";
+  return prefix + product + variant;
+};
+
+export const variantItemsIdGenerator = (
+  productId: number,
+  variantId: number
+) => {
+  const product = decimalsNumber(productId, 100);
+  const variant = decimalsNumber(variantId, 100);
+  const prefix = "PVI";
+  return prefix + product + variant;
 };

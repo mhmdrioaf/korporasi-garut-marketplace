@@ -1,16 +1,10 @@
 "use client";
 
-import { IProduct } from "@/lib/globals";
+import { TProduct } from "@/lib/globals";
 import { Container } from "./container";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  CheckIcon,
-  MinusIcon,
-  PlusIcon,
-  StarIcon,
-} from "lucide-react";
+import { ArrowLeft, MinusIcon, PlusIcon, StarIcon } from "lucide-react";
 import { ChangeEvent, useState } from "react";
 import { Button } from "./button";
 import {
@@ -23,55 +17,69 @@ import { Separator } from "./separator";
 import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
 import { rupiahConverter } from "@/lib/helper";
+import ProductVariants from "./product-variant";
+import { useToast } from "./use-toast";
 
-interface ProductDetailComponentProps {
-  product: IProduct | null;
+interface IProductDetailComponentProps {
+  product: TProduct;
 }
 
 export default function ProductDetail({
   product,
-}: ProductDetailComponentProps) {
-  const [withPot, setWithPot] = useState<boolean>(false);
-  const [potColor, setPotColor] = useState<string | null>(null);
-  const [totalPrice, setTotalPrice] = useState<number>(product?.price ?? 0);
-  const [productQuantity, setProductQuantity] = useState(0);
+}: IProductDetailComponentProps) {
+  const [withVariants, setWithVariants] = useState<boolean>(false);
+  const [variantsValue, setVariantsValue] = useState<string | null>(null);
+  const [totalPrice, setTotalPrice] = useState<number>(product.price);
+  const [productQuantity, setProductQuantity] = useState(1);
 
-  const tempStock = 5;
-  const tempProductUnit = "Pot";
-
-  const onPotOptionsChangeHandler = (value: boolean) => {
-    if (value === false) {
-      setPotColor(null);
-      setTotalPrice(product?.price ?? 0);
-    } else {
-      setTotalPrice((prev) => prev + 12000);
-    }
-    setWithPot(value);
-  };
-
-  const onPotColorChangeHandler = (color: string) => {
-    if (!withPot) onPotOptionsChangeHandler(true);
-    setPotColor(color);
-  };
+  const { toast } = useToast();
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
     // TODO: Increase total amount based on quantity
     if (option === "increase") {
-      setProductQuantity((prev) => (prev === tempStock ? prev : prev + 1));
+      setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
     } else {
-      setProductQuantity((prev) => (prev === 0 ? 0 : prev - 1));
+      setProductQuantity((prev) => (prev === 1 ? 1 : prev - 1));
     }
   };
 
   const onQuantityInputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
 
-    if (value > tempStock) {
-      setProductQuantity(tempStock);
-    } else if (value < 0) {
-      setProductQuantity(0);
+    if (value > product.stock) {
+      setProductQuantity(product.stock);
+    } else if (value < 1) {
+      setProductQuantity(1);
     } else {
       setProductQuantity(value);
+    }
+  };
+
+  const onAddToCart = () => {
+    if (product.variant.length > 0 && !withVariants)
+      toast({
+        variant: "destructive",
+        title: "Gagal menambahkan produk ke keranjang.",
+        description:
+          "Harap memilih salah satu variant untuk menambahkan ke keranjang.",
+      });
+    else {
+      setWithVariants(false);
+      setVariantsValue(null);
+      setProductQuantity(1);
+      setTotalPrice(product.price);
+      toast({
+        variant: "success",
+        title: "Berhasil menambahkan produk ke keranjang.",
+        description: "Produk telah berhasil ditambahkan ke keranjang anda.",
+      });
+      console.log({
+        totalPrice: totalPrice,
+        variantsValue: variantsValue,
+        withVariants: withVariants,
+        quantity: productQuantity,
+        productId: product.id,
+      });
     }
   };
 
@@ -137,62 +145,15 @@ export default function ProductDetail({
             <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
           </div>
 
-          <div className="w-fit flex flex-row items-center rounded-md border border-input">
-            <Button
-              variant={withPot ? "default" : "ghost"}
-              onClick={() => onPotOptionsChangeHandler(true)}
-            >
-              Dengan Pot
-            </Button>
-            <Button
-              variant={!withPot ? "default" : "ghost"}
-              onClick={() => onPotOptionsChangeHandler(false)}
-            >
-              Tanpa Pot
-            </Button>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <p className="font-bold">Warna Pot</p>
-
-            <div className="flex flex-row gap-4 items-center">
-              <div
-                className="w-8 h-8 grid place-items-center rounded-full bg-green-900 cursor-pointer"
-                onClick={() => onPotColorChangeHandler("green")}
-              >
-                {potColor === "green" ? (
-                  <CheckIcon className="w-4 h-4 text-primary-foreground" />
-                ) : null}
-              </div>
-
-              <div
-                className="w-8 h-8 grid place-items-center rounded-full bg-red-900 cursor-pointer"
-                onClick={() => onPotColorChangeHandler("red")}
-              >
-                {potColor === "red" ? (
-                  <CheckIcon className="w-4 h-4 text-primary-foreground" />
-                ) : null}
-              </div>
-
-              <div
-                className="w-8 h-8 grid place-items-center rounded-full bg-blue-900 cursor-pointer"
-                onClick={() => onPotColorChangeHandler("blue")}
-              >
-                {potColor === "blue" ? (
-                  <CheckIcon className="w-4 h-4 text-primary-foreground" />
-                ) : null}
-              </div>
-
-              <div
-                className="w-8 h-8 grid place-items-center rounded-full bg-stone-900 cursor-pointer"
-                onClick={() => onPotColorChangeHandler("stone")}
-              >
-                {potColor === "stone" ? (
-                  <CheckIcon className="w-4 h-4 text-primary-foreground" />
-                ) : null}
-              </div>
-            </div>
-          </div>
+          <ProductVariants
+            product={product}
+            setTotalPrice={setTotalPrice}
+            variants={product.variant}
+            setVariantsValue={setVariantsValue}
+            variantsValue={variantsValue}
+            withVariants={withVariants}
+            setWithVariants={setWithVariants}
+          />
 
           <Accordion
             type="single"
@@ -201,7 +162,7 @@ export default function ProductDetail({
           >
             <AccordionItem value="product-descriptions">
               <AccordionTrigger>Deskripsi Produk</AccordionTrigger>
-              <AccordionContent>{product.descriptions}</AccordionContent>
+              <AccordionContent>{product.description}</AccordionContent>
             </AccordionItem>
           </Accordion>
 
@@ -209,9 +170,6 @@ export default function ProductDetail({
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
               <p className="text-xl font-bold">{rupiahConverter(totalPrice)}</p>
-              {withPot && (
-                <p className="text-sm font-bold text-green-950">+ Harga Pot</p>
-              )}
             </div>
           </div>
 
@@ -226,10 +184,11 @@ export default function ProductDetail({
               </Button>
               <Input
                 type="number"
-                max={tempStock}
+                min={1}
+                max={product.stock}
                 value={productQuantity}
                 onChange={onQuantityInputChangeHandler}
-                className="w-[6ch] text-center appearance-none"
+                className="w-[9ch] text-center appearance-none"
               />
               <Button
                 variant="default"
@@ -239,14 +198,18 @@ export default function ProductDetail({
                 <PlusIcon className="w-4 h-4" />
               </Button>
               <p className="text-sm font-bold">
-                Stok tersedia: {tempStock} {tempProductUnit}
+                Stok tersedia: {product.stock} {product.unit}
               </p>
             </div>
             <div className="w-full flex flex-row gap-2 items-center">
               <Button variant="default" className="w-full">
                 Beli Sekarang
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={onAddToCart}
+              >
                 Tambahkan ke Keranjang
               </Button>
             </div>

@@ -3,7 +3,7 @@
 import { Dialog, DialogContent } from "./dialog";
 import { useState } from "react";
 
-interface ModalComponentProps {
+interface IModalComponentProps {
   children: React.ReactNode;
   defaultOpen: boolean;
   onClose: () => void;
@@ -13,7 +13,7 @@ export default function Modal({
   defaultOpen = true,
   onClose,
   children,
-}: ModalComponentProps) {
+}: IModalComponentProps) {
   const [isOpen, setIsOpen] = useState<boolean>(defaultOpen);
 
   const handleOnOpenChange = (open: boolean) => {

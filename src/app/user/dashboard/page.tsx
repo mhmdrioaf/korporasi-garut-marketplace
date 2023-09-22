@@ -2,7 +2,7 @@ import Loading from "@/app/loading";
 import { Container } from "@/components/ui/container";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { IUser } from "@/lib/globals";
+import { TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Suspense, lazy } from "react";
@@ -17,7 +17,7 @@ async function getUserDetail(id: string) {
   });
 
   const response = await fetchUser.json();
-  return response.result as IUser;
+  return response.result as TUser;
 }
 
 export default async function DashboardPage() {

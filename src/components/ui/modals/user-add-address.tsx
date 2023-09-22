@@ -5,11 +5,11 @@ import Modal from "../modal";
 import { ScrollArea } from "../scroll-area";
 import AddAddressForm from "../add-address";
 
-interface AddAddressComponentProps {
+interface IAddAddressComponentProps {
   userId: string;
 }
 
-export default function AddAddress({ userId }: AddAddressComponentProps) {
+export default function AddAddress({ userId }: IAddAddressComponentProps) {
   const router = useRouter();
 
   const onModalCloses = () => {

@@ -21,11 +21,11 @@ import { ROUTES } from "@/lib/constants";
 import * as z from "zod";
 import { addressSchema } from "@/lib/resolver/addressResolver";
 
-interface AddAddressFormProps {
+interface IAddAddressProps {
   userId: string;
 }
 
-export default function AddAddressForm({ userId }: AddAddressFormProps) {
+export default function AddAddressForm({ userId }: IAddAddressProps) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof addressSchema>>({

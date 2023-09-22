@@ -1,53 +1,72 @@
 import { StaticImageData } from "next/image";
 
-type ICarouselAssets = {
+type TCarouselAssets = {
   image: StaticImageData | string;
   title: string;
   descriptions: string | null;
 };
 
-type IProduct = {
+type TProduct = {
   id: number;
   title: string;
-  descriptions: string;
+  description: string;
   price: number;
-  seller_id: number;
   images: string[];
+  unit: string;
+  weight: number;
+  stock: number;
+  variant: TProductVariant[];
 };
 
-type IUser = {
-  account: IAccount | null;
+type TProductVariant = {
+  variant_id: string;
+  variant_title: string;
+
+  product_id: number;
+  product: TProduct;
+  variant_item: TProductVariantItem[];
+};
+
+type TProductVariantItem = {
+  variant_item_id: string;
+  variant_name: string;
+  variant_value: string;
+  variant_price: number;
+};
+
+type TUser = {
+  account: TAccount | null;
   user_id: number;
   username: string;
   email: string;
   phone_number: string | null;
   role: string;
-  addresses: IAddress[];
+  addresses: TAddress[];
   primary_address: string | null;
 };
 
-type IAccount = {
+type TAccount = {
   account_id: string;
   user_id: number;
   user_name: string;
   profile_picture: string | null;
 };
 
-type ICustomerOrder = {
+type TCustomerOrder = {
   order_id: string;
   order_status: ORDER_STATUS;
   order_date: Date;
   order_delivered_date: Date | null;
   customer_id: string;
 
-  order_items: IOrderItem[];
+  order_items: TOrderItem[];
 };
 
-type IOrderItem = {
+type TOrderItem = {
   order_item_id: string;
   order_quantity: number;
   customer_id: string;
-  product: IProduct;
+  product: TProduct;
 };
 
 type ORDER_STATUS =
@@ -58,7 +77,7 @@ type ORDER_STATUS =
   | "DELIVERED"
   | "FINISHED";
 
-type IAddress = {
+type TAddress = {
   address_id: string;
   city: string;
   full_address: string;

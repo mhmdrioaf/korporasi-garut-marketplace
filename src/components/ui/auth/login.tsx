@@ -23,13 +23,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 
-type LoginOptions = "username" | "email";
+type TLoginOptions = "username" | "email";
 
 export default function AuthLogin() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [loginOptions, setLoginOptions] = useState<LoginOptions>("username");
+  const [loginOptions, setLoginOptions] = useState<TLoginOptions>("username");
 
   const { toast } = useToast();
   const router = useRouter();
