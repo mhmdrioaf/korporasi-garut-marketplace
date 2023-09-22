@@ -34,7 +34,7 @@ export const properizeWords = (words: string): string => {
 
 export const getProductDetail = async (id: string) => {
   const fetchProduct = await fetch(
-    process.env.NEXT_PUBLIC_API_GET_PRODUCT! + id,
+    process.env.NEXT_PUBLIC_API_PRODUCT_GET! + id,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -167,4 +167,10 @@ export const variantItemsIdGenerator = (
   const variant = decimalsNumber(variantId, 100);
   const prefix = "PVI";
   return prefix + product + variant;
+};
+
+export const productCategoryIdGenerator = (maxId: number) => {
+  const id = decimalsNumber(maxId, 10);
+  const prefix = "CAT";
+  return prefix + id;
 };

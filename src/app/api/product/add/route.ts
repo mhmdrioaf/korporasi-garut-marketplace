@@ -24,6 +24,7 @@ interface IProductRequestBody {
   seller_id: string;
   variant: TProductVariantInput[] | null;
   variant_items: TProductVariantItemInput[] | null;
+  category_id: string | null;
 }
 
 async function handler(request: NextRequest) {

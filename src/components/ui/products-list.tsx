@@ -2,13 +2,10 @@ import { TProduct } from "@/lib/globals";
 import ProductCard from "./product-card";
 
 async function listProdudcts() {
-  const fetchProducts = await fetch(
-    process.env.NEXT_PUBLIC_API_LIST_PRODUCTS!,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  const fetchProducts = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_LIST!, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  });
 
   const response = await fetchProducts.json();
   if (!response.ok) {

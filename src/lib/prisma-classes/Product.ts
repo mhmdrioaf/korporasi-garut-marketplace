@@ -26,6 +26,7 @@ interface IProductData {
   seller_id: string;
   variant: TProductVariantInput[] | null;
   variant_items: TProductVariantItemInput[] | null;
+  category_id: string | null;
 }
 
 export default class Product {
@@ -116,6 +117,7 @@ export default class Product {
         variant: {
           create: variants,
         },
+        category_id: data.category_id,
       },
     });
   }
