@@ -4,6 +4,8 @@ import {
   variantIdGenerator,
   variantItemsIdGenerator,
 } from "../helper";
+import { db } from "../db";
+import { TProductVariant } from "../globals";
 
 type TProductVariantInput = {
   variant_title: string;
@@ -13,6 +15,11 @@ type TProductVariantItemInput = {
   variant_name: string;
   variant_value: string;
   variant_price: number;
+};
+
+type TNewProductVariantInput = {
+  variant_title: string;
+  variant_item: TProductVariantItemInput[];
 };
 
 interface IProductData {
@@ -27,6 +34,20 @@ interface IProductData {
   variant: TProductVariantInput[] | null;
   variant_items: TProductVariantItemInput[] | null;
   category_id: string | null;
+}
+
+interface IProductUpdateData extends IProductData {
+  id: string;
+}
+
+interface IProductVariantUpdate {
+  product_id: string;
+  variant: TProductVariant[];
+}
+
+export interface IAddProductVariant {
+  product_id: string;
+  variant: TNewProductVariantInput;
 }
 
 export default class Product {
@@ -149,6 +170,164 @@ export default class Product {
             variant_item: true,
           },
         },
+      },
+    });
+  }
+
+  async updateProduct(data: IProductUpdateData) {
+    return await this.prismaProduct.update({
+      where: {
+        id: parseInt(data.id),
+      },
+      data: {
+        title: data.title,
+        description: data.description,
+        price: data.price,
+        images: data.images,
+        stock: data.stock,
+        unit: data.unit,
+        weight: data.weight,
+        category_id: data.category_id,
+      },
+    });
+  }
+
+  async productVariantUpdate(data: IProductVariantUpdate) {
+    const variantItems = data.variant.flatMap(
+      (variant) => variant.variant_item
+    );
+    const upsertVariantItems = variantItems.map((item, index) => {
+      const currentVariantItemsId = (id: string) =>
+        Number(id.length > 0 ? id.slice(id.length - 3, id.length) : index + 1);
+
+      return {
+        where: {
+          variant_item_id: variantItemsIdGenerator(
+            parseInt(data.product_id),
+            currentVariantItemsId(item.variant_item_id)
+          ),
+        },
+        create: {
+          variant_item_id: variantItemsIdGenerator(
+            parseInt(data.product_id),
+            currentVariantItemsId(item.variant_item_id)
+          ),
+          variant_name: item.variant_name,
+          variant_value: item.variant_value,
+          variant_price: item.variant_price,
+        },
+        update: {
+          variant_name: item.variant_name,
+          variant_price: item.variant_price,
+          variant_value: item.variant_value,
+        },
+      };
+    });
+
+    // const createNewVariant = data.variant.map((variant, index) => {
+    //   const currentVariantId = (id: string) =>
+    //     Number(id.length > 0 ? id.slice(id.length - 3, id.length) : index + 1);
+
+    //   return {
+    //     where: {
+    //       variant_id: variantIdGenerator(parseInt(data.product_id), currentVariantId(variant.variant_id)),
+    //     },
+    //     create: {
+    //       variant_id: variantIdGenerator(parseInt(data.product_id), currentVariantId(variant.variant_id)),
+    //       variant_title: properizeWords(variant.variant_title),
+    //       variant_item: variant.variant_item
+    //     },
+    //     update: {
+    //       variant_title: variant.variant_title,
+    //       variant_item: {
+    //         upsert: upsertVariantItems
+    //       }
+    //     },
+    //   }
+    // })
+
+    return await db.$transaction(
+      data.variant.map((variant) =>
+        db.product_variant.update({
+          where: {
+            variant_id: variant.variant_id,
+          },
+          data: {
+            variant_title: variant.variant_title,
+            variant_item: {
+              upsert: upsertVariantItems,
+            },
+          },
+        })
+      )
+    );
+  }
+
+  async addProductVariant(data: IAddProductVariant) {
+    const getMaxVariants = await this.prismaProductVariant?.aggregate({
+      where: {
+        product_id: {
+          equals: parseInt(data.product_id),
+        },
+      },
+      _max: {
+        variant_id: true,
+      },
+    });
+
+    const maxVariants = getMaxVariants?._max.variant_id;
+    const maxVariantsId = Number(
+      maxVariants?.slice(maxVariants.length - 3, maxVariants.length) ?? 0
+    );
+
+    const createManyVariantsItem = data.variant.variant_item.map(
+      (item, index) => ({
+        variant_item_id: variantItemsIdGenerator(
+          parseInt(data.product_id),
+          index + 1
+        ),
+        variant_name: item.variant_name,
+        variant_price: item.variant_price,
+        variant_value: item.variant_value,
+      })
+    );
+
+    return await this.prismaProductVariant?.create({
+      data: {
+        variant_id: variantIdGenerator(
+          parseInt(data.product_id),
+          maxVariantsId + 1
+        ),
+        variant_title: data.variant.variant_title,
+        variant_item: {
+          createMany: {
+            data: createManyVariantsItem,
+          },
+        },
+      },
+    });
+  }
+
+  async deleteProductVariant(id: string) {
+    return await this.prismaProductVariant?.delete({
+      where: {
+        variant_id: id,
+      },
+    });
+  }
+
+  async deleteProductVariantItems(id: string) {
+    return await this.prismaProductVariantItems?.delete({
+      where: {
+        variant_item_id: id,
+      },
+    });
+  }
+
+  async deleteProduct(id: string) {
+    return await this.prismaProduct.delete({
+      where: {
+        id: parseInt(id),
       },
     });
   }
