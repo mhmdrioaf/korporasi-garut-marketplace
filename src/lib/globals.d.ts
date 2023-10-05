@@ -16,6 +16,7 @@ type TProduct = {
   weight: number;
   stock: number;
   variant: TProductVariant[];
+  category_id: string | null;
 };
 
 type TProductVariant = {
@@ -67,6 +68,12 @@ type TOrderItem = {
   order_quantity: number;
   customer_id: string;
   product: TProduct;
+};
+
+type TProductCategory = {
+  category_id: string;
+  category_name: string;
+  products: TProduct[];
 };
 
 type ORDER_STATUS =

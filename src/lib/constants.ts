@@ -44,3 +44,6 @@ export const ROUTES = {
     DETAIL: (id: string) => `/product/${id}`,
   },
 };
+
+export const CATEGORIES_OPTIONS = (CATEGORY_ID: string) =>
+  !CATEGORY_ID ? "UNCATEGORIZED" : CATEGORY_ID;
