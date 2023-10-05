@@ -10,7 +10,7 @@ async function handler(
   const headerLists = headers();
   const date = headerLists.get("date");
 
-  const products = new Product(db.product, null);
+  const products = new Product(db.product, null, null);
   const product = await products.getProductDetail(params.id);
 
   if (product) {

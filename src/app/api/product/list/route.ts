@@ -7,7 +7,7 @@ async function handler(request: NextRequest) {
   const headerLists = headers();
   const date = headerLists.get("date");
 
-  const products = new Product(db.product, null);
+  const products = new Product(db.product, null, null);
   const listProducts = await products.listProduct();
 
   if (listProducts) {
