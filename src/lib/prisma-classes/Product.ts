@@ -144,16 +144,34 @@ export default class Product {
   }
 
   async listProduct() {
-    return await this.prismaProduct.findMany({
+    const products = this.prismaProduct.findMany({
       include: {
-        seller: true,
         variant: {
           include: {
             variant_item: true,
           },
         },
+        seller: true,
       },
     });
+
+    const maxProductId = this.prismaProduct.aggregate({
+      _max: {
+        id: true,
+      },
+    });
+
+    const [productsResult, maxIdResult] = await Promise.all([
+      products,
+      maxProductId,
+    ]);
+
+    const returnValue = {
+      products: productsResult,
+      maxId: maxIdResult._max.id ?? 0,
+    };
+
+    return returnValue;
   }
 
   async getProductDetail(id: string) {
