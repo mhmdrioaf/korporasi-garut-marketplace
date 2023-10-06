@@ -65,7 +65,10 @@ export default function AuthRegister() {
       setLoading(true);
       const res = await fetch(process.env.NEXT_PUBLIC_API_REGISTER!, {
         method: "PUT",
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          token: process.env.NEXT_PUBLIC_CUSTOMER_TOKEN!,
+        }),
       });
 
       const registerResponse = await res.json();

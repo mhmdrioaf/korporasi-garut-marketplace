@@ -16,6 +16,7 @@ model user {
   role               USER_ROLE @default(CUSTOMER)
   createdAt          DateTime  @default(now())
   primary_address_id String?
+  token              String
 
   account  account?
   address  address[]
