@@ -42,6 +42,7 @@ export const ROUTES = {
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,
+    ADD: "/product/add",
   },
 };
 

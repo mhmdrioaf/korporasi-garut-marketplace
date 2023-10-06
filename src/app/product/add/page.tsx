@@ -6,7 +6,11 @@ import { getServerSession } from "next-auth";
 
 export default async function AddProductPage() {
   const session = await getServerSession(authOptions);
-  if (!session) {
+  if (
+    !session ||
+    session.user.token === process.env.NEXT_PUBLIC_CUSTOMER_TOKEN ||
+    session.user.role === "CUSTOMER"
+  ) {
     return (
       <div className="w-full h-screen grid place-items-center">
         Anda tidak mempunyai akses untuk halaman ini.

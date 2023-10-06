@@ -126,9 +126,10 @@ export default function ProductAddForm() {
         <div className="flex flex-col gap-2">
           <Label htmlFor="product.description">Deskripsi Produk</Label>
           <Textarea
-            cols={7}
+            rows={16}
             placeholder="Produk ini merupakan..."
             id="product.description"
+            disabled={uploading}
             {...productForm.register("product.description")}
             required
           />
@@ -274,6 +275,7 @@ export default function ProductAddForm() {
           onValueChange={(value) =>
             productForm.setValue("product.category_id", value)
           }
+          disabled={uploading}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Pilih Kategori" />

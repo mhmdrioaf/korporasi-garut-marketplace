@@ -171,7 +171,6 @@ export function ProductProvider({
     );
     const productsId = productsList ? productsList.result.maxId + 1 : 1;
     const imagesURL = await uploadImages(productsId);
-    console.log(imagesURL);
 
     const product = {
       ...rest.product,
@@ -191,7 +190,10 @@ export function ProductProvider({
             "Content-Type": "application/json",
             Seller_Key: process.env.NEXT_PUBLIC_SELLER_SCRET!,
           },
-          body: JSON.stringify(product),
+          body: JSON.stringify({
+            ...product,
+            secret: session.user.token,
+          }),
         }
       );
 

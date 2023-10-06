@@ -25,37 +25,49 @@ interface IProductRequestBody {
   variant: TProductVariantInput[] | null;
   variant_items: TProductVariantItemInput[] | null;
   category_id: string | null;
+  secret: string;
 }
-
-// TODO: Add user validation via token
 
 async function handler(request: NextRequest) {
   const body: IProductRequestBody = await request.json();
-  try {
-    const products = new Product(
-      db.product,
-      db.product_variant,
-      db.product_variant_item
-    );
-    const newProduct = await products.addProduct(body);
+  const { secret, ...data } = body;
 
-    if (newProduct) {
-      return NextResponse.json({
-        ok: true,
-        message: "Produk baru telah ditambahkan ke katalog produk anda.",
-      });
-    } else {
+  if (
+    secret === process.env.NEXT_PUBLIC_SELLER_TOKEN ||
+    secret === process.env.NEXT_PUBLIC_ADMIN_TOKEN
+  ) {
+    try {
+      const products = new Product(
+        db.product,
+        db.product_variant,
+        db.product_variant_item
+      );
+      const newProduct = await products.addProduct(data);
+
+      if (newProduct) {
+        return NextResponse.json({
+          ok: true,
+          message: "Produk baru telah ditambahkan ke katalog produk anda.",
+        });
+      } else {
+        return NextResponse.json({
+          ok: false,
+          message:
+            "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
+        });
+      }
+    } catch (err) {
+      console.error(err);
       return NextResponse.json({
         ok: false,
         message:
           "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
       });
     }
-  } catch (err) {
-    console.error(err);
+  } else {
     return NextResponse.json({
       ok: false,
-      message: "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
+      message: "Anda tidak mempunyai akses untuk melakukan permintaan ini.",
     });
   }
 }
