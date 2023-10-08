@@ -12,10 +12,12 @@ The purpose of this project is to fulfill my thesis project and also to facilita
 ## Development Tools
 
 ### Proposed database diagram (unfinished)  
-![mhmdrioaf-thesis](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/34c9970d-2da8-475b-98e6-028264c64a21)  
+![mhmdrioaf-thesis](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/2e575985-a360-451c-8a8f-a2e9fd82780c)
+
 
 ### Proposed class diagram (unfinished)  
-![class-diagram drawio](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/c3fbcf88-b3da-409e-8be0-52b29955d8ef)
+![class-diagram drawio](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/858a5ad8-20a5-405a-9fa7-3f3141f8663a)
+
 
 
 _will be added more later..._
