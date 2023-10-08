@@ -277,11 +277,11 @@ export default function ProductAddForm() {
       <div className="flex flex-col gap-2">
         <Label>Kategori Produk</Label>
         <Select
-          defaultValue="noCategory"
           onValueChange={(value) =>
             productForm.setValue("product.category_id", value)
           }
           disabled={uploading}
+          value={productForm.getValues("product.category_id") ?? ""}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Pilih Kategori" />

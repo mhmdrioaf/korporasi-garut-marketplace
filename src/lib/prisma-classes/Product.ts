@@ -6,6 +6,7 @@ import {
 } from "../helper";
 import { db } from "../db";
 import { TProductVariant } from "../globals";
+import supabase from "../supabase";
 
 type TProductVariantInput = {
   variant_title: string;
@@ -146,7 +147,10 @@ export default class Product {
         variant: {
           create: variants,
         },
-        category_id: data.category_id,
+        category_id:
+          data.category_id === "noCategory" || data.category_id === ""
+            ? null
+            : data.category_id,
       },
     });
   }
@@ -180,6 +184,24 @@ export default class Product {
     };
 
     return returnValue;
+  }
+
+  async listSellerProduct(seller_id: string) {
+    return await this.prismaProduct.findMany({
+      where: {
+        seller_id: {
+          equals: parseInt(seller_id),
+        },
+      },
+      include: {
+        seller: true,
+        variant: {
+          include: {
+            variant_item: true,
+          },
+        },
+      },
+    });
   }
 
   async getProductDetail(id: string) {
@@ -378,6 +400,22 @@ export default class Product {
   }
 
   async deleteProduct(id: string) {
+    const { data: imageList } = await supabase.storage
+      .from("products")
+      .list(`PROD-${id}`);
+    if (imageList) {
+      const filesToRemove = imageList.map((x) => `PROD-${id}/${x.name}`);
+      const { error } = await supabase.storage
+        .from("products")
+        .remove(filesToRemove);
+      if (error) {
+        console.error(
+          "An error occurred when deleting product images: ",
+          error
+        );
+      }
+    }
+
     return await this.prismaProduct.delete({
       where: {
         id: parseInt(id),
