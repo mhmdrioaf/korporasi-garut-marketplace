@@ -10,6 +10,8 @@ import { Button } from "./ui/button";
 import { ProductContext } from "@/lib/hooks/context/useProductContext";
 import { TProductContextType } from "@/lib/hooks/context/productContextType";
 
+// TODO: Add product thumbnail input
+
 export default function ProductImageAdd() {
   const {
     addImages,
