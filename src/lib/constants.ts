@@ -39,10 +39,12 @@ export const ROUTES = {
     ORDERS: "/user/dashboard/orders",
     ADDRESSES: "/user/dashboard/address",
     ADD_ADDRESS: "/user/dashboard/address/create",
+    PRODUCTS_LIST: "/user/dashboard/product-list",
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,
     ADD: "/product/add",
+    EDIT: (id: string) => `/product/edit/${id}`,
   },
 };
 
