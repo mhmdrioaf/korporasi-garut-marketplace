@@ -1,4 +1,5 @@
 import { TAddress, TProduct, ORDER_STATUS } from "./globals";
+import supabase from "./supabase";
 
 export const getAvatarInitial = (name: string): string => {
   const slicedName = name.split(" ");
@@ -34,7 +35,7 @@ export const properizeWords = (words: string): string => {
 
 export const getProductDetail = async (id: string) => {
   const fetchProduct = await fetch(
-    process.env.NEXT_PUBLIC_API_GET_PRODUCT! + id,
+    process.env.NEXT_PUBLIC_API_PRODUCT_GET! + id,
     {
       method: "GET",
       headers: { "Content-Type": "application/json" },
@@ -167,4 +168,54 @@ export const variantItemsIdGenerator = (
   const variant = decimalsNumber(variantId, 100);
   const prefix = "PVI";
   return prefix + product + variant;
+};
+
+export const productCategoryIdGenerator = (maxId: number) => {
+  const id = decimalsNumber(maxId, 10);
+  const prefix = "CAT";
+  return prefix + id;
+};
+
+export const NaNHandler = (value: number) => {
+  return isNaN(value) ? 0 : value;
+};
+
+export const fetcher = (url: string) =>
+  fetch(url).then((response) => response.json());
+
+export const createImagePreview = (file: File) => {
+  const imageUrl = URL.createObjectURL(file);
+  return imageUrl;
+};
+
+export const uploadProductImage = async (image: File, imageName: string) => {
+  const { data: uploadedImage, error: uploadError } = await supabase.storage
+    .from("products")
+    .upload(imageName, image, {
+      cacheControl: "3600",
+      upsert: true,
+    });
+
+  if (uploadedImage) {
+    const { data: imageURL } = supabase.storage
+      .from("products")
+      .getPublicUrl(imageName);
+
+    return {
+      imageURL: imageURL.publicUrl,
+      error: null,
+    };
+  } else {
+    console.log("An error occurred: ", uploadError);
+    return {
+      imageURL: null,
+      error: uploadError.message,
+    };
+  }
+};
+
+export const remoteImageSource = (source: string) => {
+  const date = new Date();
+  const timestamp = date.getTime();
+  return `${source}?t=${timestamp}`;
 };

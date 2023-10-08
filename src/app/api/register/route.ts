@@ -9,6 +9,7 @@ interface IRegisterRequestBody {
   username: string;
   email: string;
   password: string;
+  token: string;
 }
 
 async function handler(request: NextRequest) {

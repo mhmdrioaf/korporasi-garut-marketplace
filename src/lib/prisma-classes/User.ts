@@ -12,6 +12,7 @@ type TRegisterData = {
   username: string;
   email: string;
   password: string;
+  token: string;
 };
 
 type TLoginData = {
@@ -37,6 +38,7 @@ export default class Users {
         password: await bcrypt.hash(data.password, 10),
         username: data.username.toLowerCase(),
         phone_number: data.phone_number,
+        token: data.token,
         account: {
           connectOrCreate: {
             where: {

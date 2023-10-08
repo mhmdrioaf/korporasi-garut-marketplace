@@ -16,6 +16,7 @@ model user {
   role               USER_ROLE @default(CUSTOMER)
   createdAt          DateTime  @default(now())
   primary_address_id String?
+  token              String
 
   account  account?
   address  address[]
@@ -77,7 +78,9 @@ model product {
   weight      Int
   stock       Int      @default(1)
   seller_id   Int
+  category_id String?
 
+  category    product_category? @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user              @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
   order_items order_item[]
   variant     product_variant[]
@@ -101,6 +104,13 @@ model product_variant_item {
   variant_id  String
   variant     product_variant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
   order_items order_item[]
+}
+
+model product_category {
+  category_id   String @id
+  category_name String
+
+  products product[]
 }
 
 enum USER_ROLE {

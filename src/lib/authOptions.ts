@@ -42,6 +42,7 @@ const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.username = token.username;
         session.user.role = token.role;
+        session.user.token = token.token;
       }
       return session;
     },
@@ -59,6 +60,7 @@ const authOptions: NextAuthOptions = {
         token.email = loggedInUser.email;
         token.role = loggedInUser.role;
         token.username = loggedInUser.username;
+        token.token = loggedInUser.token;
         return token;
       } else {
         token.user_id = user.id;

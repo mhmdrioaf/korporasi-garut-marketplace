@@ -1,6 +1,6 @@
 import { ROUTES } from "@/lib/constants";
 import { TProduct } from "@/lib/globals";
-import { rupiahConverter } from "@/lib/helper";
+import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -16,7 +16,7 @@ export default function ProductCard({ product }: TProductCardProps) {
     >
       <div className="w-full h-32 bg-stone-200 shrink-0 rounded-md overflow-hidden relative">
         <Image
-          src={product.images[0]}
+          src={remoteImageSource(product.images[0])}
           alt={product.title + " picture"}
           fill
           className="object-cover"

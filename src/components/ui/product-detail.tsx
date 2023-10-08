@@ -16,7 +16,7 @@ import {
 import { Separator } from "./separator";
 import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
-import { rupiahConverter } from "@/lib/helper";
+import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import ProductVariants from "./product-variant";
 import { useToast } from "./use-toast";
 
@@ -31,6 +31,7 @@ export default function ProductDetail({
   const [variantsValue, setVariantsValue] = useState<string | null>(null);
   const [totalPrice, setTotalPrice] = useState<number>(product.price);
   const [productQuantity, setProductQuantity] = useState(1);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const { toast } = useToast();
 
@@ -90,7 +91,7 @@ export default function ProductDetail({
         <div className="w-full flex flex-col gap-2">
           <div className="w-full h-auto aspect-square rounded-lg overflow-hidden relative">
             <Image
-              src={product.images[0]}
+              src={remoteImageSource(product.images[activeImageIndex])}
               alt="Foto produk"
               fill
               sizes="100vw"
@@ -100,13 +101,14 @@ export default function ProductDetail({
 
           {product.images.length > 1 && (
             <div className="w-full flex flex-row gap-2 items-center overflow-auto">
-              {product.images.map((source) => (
+              {product.images.map((source, index) => (
                 <div
                   key={source}
-                  className="w-48 h-auto shrink-0 aspect-square rounded-lg overflow-hidden relative"
+                  className="w-48 h-auto shrink-0 aspect-square rounded-lg overflow-hidden relative cursor-pointer"
+                  onClick={() => setActiveImageIndex(index)}
                 >
                   <Image
-                    src={source}
+                    src={remoteImageSource(source)}
                     alt="Foto produk"
                     fill
                     sizes="75vw"
@@ -162,7 +164,9 @@ export default function ProductDetail({
           >
             <AccordionItem value="product-descriptions">
               <AccordionTrigger>Deskripsi Produk</AccordionTrigger>
-              <AccordionContent>{product.description}</AccordionContent>
+              <AccordionContent className="whitespace-pre-wrap">
+                {product.description}
+              </AccordionContent>
             </AccordionItem>
           </Accordion>
 
@@ -170,6 +174,11 @@ export default function ProductDetail({
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
               <p className="text-xl font-bold">{rupiahConverter(totalPrice)}</p>
+              {totalPrice !== product.price && (
+                <p className="text-sm font-bold text-green-950">
+                  + Harga Varian
+                </p>
+              )}
             </div>
           </div>
 
