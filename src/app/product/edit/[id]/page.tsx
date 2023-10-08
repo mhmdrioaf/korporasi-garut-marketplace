@@ -1,3 +1,4 @@
+import { Container } from "@/components/ui/container";
 import ProductAddForm from "@/components/ui/product-add-form";
 import authOptions from "@/lib/authOptions";
 import { ProductProvider } from "@/lib/hooks/context/useProductContext";
@@ -45,7 +46,9 @@ export default async function ProductEditPage({
   } else {
     return (
       <ProductProvider session={session} product={product}>
-        <ProductAddForm />
+        <Container>
+          <ProductAddForm />
+        </Container>
       </ProductProvider>
     );
   }
