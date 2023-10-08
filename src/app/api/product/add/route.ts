@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import Product from "@/lib/prisma-classes/Product";
-import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 type TProductVariantInput = {
@@ -26,6 +25,7 @@ interface IProductRequestBody {
   variant_items: TProductVariantItemInput[] | null;
   category_id: string | null;
   secret: string;
+  id: string;
 }
 
 async function handler(request: NextRequest) {

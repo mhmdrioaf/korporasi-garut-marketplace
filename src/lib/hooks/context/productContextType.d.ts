@@ -1,4 +1,5 @@
 import { TProductCategory } from "@/lib/globals";
+import { SetStateAction } from "react";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TProductInput = {
@@ -13,13 +14,14 @@ type TProductInput = {
 };
 
 type TVariantItemInput = {
-  id: string;
+  variant_item_id: string;
   variant_name: string;
   variant_price: number;
   variant_value: string;
 };
 
 type TVariantInput = {
+  variant_id: string;
   variant_title: string;
   variant_item: TVariantItemInput[];
 };
@@ -30,6 +32,7 @@ interface IProductInputs {
 }
 
 type TVariantField = {
+  variant_id: string;
   variant_title: string;
   variant_item: TVariantItemInput[];
   id: string;
@@ -53,4 +56,7 @@ type TProductContextType = {
   addImages: (newImage: File) => void;
   removeImage: (deletedImage: File) => void;
   uploading: boolean;
+  product: TProduct | null;
+  currentImages: string[];
+  removeCurrentImage: (deletedImage: string) => void;
 };

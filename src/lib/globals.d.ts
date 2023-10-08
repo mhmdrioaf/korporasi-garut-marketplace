@@ -17,6 +17,7 @@ type TProduct = {
   stock: number;
   variant: TProductVariant[];
   category_id: string | null;
+  seller: Omit<TUser, "account" | "address" | "orders" | "products">;
 };
 
 type TProductVariant = {
@@ -36,14 +37,43 @@ type TProductVariantItem = {
 };
 
 type TUser = {
-  account: TAccount | null;
   user_id: number;
   username: string;
   email: string;
+  password: string;
   phone_number: string | null;
   role: string;
-  addresses: TAddress[];
-  primary_address: string | null;
+  createdAt: Date;
+  primary_address_id: string | null;
+  token: string;
+
+  account: TAccount;
+  address: TAddress[];
+  orders: TOrder[];
+  products: TProduct[];
+};
+
+type TOrder = {
+  order_id: string;
+  order_status: ORDER_STATUS;
+  order_date: Date;
+  order_delivered_date: Date | null;
+  user_id: number;
+
+  user: TUser;
+  order_item: TOrderItem[];
+};
+
+type TOrderItem = {
+  order_item_id: string;
+  order_quantity: number;
+  order_id: string;
+  product_id: string;
+  product_variant_id: string;
+
+  orders: TOrder;
+  product: TProduct;
+  variant: TProductVariantItem | null;
 };
 
 type TAccount = {

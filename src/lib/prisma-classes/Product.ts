@@ -34,6 +34,7 @@ interface IProductData {
   variant: TProductVariantInput[] | null;
   variant_items: TProductVariantItemInput[] | null;
   category_id: string | null;
+  id: string;
 }
 
 interface IProductUpdateData extends IProductData {
@@ -42,7 +43,7 @@ interface IProductUpdateData extends IProductData {
 
 interface IProductVariantUpdate {
   product_id: string;
-  variant: TProductVariant[];
+  variant: Omit<TProductVariant, "product_id" | "product">[];
 }
 
 export interface IAddProductVariant {
@@ -62,31 +63,35 @@ export default class Product {
   ) {}
 
   async addProduct(data: IProductData) {
-    const products = this.prismaProduct.aggregate({
-      _max: {
-        id: true,
-      },
-    });
-
     const productVariants = this.prismaProductVariant!.aggregate({
+      where: {
+        product_id: {
+          equals: parseInt(data.id),
+        },
+      },
       _max: {
         variant_id: true,
       },
     });
 
     const productVariantItems = this.prismaProductVariantItems!.aggregate({
+      where: {
+        variant: {
+          product_id: {
+            equals: parseInt(data.id),
+          },
+        },
+      },
       _max: {
         variant_item_id: true,
       },
     });
 
-    const [maxProduct, maxVariants, maxVariantItems] = await Promise.all([
-      products,
+    const [maxVariants, maxVariantItems] = await Promise.all([
       productVariants,
       productVariantItems,
     ]);
 
-    const productId = maxProduct._max.id ? maxProduct._max.id + 1 : 1;
     const maxVariantId = maxVariants._max.variant_id;
     const variantId = Number(
       maxVariantId?.slice(maxVariantId.length - 3, maxVariantId.length) ?? 0
@@ -103,7 +108,7 @@ export default class Product {
     const variantItems = data.variant_items
       ? data.variant_items.map((items, index) => ({
           variant_item_id: variantItemsIdGenerator(
-            productId,
+            parseInt(data.id),
             variantItemId + (index + 1)
           ),
           variant_name: properizeWords(items.variant_name),
@@ -114,7 +119,10 @@ export default class Product {
 
     const variants = data.variant
       ? data.variant.map((variant, index) => ({
-          variant_id: variantIdGenerator(productId, variantId + (index + 1)),
+          variant_id: variantIdGenerator(
+            parseInt(data.id),
+            variantId + (index + 1)
+          ),
           variant_title: variant.variant_title,
           variant_item: {
             createMany: {
@@ -126,7 +134,7 @@ export default class Product {
 
     return await this.prismaProduct.create({
       data: {
-        id: productId,
+        id: parseInt(data.id),
         description: data.description,
         price: data.price,
         seller_id: parseInt(data.seller_id),
@@ -211,25 +219,17 @@ export default class Product {
   }
 
   async productVariantUpdate(data: IProductVariantUpdate) {
-    const variantItems = data.variant.flatMap(
-      (variant) => variant.variant_item
-    );
-    const upsertVariantItems = variantItems.map((item, index) => {
-      const currentVariantItemsId = (id: string) =>
-        Number(id.length > 0 ? id.slice(id.length - 3, id.length) : index + 1);
+    const upsertVariantItems = (
+      variant: Omit<TProductVariant, "product_id" | "product">
+    ) => {
+      const variantItems = variant.variant_item;
 
-      return {
+      return variantItems.map((item, index) => ({
         where: {
-          variant_item_id: variantItemsIdGenerator(
-            parseInt(data.product_id),
-            currentVariantItemsId(item.variant_item_id)
-          ),
+          variant_item_id: item.variant_item_id,
         },
         create: {
-          variant_item_id: variantItemsIdGenerator(
-            parseInt(data.product_id),
-            currentVariantItemsId(item.variant_item_id)
-          ),
+          variant_item_id: item.variant_item_id,
           variant_name: item.variant_name,
           variant_value: item.variant_value,
           variant_price: item.variant_price,
@@ -239,41 +239,35 @@ export default class Product {
           variant_price: item.variant_price,
           variant_value: item.variant_value,
         },
-      };
-    });
-
-    // const createNewVariant = data.variant.map((variant, index) => {
-    //   const currentVariantId = (id: string) =>
-    //     Number(id.length > 0 ? id.slice(id.length - 3, id.length) : index + 1);
-
-    //   return {
-    //     where: {
-    //       variant_id: variantIdGenerator(parseInt(data.product_id), currentVariantId(variant.variant_id)),
-    //     },
-    //     create: {
-    //       variant_id: variantIdGenerator(parseInt(data.product_id), currentVariantId(variant.variant_id)),
-    //       variant_title: properizeWords(variant.variant_title),
-    //       variant_item: variant.variant_item
-    //     },
-    //     update: {
-    //       variant_title: variant.variant_title,
-    //       variant_item: {
-    //         upsert: upsertVariantItems
-    //       }
-    //     },
-    //   }
-    // })
+      }));
+    };
 
     return await db.$transaction(
       data.variant.map((variant) =>
-        db.product_variant.update({
+        db.product_variant.upsert({
           where: {
             variant_id: variant.variant_id,
           },
-          data: {
+          create: {
+            variant_id: variant.variant_id,
             variant_title: variant.variant_title,
             variant_item: {
-              upsert: upsertVariantItems,
+              createMany: {
+                data: variant.variant_item.map((item) => ({
+                  variant_item_id: item.variant_item_id,
+                  variant_name: item.variant_name,
+                  variant_price: item.variant_price,
+                  variant_value: item.variant_value,
+                })),
+                skipDuplicates: true,
+              },
+            },
+            product_id: parseInt(data.product_id),
+          },
+          update: {
+            variant_title: variant.variant_title,
+            variant_item: {
+              upsert: upsertVariantItems(variant),
             },
           },
         })
@@ -324,6 +318,47 @@ export default class Product {
         },
       },
     });
+  }
+
+  async getVariantDetail(product_id: string) {
+    const _maxVariantItemId = this.prismaProductVariantItems?.aggregate({
+      where: {
+        variant: {
+          product_id: {
+            equals: parseInt(product_id),
+          },
+        },
+      },
+      _max: {
+        variant_item_id: true,
+      },
+    });
+
+    const _maxVariantId = this.prismaProductVariant?.aggregate({
+      _max: {
+        variant_id: true,
+      },
+    });
+
+    const [maxVariantItemIdData, maxVariantIdData] = await Promise.all([
+      _maxVariantItemId,
+      _maxVariantId,
+    ]);
+    const variantItemId = maxVariantItemIdData?._max.variant_item_id;
+    const variantId = maxVariantIdData?._max.variant_id;
+    const maxVariantItemId = Number(
+      variantItemId?.slice(variantItemId.length - 3, variantItemId.length) ?? 0
+    );
+    const maxVariantId = Number(
+      variantId?.slice(variantId.length - 3, variantId.length) ?? 0
+    );
+
+    const returnValues = {
+      maxVariantItem: maxVariantItemId,
+      maxVariant: maxVariantId,
+    };
+
+    return returnValues;
   }
 
   async deleteProductVariant(id: string) {

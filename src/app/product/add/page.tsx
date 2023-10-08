@@ -18,7 +18,7 @@ export default async function AddProductPage() {
     );
   } else {
     return (
-      <ProductProvider session={session}>
+      <ProductProvider session={session} product={null}>
         <Container>
           <ProductAddForm />
         </Container>

@@ -19,8 +19,6 @@ import { ProductContext } from "@/lib/hooks/context/useProductContext";
 import { TProductContextType } from "@/lib/hooks/context/productContextType";
 
 export default function ProductAddForm() {
-  const [isVariant, setIsVariant] = useState<boolean>(false);
-
   const {
     addVariant,
     addVariantItem,
@@ -32,7 +30,12 @@ export default function ProductAddForm() {
     productCategories,
     loadingCategories,
     uploading,
+    product,
   } = useContext(ProductContext) as TProductContextType;
+
+  const [isVariant, setIsVariant] = useState<boolean>(
+    product ? product.variant.length > 0 : false
+  );
 
   const isVariantChangeHandler = (value: string) => {
     if (value === "true") {
@@ -193,7 +196,10 @@ export default function ProductAddForm() {
 
               <div className="w-full grid grid-cols-2 gap-4">
                 {field.variant_item.map((item, itemIndex) => (
-                  <div className="w-full flex flex-col gap-4" key={item.id}>
+                  <div
+                    className="w-full flex flex-col gap-4"
+                    key={item.variant_item_id}
+                  >
                     <div className="flex flex-col gap-2">
                       <div className="w-full flex flex-row items-center gap-2 justify-between">
                         <Label
