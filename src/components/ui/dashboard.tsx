@@ -1,7 +1,7 @@
 "use client";
 
 import { TUser } from "@/lib/globals";
-import { Trash2Icon, User2Icon } from "lucide-react";
+import { Loader2Icon, Trash2Icon, User2Icon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";
 import { Input } from "./input";
@@ -9,6 +9,12 @@ import { Label } from "./label";
 import { ACCOUNT_DELETE_NOTES, IMAGE_UPLOAD_NOTES } from "@/lib/constants";
 import { useState } from "react";
 import UserDetailModals from "@/components/ui/modals/user-detail";
+import imageCompression from "browser-image-compression";
+import { remoteImageSource, uploadImage } from "@/lib/helper";
+import { useToast } from "./use-toast";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import supabase from "@/lib/supabase";
 
 interface IUserDashboardComponentProps {
   user: TUser;
@@ -23,8 +29,112 @@ export default function UserDashboardComponent({
     useState<TUserDetailChangeOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [modalValue, setModalValue] = useState<string | null>(null);
+  const [profilePictureLoading, setProfilePictureLoading] =
+    useState<boolean>(false);
 
-  const onImageInputChangesHandler = () => {};
+  const { toast } = useToast();
+  const { update } = useSession();
+  const router = useRouter();
+
+  const onImageInputChangesHandler = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setProfilePictureLoading(true);
+    const { files } = event.target;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const compressedImage = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+      });
+      const userImage = await uploadImage(
+        compressedImage,
+        `${user.username}/profile-picture.jpg`,
+        "users"
+      );
+      if (userImage.imageURL) {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_UPDATE_USER!, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dataToChange: "profile_picture",
+            dataValue: userImage.imageURL,
+            userId: user.user_id.toString(),
+          }),
+        });
+
+        const response = await res.json();
+        if (!response.ok) {
+          setProfilePictureLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Gagal mengunggah foto",
+            description: response.message,
+          });
+        } else {
+          setProfilePictureLoading(false);
+          toast({
+            variant: "success",
+            title: "Berhasil mengunggah foto",
+            description: response.message,
+          });
+          update();
+          router.refresh();
+        }
+      }
+    }
+  };
+
+  const onImageDeleteHandler = async () => {
+    setProfilePictureLoading(true);
+
+    try {
+      const { error } = await supabase.storage
+        .from("users")
+        .remove([`${user.username}/profile-picture.jpg`]);
+      if (error) {
+        setProfilePictureLoading(false);
+        toast({
+          variant: "destructive",
+          description:
+            "Terjadi kesalahan ketika menghapus foto profil, silahkan coba lagi nanti atau hubungi developer jika masalah berlanjut.",
+        });
+      } else {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_UPDATE_USER!, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dataToChange: "profile_picture",
+            dataValue: null,
+            userId: user.user_id.toString(),
+          }),
+        });
+
+        const response = await res.json();
+        if (!response.ok) {
+          setProfilePictureLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Gagal menghapus foto",
+            description: response.message,
+          });
+        } else {
+          setProfilePictureLoading(false);
+          toast({
+            variant: "success",
+            title: "Berhasil menghapus foto",
+            description: response.message,
+          });
+          update();
+          router.refresh();
+        }
+      }
+    } catch (err) {
+      setProfilePictureLoading(false);
+      console.error(err);
+    }
+  };
+
   const onUserDetailChanges = (
     options: TUserDetailChangeOptions,
     defaultValue: string
@@ -33,6 +143,7 @@ export default function UserDashboardComponent({
     setModalValue(defaultValue);
     setIsModalOpen(true);
   };
+
   const onModalCloses = () => {
     setModalOptions(null);
     setIsModalOpen(false);
@@ -49,10 +160,12 @@ export default function UserDashboardComponent({
         onClose={onModalCloses}
       />
       <div className="w-full p-2 rounded-md overflow-hidden flex flex-col gap-4 border border-input">
-        <div className="w-full h-auto aspect-square rounded-md border border-input overflow-hidden relative">
-          {user.account?.profile_picture ? (
+        <div className="w-full h-auto aspect-square grid place-items-center rounded-md border border-input overflow-hidden relative">
+          {profilePictureLoading ? (
+            <Loader2Icon className="w-4 h-4 animate-spin" />
+          ) : user.account?.profile_picture ? (
             <Image
-              src={user.account.profile_picture}
+              src={remoteImageSource(user.account.profile_picture)}
               alt="foto profil"
               fill
               className="object-cover"
@@ -65,7 +178,12 @@ export default function UserDashboardComponent({
           )}
         </div>
 
-        <Button asChild variant="outline" className="cursor-pointer">
+        <Button
+          asChild
+          variant="outline"
+          className="cursor-pointer"
+          disabled={profilePictureLoading}
+        >
           <Label htmlFor="profile-picture">Unggah Gambar</Label>
         </Button>
         <Input
@@ -76,6 +194,16 @@ export default function UserDashboardComponent({
           hidden
           className="hidden"
         />
+
+        {user.account?.profile_picture && (
+          <Button
+            variant="destructive"
+            disabled={profilePictureLoading}
+            onClick={() => onImageDeleteHandler()}
+          >
+            Hapus Foto Profil
+          </Button>
+        )}
 
         <p className="text-sm">
           <b>Note:</b> {IMAGE_UPLOAD_NOTES}

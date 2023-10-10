@@ -104,7 +104,7 @@ export default class Users {
     }
   }
 
-  async updateUser(dataToChange: string, value: string, userId: string) {
+  async updateUser(dataToChange: string, value: string | null, userId: string) {
     const dataChanged =
       dataToChange === "name"
         ? "nama"
@@ -112,6 +112,8 @@ export default class Users {
         ? "nama pengguna"
         : dataToChange === "phone_number"
         ? "nomor telepon"
+        : dataToChange === "profile_picture"
+        ? "foto profil"
         : "alamat utama";
     try {
       const updateUser = await this.prismaUser.update({
@@ -119,17 +121,36 @@ export default class Users {
           user_id: parseInt(userId),
         },
         data:
-          dataToChange !== "name"
+          dataToChange === "name"
             ? {
-                [dataToChange]: value,
-              }
-            : {
                 account: {
                   update: {
-                    user_name: value,
+                    user_name: value!,
                   },
                 },
+              }
+            : dataToChange === "profile_picture"
+            ? {
+                account: {
+                  update: {
+                    profile_picture: value,
+                  },
+                },
+              }
+            : {
+                [dataToChange]: value,
               },
+        // dataToChange !== "name"
+        //   ? {
+        //       [dataToChange]: value,
+        //     }
+        //   : {
+        //       account: {
+        //         update: {
+        //           user_name: value,
+        //         },
+        //       },
+        //     },
       });
 
       if (updateUser) {
