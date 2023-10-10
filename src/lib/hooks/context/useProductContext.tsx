@@ -2,20 +2,18 @@
 
 import { TProduct, TProductCategory } from "@/lib/globals";
 import {
-  NaNHandler,
   fetcher,
-  uploadProductImage,
+  uploadImage,
   variantIdGenerator,
   variantItemsIdGenerator,
 } from "@/lib/helper";
-import { ReactNode, createContext, useEffect, useState } from "react";
+import { ReactNode, createContext, useState } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import useSWR from "swr";
 import { TProductContextType } from "./productContextType";
 import { useToast } from "@/components/ui/use-toast";
 import imageCompression from "browser-image-compression";
 import { Session } from "next-auth";
-import { useRouter } from "next/navigation";
 
 type TProductInput = {
   title: string;
@@ -209,14 +207,15 @@ export function ProductProvider({
         maxWidthOrHeight: 1024,
       });
 
-      const uploadImage = await uploadProductImage(
+      const productImage = await uploadImage(
         compressedImage,
         `/PROD-${productId}/${
           product ? product.images.length + (index + 1) : index + 1
-        }.jpg`
+        }.jpg`,
+        "products"
       );
-      if (uploadImage.imageURL) {
-        imagesURL.push(uploadImage.imageURL);
+      if (productImage.imageURL) {
+        imagesURL.push(productImage.imageURL);
       }
     }
     return imagesURL.concat(currentProductImages);
