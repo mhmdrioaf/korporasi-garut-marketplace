@@ -79,6 +79,7 @@ model product {
   stock       Int      @default(1)
   seller_id   Int
   category_id String?
+  tags        String[]
 
   category    product_category? @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user              @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)

@@ -26,6 +26,7 @@ interface IProductRequestBody {
   category_id: string | null;
   secret: string;
   id: string;
+  tags: string[];
 }
 
 async function handler(request: NextRequest) {

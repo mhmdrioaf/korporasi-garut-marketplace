@@ -17,6 +17,7 @@ import {
 import ProductImageAdd from "../product-image-add";
 import { ProductContext } from "@/lib/hooks/context/useProductContext";
 import { TProductContextType } from "@/lib/hooks/context/productContextType";
+import ProductTagsInput from "./product-tags-input";
 
 export default function ProductAddForm() {
   const {
@@ -155,6 +156,18 @@ export default function ProductAddForm() {
               <SelectItem value="false">Tidak</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="keywords" className="font-bold text-primary">
+            Kata kunci produk
+          </Label>
+          <ProductTagsInput />
+          <p className="text-sm">
+            Kata kunci berguna untuk meningkatkan tingkat ditemukannya produk
+            pada mesin pencarian produk. Harap isi kata kunci sesuai dengan
+            jenis produk yang akan anda unggah.
+          </p>
         </div>
       </div>
 

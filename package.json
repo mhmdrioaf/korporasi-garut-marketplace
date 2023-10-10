@@ -49,8 +49,8 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "@prisma/client": "^5.4.1",
+    "@prisma/client": "^5.4.2",
     "@types/bcrypt": "^5.0.0",
-    "prisma": "^5.4.1"
+    "prisma": "^5.4.2"
   }
 }

@@ -18,6 +18,7 @@ type TProduct = {
   variant: TProductVariant[];
   category_id: string | null;
   seller: Omit<TUser, "account" | "address" | "orders" | "products">;
+  tags: string[];
 };
 
 type TProductVariant = {

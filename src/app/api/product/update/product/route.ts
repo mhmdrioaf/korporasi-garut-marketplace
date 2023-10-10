@@ -31,6 +31,7 @@ interface IProductUpdateRequestBody {
   id: string;
   deletedVariantItems: string[];
   deletedVariant: string[];
+  tags: string[];
 }
 
 async function handler(request: NextRequest) {
