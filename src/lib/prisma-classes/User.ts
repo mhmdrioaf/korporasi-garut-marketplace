@@ -5,6 +5,7 @@ import {
   properizeWords,
 } from "../helper";
 import * as bcrypt from "bcrypt";
+import supabase from "../supabase";
 
 type TRegisterData = {
   phone_number: string;
@@ -104,7 +105,7 @@ export default class Users {
     }
   }
 
-  async updateUser(dataToChange: string, value: string, userId: string) {
+  async updateUser(dataToChange: string, value: string | null, userId: string) {
     const dataChanged =
       dataToChange === "name"
         ? "nama"
@@ -112,6 +113,8 @@ export default class Users {
         ? "nama pengguna"
         : dataToChange === "phone_number"
         ? "nomor telepon"
+        : dataToChange === "profile_picture"
+        ? "foto profil"
         : "alamat utama";
     try {
       const updateUser = await this.prismaUser.update({
@@ -119,17 +122,36 @@ export default class Users {
           user_id: parseInt(userId),
         },
         data:
-          dataToChange !== "name"
+          dataToChange === "name"
             ? {
-                [dataToChange]: value,
-              }
-            : {
                 account: {
                   update: {
-                    user_name: value,
+                    user_name: value!,
                   },
                 },
+              }
+            : dataToChange === "profile_picture"
+            ? {
+                account: {
+                  update: {
+                    profile_picture: value,
+                  },
+                },
+              }
+            : {
+                [dataToChange]: value,
               },
+        // dataToChange !== "name"
+        //   ? {
+        //       [dataToChange]: value,
+        //     }
+        //   : {
+        //       account: {
+        //         update: {
+        //           user_name: value,
+        //         },
+        //       },
+        //     },
       });
 
       if (updateUser) {
@@ -164,6 +186,88 @@ export default class Users {
             "Telah terjadi kesalahan pada server, silahkan coba lagi nanti.",
         };
       }
+    }
+  }
+
+  async deleteUser(username: string) {
+    const user = await this.prismaUser.findFirst({
+      where: {
+        username: {
+          equals: username,
+        },
+      },
+      include: {
+        products: true,
+        account: true,
+      },
+    });
+
+    if (user) {
+      if (user.account?.profile_picture) {
+        const profilePictureDelete = await supabase.storage
+          .from("users")
+          .remove([`${username}/profile-picture.jpg`]);
+        if (profilePictureDelete.error) {
+          console.error(
+            "An error occurred while deleting user profile picture",
+            profilePictureDelete.error
+          );
+          return {
+            status: "failed",
+            message:
+              "Telah terjadi kesalahan ketika menghapus foto profil user.",
+          };
+        }
+      }
+
+      if (user.products.length > 0) {
+        user.products.forEach(async (product) => {
+          const { data: productImageLists } = await supabase.storage
+            .from("products")
+            .list(`PROD-${product.id}`);
+          if (productImageLists) {
+            const imagesToRemove = productImageLists.map(
+              (file) => `PROD-${product.id}/${file.name}`
+            );
+            const { error: productImagesDeleteError } = await supabase.storage
+              .from("products")
+              .remove(imagesToRemove);
+            if (productImagesDeleteError) {
+              console.error(
+                "An error occurred while deleting user product images: ",
+                productImagesDeleteError
+              );
+              return {
+                status: "failed",
+                message: "Gagal menghapus foto-foto produk user.",
+              };
+            }
+          }
+        });
+      }
+
+      const deleteUser = await this.prismaUser.delete({
+        where: {
+          username: username,
+        },
+      });
+
+      if (deleteUser) {
+        return {
+          status: "success",
+          message: "Berhasil menghapus user.",
+        };
+      } else {
+        return {
+          status: "failed",
+          message: "Telah terjadi kesalahan ketika menghapus data user.",
+        };
+      }
+    } else {
+      return {
+        status: "failed",
+        message: `User dengan nama pengguna ${username} tidak ditemukan.`,
+      };
     }
   }
 }

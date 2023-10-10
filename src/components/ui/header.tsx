@@ -14,7 +14,7 @@ import {
   User2Icon,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
-import { getAvatarInitial } from "@/lib/helper";
+import { getAvatarInitial, remoteImageSource } from "@/lib/helper";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -229,8 +229,13 @@ export default function Header({ session }: { session: Session | null }) {
             <DropdownMenuTrigger asChild>
               <Avatar className="w-12 h-12 cursor-pointer">
                 <AvatarImage
-                  src={session.user.image ?? undefined}
+                  src={
+                    session.user.image
+                      ? remoteImageSource(session.user.image)
+                      : undefined
+                  }
                   alt="Profile pic"
+                  className="object-cover"
                 />
                 <AvatarFallback className="bg-background border border-stone-300">
                   {getAvatarInitial(session.user.name!)}

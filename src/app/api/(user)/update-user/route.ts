@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface IUpdateUserBody {
   dataToChange: string;
-  dataValue: string;
+  dataValue: string | null;
   userId: string;
 }
 
@@ -15,11 +15,11 @@ async function handler(request: NextRequest) {
   try {
     const valueToSubmit =
       body.dataToChange === "name"
-        ? properizeWords(body.dataValue)
+        ? properizeWords(body.dataValue!)
         : body.dataToChange === "username"
-        ? body.dataValue.toLowerCase()
+        ? body.dataValue!.toLowerCase()
         : body.dataToChange === "phone_number"
-        ? phoneNumberGenerator(body.dataValue)
+        ? phoneNumberGenerator(body.dataValue!)
         : body.dataValue;
     const users = new Users(db.user);
     const updateUser = await users.updateUser(

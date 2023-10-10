@@ -188,9 +188,13 @@ export const createImagePreview = (file: File) => {
   return imageUrl;
 };
 
-export const uploadProductImage = async (image: File, imageName: string) => {
+export const uploadImage = async (
+  image: File,
+  imageName: string,
+  bucket: string
+) => {
   const { data: uploadedImage, error: uploadError } = await supabase.storage
-    .from("products")
+    .from(bucket)
     .upload(imageName, image, {
       cacheControl: "3600",
       upsert: true,
@@ -198,7 +202,7 @@ export const uploadProductImage = async (image: File, imageName: string) => {
 
   if (uploadedImage) {
     const { data: imageURL } = supabase.storage
-      .from("products")
+      .from(bucket)
       .getPublicUrl(imageName);
 
     return {
