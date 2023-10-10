@@ -36,6 +36,7 @@ interface IProductData {
   variant_items: TProductVariantItemInput[] | null;
   category_id: string | null;
   id: string;
+  tags: string[];
 }
 
 interface IProductUpdateData extends IProductData {
@@ -151,6 +152,7 @@ export default class Product {
           data.category_id === "noCategory" || data.category_id === ""
             ? null
             : data.category_id,
+        tags: data.tags,
       },
     });
   }
@@ -236,6 +238,7 @@ export default class Product {
         unit: data.unit,
         weight: data.weight,
         category_id: data.category_id,
+        tags: data.tags,
       },
     });
   }

@@ -61,6 +61,9 @@ export function ProductProvider({
   );
   const [deletedVariantItems, setDeletedVariantItems] = useState<string[]>([]);
   const [deletedVariant, setDeletedVariant] = useState<string[]>([]);
+  const [productTags, setProductTags] = useState<string[]>(
+    product ? product.tags : []
+  );
 
   const [uploading, setUploading] = useState<boolean>(false);
 
@@ -250,6 +253,7 @@ export function ProductProvider({
       category_id: rest.product.category_id ?? null,
       seller_id: session.user.id,
       id: productsId,
+      tags: productTags,
     };
 
     const requestBody = product
@@ -262,6 +266,7 @@ export function ProductProvider({
           id: product.id,
           deletedVariantItems: deletedVariantItems,
           deletedVariant: deletedVariant,
+          tags: productTags,
         }
       : {
           ...newProduct,
@@ -330,6 +335,8 @@ export function ProductProvider({
     product: product,
     currentImages: currentProductImages,
     removeCurrentImage: onCurrentProductImageDeleteHandler,
+    tags: productTags,
+    setTags: setProductTags,
   };
 
   return (

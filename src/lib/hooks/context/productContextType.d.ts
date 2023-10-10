@@ -59,4 +59,6 @@ type TProductContextType = {
   product: TProduct | null;
   currentImages: string[];
   removeCurrentImage: (deletedImage: string) => void;
+  tags: string[];
+  setTags: React.Dispatch<SetStateAction<string[]>>;
 };
