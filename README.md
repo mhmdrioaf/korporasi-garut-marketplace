@@ -12,7 +12,8 @@ The purpose of this project is to fulfill my thesis project and also to facilita
 ## Development Tools
 
 ### Proposed database diagram (unfinished)  
-![mhmdrioaf-thesis](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/2e575985-a360-451c-8a8f-a2e9fd82780c)
+![mhmdrioaf-thesis](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/1d9d49bb-a475-4d7b-b21b-28a08b0237a6)
+
 
 
 ### Proposed class diagram (unfinished)  
