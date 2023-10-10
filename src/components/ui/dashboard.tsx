@@ -15,6 +15,7 @@ import { useToast } from "./use-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import supabase from "@/lib/supabase";
+import UserDeleteModal from "./modals/user-delete";
 
 interface IUserDashboardComponentProps {
   user: TUser;
@@ -28,6 +29,7 @@ export default function UserDashboardComponent({
   const [modalOptions, setModalOptions] =
     useState<TUserDetailChangeOptions | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isUserDelete, setIsUserDelete] = useState<boolean>(false);
   const [modalValue, setModalValue] = useState<string | null>(null);
   const [profilePictureLoading, setProfilePictureLoading] =
     useState<boolean>(false);
@@ -147,6 +149,7 @@ export default function UserDashboardComponent({
   const onModalCloses = () => {
     setModalOptions(null);
     setIsModalOpen(false);
+    setIsUserDelete(false);
     setModalValue(null);
   };
 
@@ -158,6 +161,11 @@ export default function UserDashboardComponent({
         defaultValue={modalValue ?? ""}
         isOpen={isModalOpen}
         onClose={onModalCloses}
+      />
+      <UserDeleteModal
+        isOpen={isUserDelete}
+        onClose={onModalCloses}
+        username={user.username}
       />
       <div className="w-full p-2 rounded-md overflow-hidden flex flex-col gap-4 border border-input">
         <div className="w-full h-auto aspect-square grid place-items-center rounded-md border border-input overflow-hidden relative">
@@ -291,7 +299,7 @@ export default function UserDashboardComponent({
         <div className="w-full p-2 mb-20 lg:mb-0 flex flex-col gap-4 rounded-md border border-input">
           <p className="text-xl text-red-700 font-bold">Aksi Berbahaya</p>
           <p className="text-sm text-stone-700">{ACCOUNT_DELETE_NOTES}</p>
-          <Button variant="destructive">
+          <Button variant="destructive" onClick={() => setIsUserDelete(true)}>
             <Trash2Icon className="w-4 h-4 mr-2" />
             <span>Hapus Akun</span>
           </Button>
