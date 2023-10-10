@@ -1,11 +1,11 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import {
   properizeWords,
   variantIdGenerator,
   variantItemsIdGenerator,
 } from "../helper";
 import { db } from "../db";
-import { TProductVariant } from "../globals";
+import { TProduct, TProductVariant } from "../globals";
 import supabase from "../supabase";
 
 type TProductVariantInput = {
@@ -424,5 +424,45 @@ export default class Product {
         id: parseInt(id),
       },
     });
+  }
+
+  async searchProducts(query: string) {
+    const productsQuerySearch = await this.prismaProduct.findMany({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            description: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      include: {
+        variant: {
+          include: {
+            variant_item: true,
+          },
+        },
+        seller: true,
+      },
+    });
+
+    if (productsQuerySearch.length < 1) {
+      return await db.$queryRaw`
+        SELECT * FROM product
+        WHERE EXISTS (
+        SELECT FROM unnest(tags) tags
+        WHERE tags LIKE ${`%${query}%`}
+     )`;
+    } else {
+      return productsQuerySearch;
+    }
   }
 }
