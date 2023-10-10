@@ -6,12 +6,8 @@ import { useState } from "react";
 import { Button } from "./button";
 import { SearchIcon } from "lucide-react";
 
-interface ISearchBarComponentProps {
-  defaultQuery: string;
-}
-
-export default function SearchBar({ defaultQuery }: ISearchBarComponentProps) {
-  const [query, setQuery] = useState<string>(defaultQuery);
+export default function SearchBar() {
+  const [query, setQuery] = useState<string>("");
   const [isKeyReleased, setIsKeyReleased] = useState<boolean>(false);
   const router = useRouter();
 
@@ -56,7 +52,7 @@ export default function SearchBar({ defaultQuery }: ISearchBarComponentProps) {
         onChange={onQueryChangeHandler}
         onKeyDown={onInputKeyDownHandler}
         onKeyUp={onInputKeyUpHandler}
-        placeholder="Cari produk..."
+        placeholder="Cari produk, kategori, kata kunci, penjual, dll"
       />
       <Button
         variant={query.length ? "default" : "ghost"}

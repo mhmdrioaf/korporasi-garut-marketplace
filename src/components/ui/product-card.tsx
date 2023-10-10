@@ -12,7 +12,7 @@ export default function ProductCard({ product }: TProductCardProps) {
   return (
     <Link
       href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
-      className="w-full border border-stone-200 p-2 min-h-full max-h-96 overflow-hidden flex flex-col gap-2 rounded-lg"
+      className="w-full border border-stone-200 p-2 min-h-full max-h-96 overflow-hidden flex flex-col gap-2 rounded-lg select-none"
     >
       <div className="w-full h-32 bg-stone-200 shrink-0 rounded-md overflow-hidden relative">
         <Image

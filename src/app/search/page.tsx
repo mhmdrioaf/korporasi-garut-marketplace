@@ -6,7 +6,6 @@ import { fetcher } from "@/lib/helper";
 import { useSearchParams } from "next/navigation";
 import useSWR from "swr";
 import Loading from "../loading";
-import SearchBar from "@/components/ui/search-bar";
 import { ROUTES } from "@/lib/constants";
 import { ArrowLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +31,6 @@ export default function SearchResultPage() {
           </Link>
           <p className="text-2xl text-primary font-bold">Hasil Pencarian</p>
         </div>
-        <SearchBar defaultQuery={query ?? ""} />
         {data.result.length < 1 ? (
           <div className="w-full grid place-items-center text-sm">
             Produk yang anda cari tidak ditemukan...

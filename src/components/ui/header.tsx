@@ -1,20 +1,25 @@
 "use client";
-
-import Image from "next/image";
-import logo from "../../../public/smk_logo.png";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
+import logo from "../../../public/smk_logo.png";
 import {
+  BellIcon,
+  FacebookIcon,
   GanttChartSquareIcon,
+  InstagramIcon,
   LayoutDashboardIcon,
-  LogIn,
-  LogOut,
-  Menu,
+  LogInIcon,
+  LogOutIcon,
+  MenuIcon,
+  ShoppingCartIcon,
+  TwitterIcon,
   User2Icon,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
+import Image from "next/image";
+import SearchBar from "./search-bar";
+import { Button } from "./button";
+import { Session } from "next-auth";
 import { getAvatarInitial, remoteImageSource } from "@/lib/helper";
+import { ROUTES } from "@/lib/constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,32 +29,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "./sheet";
-import { Session } from "next-auth";
+import { Avatar, AvatarFallback } from "./avatar";
+import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
-import { useState } from "react";
-import { ROUTES } from "@/lib/constants";
+import { signOut } from "next-auth/react";
 
-export default function Header({ session }: { session: Session | null }) {
-  const [showSheet, setShowSheet] = useState(false);
+interface IHeaderComponentProps {
+  session: Session | null;
+}
 
-  const pathname = usePathname();
+export default function Header({ session }: IHeaderComponentProps) {
   const router = useRouter();
   const { toast } = useToast();
-
-  const activeStyles = "font-bold text-primary";
-  const baseLinkStyles =
-    "p-2 rounded-lg grid place-items-center w-full hover:bg-primary hover:text-primary-foreground";
-  const linkStyles = {
-    default: " bg-background text-foreground",
-    active: " bg-primary text-primary-foreground",
-  };
 
   const onButtonLinkClickHandler = (options: "LOGIN" | "REGISTER") => {
     if (options === "LOGIN") {
@@ -70,110 +61,106 @@ export default function Header({ session }: { session: Session | null }) {
       })
       .catch((err) => console.error(err));
   };
-
   return (
-    <div className="w-full px-4 md:px-16 py-2 border-b border-b-stone-300 relative lg:sticky top-0 left-0 grid grid-cols-3 place-items-center bg-background z-50">
-      <div className="gap-4 justify-self-start hidden lg:inline-flex">
-        <Link
-          className={
-            pathname === ROUTES.LANDING_PAGE
-              ? activeStyles
-              : "hover:text-primary hover:underline hover:underline-offset-8"
-          }
-          href={ROUTES.LANDING_PAGE}
-        >
-          Marketplace
-        </Link>
-        <Link
-          className={
-            pathname === "/ee"
-              ? activeStyles
-              : "hover:text-primary hover:underline hover:underline-offset-8"
-          }
-          href="#"
-        >
-          Kategori
-        </Link>
-        <Link
-          className={
-            pathname === "/rr"
-              ? activeStyles
-              : "hover:text-primary hover:underline hover:underline-offset-8"
-          }
-          href="#"
-        >
-          FAQs
-        </Link>
+    <div className="w-full flex flex-col overflow-hidden sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
+      <div className="w-full px-8 py-2 md:px-16 bg-slate-200 text-stone-800 flex flex-row items-center text-sm justify-between">
+        <div className="flex flex-row items-center gap-1">
+          <p>Ikuti kami di</p>
+          <Link target="_blank" href="https://facebook.com/mr.r3v">
+            <FacebookIcon className="w-4 h-4" />
+          </Link>
+          <Link target="_blank" href="https://instagram.com/mhmdrioaf">
+            <InstagramIcon className="w-4 h-4" />
+          </Link>
+          <Link target="_blank" href="https://twitter.com/oirioir">
+            <TwitterIcon className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <div className="flex flex-row items-center gap-1 min-h-full">
+          <Link href="#">Tentang SMKs Korporasi Garut</Link>
+          <span>|</span>
+          <Link href="#">Bantuan</Link>
+          <span>|</span>
+          <Link href="#">Promo</Link>
+        </div>
       </div>
 
-      <span className="justify-self-start lg:hidden">
-        <Sheet
-          open={showSheet}
-          onOpenChange={() => setShowSheet((prev) => !prev)}
+      <div className="w-full flex flex-row items-center self-stretch justify-center gap-4 px-8 py-2 md:px-16">
+        <Link
+          href={ROUTES.LANDING_PAGE}
+          className="flex flex-row gap-4 items-center shrink-0 select-none"
         >
-          <SheetTrigger>
-            <div className="p-2 rounded-md border border-stone-200 grid place-items-center">
-              <Menu className="w-6 h-6" />
-            </div>
-          </SheetTrigger>
+          <Image src={logo} width={64} height={64} alt="Logo SMK" />
+          <div className="flex flex-col text-primary font-bold">
+            <p>SMKs Korporasi Garut</p>
+            <p>Marketplace</p>
+          </div>
+        </Link>
 
-          <SheetContent className="w-full flex flex-col gap-8" side="left">
-            <SheetHeader>
-              <SheetTitle>Menu</SheetTitle>
-            </SheetHeader>
+        <SearchBar />
 
-            <div className="w-full flex flex-col gap-4">
-              <Link
-                onClick={() => setShowSheet(false)}
-                className={
-                  pathname === ROUTES.LANDING_PAGE
-                    ? baseLinkStyles + linkStyles.active
-                    : baseLinkStyles
-                }
-                href={ROUTES.LANDING_PAGE}
-              >
-                Marketplace
-              </Link>
-              <Link
-                onClick={() => setShowSheet(false)}
-                className={
-                  pathname === "#"
-                    ? baseLinkStyles + linkStyles.active
-                    : baseLinkStyles
-                }
-                href="#"
-              >
-                Kategori
-              </Link>
-              <Link
-                onClick={() => setShowSheet(false)}
-                className={
-                  pathname === "#"
-                    ? baseLinkStyles + linkStyles.active
-                    : baseLinkStyles
-                }
-                href="#"
-              >
-                FAQs
-              </Link>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </span>
+        <div className="flex flex-row items-center gap-2">
+          <Button variant="ghost" size="icon">
+            <ShoppingCartIcon className="w-4 h-4" />
+          </Button>
+          <span>|</span>
+          <Button variant="ghost" size="icon">
+            <BellIcon className="w-4 h-4" />
+          </Button>
+        </div>
 
-      <Link className="w-16 h-16 relative" href={ROUTES.LANDING_PAGE}>
-        <Image
-          src={logo}
-          alt="smk logo"
-          fill
-          className="object-center"
-          sizes="100vw"
-        />
-      </Link>
-
-      <div className="gap-4 justify-self-end inline-flex">
-        {session === null ? (
+        {session && (
           <>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="flex flex-row items-center gap-2 select-none cursor-pointer">
+                  <div className="w-12 h-12 rounded-full overflow-hidden relative grid place-items-center border border-input">
+                    {session.user.image ? (
+                      <Image
+                        src={remoteImageSource(session.user.image)}
+                        fill
+                        className="object-cover"
+                        alt="Foto profil"
+                      />
+                    ) : (
+                      <p>{getAvatarInitial(session.user.name!)}</p>
+                    )}
+                  </div>
+                  <MenuIcon className="w-4 h-4" />
+                </div>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="w-52 mr-4">
+                <DropdownMenuLabel>
+                  <span>{session.user.username}</span>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem>
+                    <Link
+                      href={ROUTES.USER.DASHBOARD}
+                      className="w-full flex flex-row"
+                    >
+                      <LayoutDashboardIcon className="w-4 h-4 mr-2" />
+                      <span>Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
+                    onClick={signOutHandler}
+                  >
+                    <LogOutIcon className="mr-2 h-4 w-4" />
+                    <span>Keluar</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
+
+        {!session && (
+          <div className="flex flex-row items-center gap-2">
             <span className="hidden lg:inline-flex gap-4">
               <Link
                 href={ROUTES.AUTH.LOGIN}
@@ -208,7 +195,7 @@ export default function Header({ session }: { session: Session | null }) {
                       className="bg-primary text-primary-foreground cursor-pointer"
                       onClick={() => onButtonLinkClickHandler("LOGIN")}
                     >
-                      <LogIn className="mr-2 h-2 w-2" />
+                      <LogInIcon className="mr-2 h-2 w-2" />
                       <span>Login</span>
                     </DropdownMenuItem>
 
@@ -223,51 +210,7 @@ export default function Header({ session }: { session: Session | null }) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </span>
-          </>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Avatar className="w-12 h-12 cursor-pointer">
-                <AvatarImage
-                  src={
-                    session.user.image
-                      ? remoteImageSource(session.user.image)
-                      : undefined
-                  }
-                  alt="Profile pic"
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-background border border-stone-300">
-                  {getAvatarInitial(session.user.name!)}
-                </AvatarFallback>
-              </Avatar>
-            </DropdownMenuTrigger>
-
-            <DropdownMenuContent className="w-52 mr-4">
-              <DropdownMenuLabel>
-                <span>{session.user.username}</span>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem>
-                  <Link
-                    href={ROUTES.USER.DASHBOARD}
-                    className="w-full flex flex-row"
-                  >
-                    <LayoutDashboardIcon className="w-4 h-4 mr-2" />
-                    <span>Dashboard</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
-                  onClick={signOutHandler}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Keluar</span>
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,6 @@
 import Carousel from "@/components/ui/carousel";
 import { Container } from "@/components/ui/container";
 import ProductsList from "@/components/ui/products-list";
-import SearchBar from "@/components/ui/search-bar";
 import { CarouselAssets } from "@/lib/constants";
 import { TProduct } from "@/lib/globals";
 
@@ -24,7 +23,6 @@ export default async function Home() {
   const products = await listProducts();
   return (
     <Container variant="column">
-      <SearchBar defaultQuery="" />
       <Carousel className="h-96" assets={CarouselAssets} />
       <ProductsList products={products} />
       {/* TODO: Add sidebar containing product categories */}
