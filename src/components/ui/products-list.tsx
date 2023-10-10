@@ -1,23 +1,13 @@
 import { TProduct } from "@/lib/globals";
 import ProductCard from "./product-card";
 
-async function listProdudcts() {
-  const fetchProducts = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_LIST!, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    cache: "no-store",
-  });
-
-  const response = await fetchProducts.json();
-  if (!response.ok) {
-    return [];
-  } else {
-    return response.result.products as TProduct[];
-  }
+interface IProductListComponentProps {
+  products: TProduct[];
 }
 
-export default async function ProductsList() {
-  const products = await listProdudcts();
+export default async function ProductsList({
+  products,
+}: IProductListComponentProps) {
   if (products.length > 0) {
     return (
       <div className="w-full grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 md:place-items-center overflow-auto">
