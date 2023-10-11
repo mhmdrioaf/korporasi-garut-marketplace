@@ -46,6 +46,15 @@ export const ROUTES = {
     ADD: "/product/add",
     EDIT: (id: string) => `/product/edit/${id}`,
   },
+  ADMIN: {
+    DASHBOARD: "/admin",
+    USER_MANAGEMENT: {
+      MAIN: "/admin/user-management",
+      USERS: "/admin/user-management/users",
+      SELLERS: "/admin/user-management/sellers",
+    },
+    PRODUCT_MANAGEMENT: "/admin/product-management",
+  },
 };
 
 export const CATEGORIES_OPTIONS = (CATEGORY_ID: string) =>
