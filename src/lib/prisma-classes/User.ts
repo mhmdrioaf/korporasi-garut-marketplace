@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
   accountIdGenerator,
+  allowanceHelper,
   capitalizeFirstWord,
   properizeWords,
 } from "../helper";
@@ -268,6 +269,24 @@ export default class Users {
         status: "failed",
         message: `User dengan nama pengguna ${username} tidak ditemukan.`,
       };
+    }
+  }
+
+  async listUser(token: string) {
+    if (allowanceHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      return await this.prismaUser.findMany({
+        include: {
+          account: true,
+          address: true,
+          orders: true,
+          products: true,
+        },
+        orderBy: {
+          role: "asc",
+        },
+      });
+    } else {
+      return null;
     }
   }
 }
