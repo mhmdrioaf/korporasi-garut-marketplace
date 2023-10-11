@@ -15,6 +15,7 @@ type TRegisterData = {
   email: string;
   password: string;
   token: string;
+  role?: "CUSTOMER" | "SELLER";
 };
 
 type TLoginData = {
@@ -41,6 +42,7 @@ export default class Users {
         username: data.username.toLowerCase(),
         phone_number: data.phone_number,
         token: data.token,
+        role: data.role ?? "CUSTOMER",
         account: {
           connectOrCreate: {
             where: {

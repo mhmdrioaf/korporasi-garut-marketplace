@@ -1,8 +1,10 @@
 import NoAccess from "@/components/ui/no-access";
 import UsersList from "@/components/ui/user-list";
 import authOptions from "@/lib/authOptions";
+import { ROUTES } from "@/lib/constants";
 import { TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
+import Link from "next/link";
 
 export const metadata = {
   title: "Kelola Pengguna | SMKs Korporasi Garut",
@@ -38,7 +40,17 @@ export default async function UserManagementPageUsers() {
     if (!users) {
       return <NoAccess />;
     } else {
-      return <UsersList users={users} />;
+      return (
+        <div className="w-full flex flex-col gap-4">
+          <Link
+            href={ROUTES.ADMIN.USER_MANAGEMENT.ADD_SELLER}
+            className="px-4 py-2 rounded-md text-sm bg-primary text-primary-foreground flex items-center justify-center self-end"
+          >
+            Tambahkan Penjual
+          </Link>
+          <UsersList users={users} />
+        </div>
+      );
     }
   }
 }

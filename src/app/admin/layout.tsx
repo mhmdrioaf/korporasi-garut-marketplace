@@ -3,7 +3,12 @@ import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
 import { permissionHelper } from "@/lib/helper";
 import { AdminProvider } from "@/lib/hooks/context/useAdmin";
-import { LayoutDashboardIcon, Package2Icon, Users2Icon } from "lucide-react";
+import {
+  LayoutDashboardIcon,
+  Package2Icon,
+  UserPlus2Icon,
+  Users2Icon,
+} from "lucide-react";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
@@ -59,6 +64,15 @@ export default async function AdminDashboardLayout({
           >
             <Users2Icon className="w-6 h-6" />
             <p className="font-bold text-sm lg:hidden">Kelola Pengguna</p>
+          </Link>
+
+          <Link
+            className="w-full lg:w-fit grid place-items-center p-2"
+            href={ROUTES.ADMIN.USER_MANAGEMENT.ADD_SELLER}
+            title="Tambahkan Penjual"
+          >
+            <UserPlus2Icon className="w-6 h-6" />
+            <p className="font-bold text-sm lg:hidden">Tambahkan Penjual</p>
           </Link>
 
           <Link

@@ -52,6 +52,7 @@ export const ROUTES = {
       MAIN: "/admin/user-management",
       USERS: "/admin/user-management/users",
       SELLERS: "/admin/user-management/sellers",
+      ADD_SELLER: "/admin/seller-add",
     },
     PRODUCT_MANAGEMENT: "/admin/product-management",
   },
