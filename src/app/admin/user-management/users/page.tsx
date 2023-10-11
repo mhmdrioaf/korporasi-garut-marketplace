@@ -1,8 +1,12 @@
-import AdminDashboardComponent from "@/components/ui/admin-dashboard";
 import NoAccess from "@/components/ui/no-access";
+import UsersList from "@/components/ui/user-list";
 import authOptions from "@/lib/authOptions";
 import { TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
+
+export const metadata = {
+  title: "Kelola Pengguna | SMKs Korporasi Garut",
+};
 
 async function listAllUser(token: string) {
   const res = await fetch(process.env.NEXT_PUBLIC_API_LIST_ALL_USERS!, {
@@ -18,7 +22,7 @@ async function listAllUser(token: string) {
   return response.result as TUser[] | null;
 }
 
-export default async function AdminDashboardPage() {
+export default async function UserManagementPageUsers() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -26,12 +30,15 @@ export default async function AdminDashboardPage() {
   } else {
     const usersData = await listAllUser(session.user.token);
     const users = usersData
-      ? usersData.filter((user) => user.username !== session.user.username)
+      ? usersData.filter(
+          (user) =>
+            user.username !== session.user.username && user.role === "CUSTOMER"
+        )
       : null;
     if (!users) {
       return <NoAccess />;
     } else {
-      return <AdminDashboardComponent users={users} />;
+      return <UsersList users={users} />;
     }
   }
 }
