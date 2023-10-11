@@ -54,7 +54,12 @@ export const ROUTES = {
       SELLERS: "/admin/user-management/sellers",
       ADD_SELLER: "/admin/seller-add",
     },
-    PRODUCT_MANAGEMENT: "/admin/product-management",
+    PRODUCT_MANAGEMENT: {
+      MAIN: "/admin/product-management",
+      APPROVED: "/admin/product-management/approved",
+      REJECTED: "/admin/product-management/rejected",
+    },
+    PRODUCT_DETAIL: (id: string) => `/admin/product/${id}`,
   },
 };
 

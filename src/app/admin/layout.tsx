@@ -77,7 +77,7 @@ export default async function AdminDashboardLayout({
 
           <Link
             className="w-full lg:w-fit grid place-items-center p-2"
-            href="#"
+            href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
             title="Kelola Produk"
           >
             <Package2Icon className="w-6 h-6" />
