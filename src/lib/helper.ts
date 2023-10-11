@@ -223,3 +223,7 @@ export const remoteImageSource = (source: string) => {
   const timestamp = date.getTime();
   return `${source}?t=${timestamp}`;
 };
+
+export const permissionHelper = (a: string, b: string) => {
+  return a === b;
+};

@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
   accountIdGenerator,
-  allowanceHelper,
+  permissionHelper,
   capitalizeFirstWord,
   properizeWords,
 } from "../helper";
@@ -273,7 +273,7 @@ export default class Users {
   }
 
   async listUser(token: string) {
-    if (allowanceHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+    if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
       return await this.prismaUser.findMany({
         include: {
           account: true,
