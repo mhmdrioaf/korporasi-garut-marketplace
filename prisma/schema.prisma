@@ -69,17 +69,18 @@ model order_item {
 }
 
 model product {
-  id          Int      @id @default(autoincrement())
+  id          Int            @id @default(autoincrement())
   title       String
   description String
   price       Int
   images      String[]
   unit        String
   weight      Int
-  stock       Int      @default(1)
+  stock       Int            @default(1)
   seller_id   Int
   category_id String?
   tags        String[]
+  status      PRODUCT_STATUS @default(PENDING)
 
   category    product_category? @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user              @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
@@ -127,4 +128,10 @@ enum ORDER_STATUS {
   SHIPPED
   DELIVERED
   FINISHED
+}
+
+enum PRODUCT_STATUS {
+  PENDING
+  APPROVED
+  REJECTED
 }
