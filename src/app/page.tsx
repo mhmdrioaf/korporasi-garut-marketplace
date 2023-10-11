@@ -24,7 +24,9 @@ export default async function Home() {
   return (
     <Container variant="column">
       <Carousel className="h-96" assets={CarouselAssets} />
-      <ProductsList products={products} />
+      <ProductsList
+        products={products.filter((product) => product.status === "APPROVED")}
+      />
       {/* TODO: Add sidebar containing product categories */}
     </Container>
   );
