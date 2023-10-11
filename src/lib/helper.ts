@@ -227,3 +227,17 @@ export const remoteImageSource = (source: string) => {
 export const permissionHelper = (a: string, b: string) => {
   return a === b;
 };
+
+export const userRoleConverter = (role: string) => {
+  switch (role) {
+    case "ADMIN":
+      return "Administrator";
+    case "SELLER":
+      return "Penjual";
+    case "CUSTOMER":
+      return "Pelanggan";
+
+    default:
+      return "Tidak diketahui";
+  }
+};
