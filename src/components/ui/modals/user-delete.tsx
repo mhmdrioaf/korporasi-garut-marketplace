@@ -12,6 +12,7 @@ interface IUserDeleteModalProps {
   username: string;
   isOpen: boolean;
   onClose: () => void;
+  executor?: string;
 }
 
 type TUserDeleteInputs = {
@@ -22,6 +23,7 @@ export default function UserDeleteModal({
   username,
   isOpen,
   onClose,
+  executor = "user",
 }: IUserDeleteModalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -61,7 +63,9 @@ export default function UserDeleteModal({
         });
       } else {
         setIsLoading(false);
-        router.replace(ROUTES.LANDING_PAGE);
+        if (executor === "user") {
+          router.replace(ROUTES.LANDING_PAGE);
+        }
         router.refresh();
         onClose();
         toast({
