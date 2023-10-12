@@ -6,31 +6,31 @@ import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductStatusChangeModal from "./modals/product-status-change";
+import { useToast } from "./use-toast";
 
 interface IAdminProductListComponentProps {
   products: TProduct[];
   token: string;
-  type?: "APPROVED" | "PENDING" | "REJECTED";
 }
 
 export default function AdminProductList({
   products,
   token,
-  type = "PENDING",
 }: IAdminProductListComponentProps) {
   const [isStatusUpdate, setIsStatusUpdate] = useState<boolean>(false);
   const [productToUpdate, setProductToUpdate] = useState<string | null>(null);
   const [productStatusUpdateOption, setProductStatusUpdateOption] = useState<
     "APPROVED" | "REJECTED" | null
   >(null);
-
   const [productStatusUpdateResponse, setProductStatusUpdateResponse] =
     useState<{
       status: "destructive" | "success";
       message: string;
     } | null>(null);
+
+  const { toast } = useToast();
 
   const openProductStatusChangeModal = (
     options: "APPROVED" | "REJECTED",
@@ -46,6 +46,15 @@ export default function AdminProductList({
     setProductStatusUpdateOption(null);
     setProductToUpdate(null);
   };
+
+  useEffect(() => {
+    if (productStatusUpdateResponse !== null) {
+      toast({
+        variant: productStatusUpdateResponse.status,
+        description: productStatusUpdateResponse.message,
+      });
+    }
+  }, [productStatusUpdateResponse, toast]);
 
   return (
     <>
@@ -93,7 +102,7 @@ export default function AdminProductList({
                   Detail produk
                 </Link>
 
-                {type !== "APPROVED" && (
+                {product.status !== "APPROVED" && (
                   <Button
                     variant="default"
                     onClick={() =>
@@ -107,7 +116,7 @@ export default function AdminProductList({
                   </Button>
                 )}
 
-                {type !== "REJECTED" && (
+                {product.status !== "REJECTED" && (
                   <Button
                     variant="destructive"
                     onClick={() =>
