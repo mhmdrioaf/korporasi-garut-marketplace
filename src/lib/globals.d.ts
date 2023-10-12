@@ -48,6 +48,7 @@ type TUser = {
   createdAt: Date;
   primary_address_id: string | null;
   token: string;
+  is_disabled: boolean;
 
   account: TAccount;
   address: TAddress[];

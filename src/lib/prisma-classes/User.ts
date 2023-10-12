@@ -98,6 +98,8 @@ export default class Users {
 
     if (!user) return null;
 
+    if (user.is_disabled) return null;
+
     const passwordMatch = await bcrypt.compare(data.password, user.password);
 
     if (passwordMatch) {
@@ -285,6 +287,21 @@ export default class Users {
         },
         orderBy: {
           role: "asc",
+        },
+      });
+    } else {
+      return null;
+    }
+  }
+
+  async disableUser(token: string, username: string, isDeactivate: boolean) {
+    if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      return await this.prismaUser.update({
+        where: {
+          username: username,
+        },
+        data: {
+          is_disabled: isDeactivate,
         },
       });
     } else {

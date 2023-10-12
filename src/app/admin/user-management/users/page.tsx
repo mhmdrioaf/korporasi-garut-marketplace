@@ -38,7 +38,7 @@ export default async function UserManagementPageUsers() {
     if (!users) {
       return <NoAccess />;
     } else {
-      return <UsersList users={users} />;
+      return <UsersList token={session.user.token} users={users} />;
     }
   }
 }

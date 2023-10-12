@@ -18,35 +18,54 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
-import { BanIcon, TrashIcon } from "lucide-react";
+import { BanIcon, CheckIcon, TrashIcon } from "lucide-react";
 import UserDeleteModal from "./modals/user-delete";
 import { useState } from "react";
+import UserDisableModal from "./modals/user-deactivate";
 
 interface IUserListComponentProps {
   users: TUser[];
+  token: string;
 }
 
-export default function UsersList({ users }: IUserListComponentProps) {
+export default function UsersList({ users, token }: IUserListComponentProps) {
   const [isUserDelete, setIsUserDelete] = useState<boolean>(false);
-  const [usernameToDelete, setUsernameToDelete] = useState<string | null>(null);
+  const [isUserDisable, setIsUserDisable] = useState<boolean>(false);
+  const [isUserDeactivate, setIsUserDeactivate] = useState<boolean>(true);
 
-  const onUserDeleteModalCloses = () => {
+  const [usernameToUpdate, setUsernameToUpdate] = useState<string | null>(null);
+
+  const onModalsCloses = () => {
     setIsUserDelete(false);
-    setUsernameToDelete(null);
+    setIsUserDisable(false);
+    setUsernameToUpdate(null);
   };
 
   const onUserDelete = (username: string) => {
     setIsUserDelete(true);
-    setUsernameToDelete(username);
+    setUsernameToUpdate(username);
+  };
+
+  const onUserDisable = (username: string, option: boolean) => {
+    setIsUserDisable(true);
+    setUsernameToUpdate(username);
+    setIsUserDeactivate(option);
   };
 
   return (
     <>
       <UserDeleteModal
         isOpen={isUserDelete}
-        onClose={onUserDeleteModalCloses}
-        username={usernameToDelete ?? ""}
+        onClose={onModalsCloses}
+        username={usernameToUpdate ?? ""}
         executor="admin"
+      />
+      <UserDisableModal
+        isOpen={isUserDisable}
+        onClose={onModalsCloses}
+        token={token}
+        username={usernameToUpdate ?? ""}
+        isDeactivate={isUserDeactivate}
       />
       <Table>
         <TableCaption>
@@ -62,6 +81,7 @@ export default function UsersList({ users }: IUserListComponentProps) {
             <TableHead>Jenis Akun</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Nomor Telepon</TableHead>
+            <TableHead>Status Akun</TableHead>
             <TableHead className="text-center">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -74,6 +94,9 @@ export default function UsersList({ users }: IUserListComponentProps) {
               <TableCell>{userRoleConverter(user.role)}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.phone_number ?? "-"}</TableCell>
+              <TableCell>
+                {user.is_disabled ? "Dinonaktifkan" : "Aktif"}
+              </TableCell>
               <TableCell>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -89,10 +112,23 @@ export default function UsersList({ users }: IUserListComponentProps) {
                       <TrashIcon className="w-4 h-4 mr-2" />
                       <span>Hapus Akun</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="hover:bg-secondary hover:text-secondary-foreground cursor-pointer">
-                      <BanIcon className="w-4 h-4 mr-2" />
-                      <span>Nonaktifkan Akun</span>
-                    </DropdownMenuItem>
+                    {user.is_disabled ? (
+                      <DropdownMenuItem
+                        className="hover:bg-secondary hover:text-secondary-foreground cursor-pointer"
+                        onClick={() => onUserDisable(user.username, false)}
+                      >
+                        <CheckIcon className="w-4 h-4 mr-2" />
+                        <span>Aktifkan Akun</span>
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem
+                        className="hover:bg-secondary hover:text-secondary-foreground cursor-pointer"
+                        onClick={() => onUserDisable(user.username, true)}
+                      >
+                        <BanIcon className="w-4 h-4 mr-2" />
+                        <span>Nonaktifkan Akun</span>
+                      </DropdownMenuItem>
+                    )}
                   </DropdownMenuContent>
                 </DropdownMenu>
               </TableCell>

@@ -48,7 +48,7 @@ export default async function UserManagementPageUsers() {
           >
             Tambahkan Penjual
           </Link>
-          <UsersList users={users} />
+          <UsersList token={session.user.token} users={users} />
         </div>
       );
     }
