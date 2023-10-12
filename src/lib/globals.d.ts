@@ -19,6 +19,7 @@ type TProduct = {
   category_id: string | null;
   seller: Omit<TUser, "account" | "address" | "orders" | "products">;
   tags: string[];
+  status: "APPROVED" | "PENDING" | "REJECTED";
 };
 
 type TProductVariant = {
@@ -47,6 +48,7 @@ type TUser = {
   createdAt: Date;
   primary_address_id: string | null;
   token: string;
+  is_disabled: boolean;
 
   account: TAccount;
   address: TAddress[];

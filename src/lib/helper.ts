@@ -223,3 +223,21 @@ export const remoteImageSource = (source: string) => {
   const timestamp = date.getTime();
   return `${source}?t=${timestamp}`;
 };
+
+export const permissionHelper = (a: string, b: string) => {
+  return a === b;
+};
+
+export const userRoleConverter = (role: string) => {
+  switch (role) {
+    case "ADMIN":
+      return "Administrator";
+    case "SELLER":
+      return "Penjual";
+    case "CUSTOMER":
+      return "Pelanggan";
+
+    default:
+      return "Tidak diketahui";
+  }
+};

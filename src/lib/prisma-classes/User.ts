@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
   accountIdGenerator,
+  permissionHelper,
   capitalizeFirstWord,
   properizeWords,
 } from "../helper";
@@ -14,6 +15,7 @@ type TRegisterData = {
   email: string;
   password: string;
   token: string;
+  role?: "CUSTOMER" | "SELLER";
 };
 
 type TLoginData = {
@@ -40,6 +42,7 @@ export default class Users {
         username: data.username.toLowerCase(),
         phone_number: data.phone_number,
         token: data.token,
+        role: data.role ?? "CUSTOMER",
         account: {
           connectOrCreate: {
             where: {
@@ -94,6 +97,8 @@ export default class Users {
     });
 
     if (!user) return null;
+
+    if (user.is_disabled) return null;
 
     const passwordMatch = await bcrypt.compare(data.password, user.password);
 
@@ -268,6 +273,39 @@ export default class Users {
         status: "failed",
         message: `User dengan nama pengguna ${username} tidak ditemukan.`,
       };
+    }
+  }
+
+  async listUser(token: string) {
+    if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      return await this.prismaUser.findMany({
+        include: {
+          account: true,
+          address: true,
+          orders: true,
+          products: true,
+        },
+        orderBy: {
+          role: "asc",
+        },
+      });
+    } else {
+      return null;
+    }
+  }
+
+  async disableUser(token: string, username: string, isDeactivate: boolean) {
+    if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      return await this.prismaUser.update({
+        where: {
+          username: username,
+        },
+        data: {
+          is_disabled: isDeactivate,
+        },
+      });
+    } else {
+      return null;
     }
   }
 }

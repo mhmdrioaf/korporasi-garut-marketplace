@@ -46,6 +46,22 @@ export const ROUTES = {
     ADD: "/product/add",
     EDIT: (id: string) => `/product/edit/${id}`,
   },
+  ADMIN: {
+    DASHBOARD: "/admin",
+    USER_MANAGEMENT: {
+      MAIN: "/admin/user-management",
+      USERS: "/admin/user-management/users",
+      SELLERS: "/admin/user-management/sellers",
+      ADD_SELLER: "/admin/seller-add",
+    },
+    PRODUCT_MANAGEMENT: {
+      MAIN: "/admin/product-management",
+      PENDING: "/admin/product-management/pending",
+      APPROVED: "/admin/product-management/approved",
+      REJECTED: "/admin/product-management/rejected",
+    },
+    PRODUCT_DETAIL: (id: string) => `/admin/product/${id}`,
+  },
 };
 
 export const CATEGORIES_OPTIONS = (CATEGORY_ID: string) =>

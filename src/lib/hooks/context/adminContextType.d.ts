@@ -1,0 +1,3 @@
+type TAdminContextType = {
+  test: string;
+};

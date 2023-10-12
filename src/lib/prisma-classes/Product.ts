@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import {
+  permissionHelper,
   properizeWords,
   variantIdGenerator,
   variantItemsIdGenerator,
@@ -463,6 +464,25 @@ export default class Product {
      )`;
     } else {
       return productsQuerySearch;
+    }
+  }
+
+  async chageProductStatus(
+    status: "APPROVED" | "REJECTED",
+    token: string,
+    productId: string
+  ) {
+    if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      return await this.prismaProduct.update({
+        where: {
+          id: parseInt(productId),
+        },
+        data: {
+          status: status,
+        },
+      });
+    } else {
+      return null;
     }
   }
 }
