@@ -15,8 +15,6 @@ The purpose of this project is to fulfill my thesis project and also to facilita
 ![mhmdrioaf-thesis](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/b6559f2c-eb33-4f49-b33a-2151f1af53a5)
 
 ### Proposed class diagram (unfinished)  
-![class-diagram drawio](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/858a5ad8-20a5-405a-9fa7-3f3141f8663a)
-
-
+![class-diagram drawio](https://github.com/mhmdrioaf/korporasi-garut-marketplace/assets/77482212/5850e1b6-ed0d-46da-b777-1b1af661bd9f)
 
 _will be added more later..._
