@@ -17,6 +17,7 @@ model user {
   createdAt          DateTime  @default(now())
   primary_address_id String?
   token              String
+  is_disabled        Boolean   @default(false)
 
   account  account?
   address  address[]
