@@ -38,7 +38,6 @@ export default async function AdminProductManagementMainPage() {
       <AdminProductList
         products={products.filter((product) => product.status === "REJECTED")}
         token={session.user.token}
-        type="REJECTED"
       />
     );
   }

@@ -34,6 +34,11 @@ export default async function AdminProductManagementMainPage() {
   ) {
     return <NoAccess />;
   } else {
-    return <AdminProductList products={products} token={session.user.token} />;
+    return (
+      <AdminProductList
+        products={products.filter((product) => product.status === "PENDING")}
+        token={session.user.token}
+      />
+    );
   }
 }

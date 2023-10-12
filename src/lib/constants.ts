@@ -56,6 +56,7 @@ export const ROUTES = {
     },
     PRODUCT_MANAGEMENT: {
       MAIN: "/admin/product-management",
+      PENDING: "/admin/product-management/pending",
       APPROVED: "/admin/product-management/approved",
       REJECTED: "/admin/product-management/rejected",
     },
