@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface IUpdateAddressBody {
   address_id: string;
   user_id: string;
-  city: string;
+  city_id: string;
   fullAddress: string;
   recipientName: string;
   recipientPhoneNumber: string;
@@ -15,9 +15,27 @@ interface IUpdateAddressBody {
 async function handler(request: NextRequest) {
   const body: IUpdateAddressBody = await request.json();
 
+  const cityData = await fetch(
+    `https://api.rajaongkir.com/starter/city?id=${body.city_id}`,
+    {
+      method: "GET",
+      headers: { key: process.env.NEXT_PUBLIC_SHIPPING_TOKEN! },
+    }
+  );
+
+  const city = await cityData.json();
+
   try {
     const address = new Address(db.address, null);
-    const updateAddress = await address.updateAddress(body);
+    const updateAddress = await address.updateAddress({
+      address_id: body.address_id,
+      city: city.rajaongkir.results,
+      fullAddress: body.fullAddress,
+      label: body.label,
+      recipientName: body.recipientName,
+      recipientPhoneNumber: body.recipientPhoneNumber,
+      user_id: body.user_id,
+    });
 
     if (updateAddress) {
       return NextResponse.json({

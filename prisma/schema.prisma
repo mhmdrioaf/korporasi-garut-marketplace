@@ -36,14 +36,26 @@ model account {
 
 model address {
   address_id             String @id
+  city_id                String
   user_id                Int
-  city                   String
   full_address           String
   label                  String
   recipient_name         String
   recipient_phone_number String
 
   user user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  city city @relation(fields: [city_id], references: [city_id])
+}
+
+model city {
+  city_id     String @id
+  city_name   String
+  province_id String
+  province    String
+  type        String
+  postal_code String
+
+  address address[]
 }
 
 model orders {

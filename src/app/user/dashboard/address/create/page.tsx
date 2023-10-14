@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import dynamic from "next/dynamic";
 import { redirect } from "next/navigation";
 
-const AddAddressForm = dynamic(() => import("@/components/ui/add-address"));
+const AddAddressForm = dynamic(() => import("@/components/ui/address-form"));
 
 export default async function AddAddressPage() {
   const session = await getServerSession(authOptions);

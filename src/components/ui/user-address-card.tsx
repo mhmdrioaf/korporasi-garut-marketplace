@@ -79,7 +79,9 @@ export default function UserAddressCard({
           )}
         </div>
 
-        <p className="font-bold text-xl">{properizeWords(address.city)}</p>
+        <p className="font-bold text-xl">{`${properizeWords(
+          address.city.city_name
+        )}, ${properizeWords(address.city.province)}`}</p>
         <div className="flex flex-row items-center gap-2 text-sm">
           <p>{address.recipient_name}</p>
           <p>-</p>

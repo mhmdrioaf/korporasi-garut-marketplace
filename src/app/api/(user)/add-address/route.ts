@@ -4,33 +4,57 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface IAddressBody {
   user_id: string;
-  city: string;
+  city_id: string;
   fullAddress: string;
-  recipientName: string;
-  recipientPhoneNumber: string;
+  recipient_name: string;
+  recipient_phone: string;
   label: string;
 }
 
 async function handler(request: NextRequest) {
   const body: IAddressBody = await request.json();
 
-  try {
-    const address = new Address(db.address, db.user);
-    const newAddress = await address.addAddress(body);
+  const cityData = await fetch(
+    `https://api.rajaongkir.com/starter/city?id=${body.city_id}`,
+    {
+      method: "GET",
+      headers: { key: process.env.NEXT_PUBLIC_SHIPPING_TOKEN! },
+    }
+  );
 
-    if (newAddress) {
-      return NextResponse.json({
-        ok: true,
-        message: "Berhasil menambahkan alamat baru.",
+  const city = await cityData.json();
+  if (city) {
+    try {
+      const address = new Address(db.address, db.user);
+      const newAddress = await address.addAddress({
+        city: city.rajaongkir.results,
+        fullAddress: body.fullAddress,
+        label: body.label,
+        recipientName: body.recipient_name,
+        recipientPhoneNumber: body.recipient_phone,
+        user_id: body.user_id,
       });
-    } else {
+
+      if (newAddress) {
+        return NextResponse.json({
+          ok: true,
+          message: "Berhasil menambahkan alamat baru.",
+        });
+      } else {
+        return NextResponse.json({
+          ok: false,
+          message:
+            "Telah terjadi kesalahan pada server, harap coba lagi nanti.",
+        });
+      }
+    } catch (err) {
+      console.error(err);
       return NextResponse.json({
         ok: false,
         message: "Telah terjadi kesalahan pada server, harap coba lagi nanti.",
       });
     }
-  } catch (err) {
-    console.error(err);
+  } else {
     return NextResponse.json({
       ok: false,
       message: "Telah terjadi kesalahan pada server, harap coba lagi nanti.",
