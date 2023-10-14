@@ -2,7 +2,7 @@ import { Container } from "@/components/ui/container";
 import UserAddressList from "@/components/ui/user-address";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { TAddress, TUser } from "@/lib/globals";
+import { TAddress } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -55,6 +55,7 @@ export default async function UserAddress() {
       <UserAddressList
         addresses={userAddress.address}
         primaryAddressId={userAddress.primary_address_id}
+        user_id={session.user.id}
       />
     </Container>
   );

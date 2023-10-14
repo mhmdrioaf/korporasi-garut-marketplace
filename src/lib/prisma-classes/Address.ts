@@ -4,10 +4,11 @@ import {
   phoneNumberGenerator,
   properizeWords,
 } from "../helper";
+import { TCity } from "../globals";
 
 type TAddAddress = {
   user_id: string;
-  city: string;
+  city: TCity;
   fullAddress: string;
   recipientName: string;
   recipientPhoneNumber: string;
@@ -55,13 +56,27 @@ export default class Address {
                 maxValue ? maxValue + 1 : 1,
                 data.user_id
               ),
-              city: properizeWords(data.city),
               full_address: data.fullAddress,
               recipient_name: properizeWords(data.recipientName),
               recipient_phone_number: phoneNumberGenerator(
                 data.recipientPhoneNumber
               ),
               label: properizeWords(data.label),
+              city: {
+                connectOrCreate: {
+                  where: {
+                    city_id: data.city.city_id,
+                  },
+                  create: {
+                    city_id: data.city.city_id,
+                    city_name: data.city.city_name,
+                    province: data.city.province,
+                    postal_code: data.city.postal_code,
+                    province_id: data.city.province_id,
+                    type: data.city.type,
+                  },
+                },
+              },
             },
           },
         },
@@ -91,7 +106,11 @@ export default class Address {
       },
       select: {
         primary_address_id: true,
-        address: true,
+        address: {
+          include: {
+            city: true,
+          },
+        },
       },
       orderBy: {
         primary_address_id: {
@@ -108,7 +127,21 @@ export default class Address {
         address_id: data.address_id,
       },
       data: {
-        city: properizeWords(data.city),
+        city: {
+          connectOrCreate: {
+            where: {
+              city_id: data.city.city_id,
+            },
+            create: {
+              city_id: data.city.city_id,
+              city_name: data.city.city_name,
+              province: data.city.province,
+              postal_code: data.city.postal_code,
+              province_id: data.city.province_id,
+              type: data.city.type,
+            },
+          },
+        },
         full_address: data.fullAddress,
         label: properizeWords(data.label),
         recipient_name: properizeWords(data.recipientName),

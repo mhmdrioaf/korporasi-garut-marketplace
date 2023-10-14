@@ -119,10 +119,24 @@ type ORDER_STATUS =
 
 type TAddress = {
   address_id: string;
-  city: string;
+  city: TCity;
   full_address: string;
   label: string;
   user_id: number;
   recipient_name: string;
   recipient_phone_number: string;
+};
+
+type TProvince = {
+  province_id: string;
+  province: string;
+};
+
+type TCity = {
+  city_id: string;
+  city_name: string;
+  province_id: string;
+  province: string;
+  type: string;
+  postal_code: string;
 };

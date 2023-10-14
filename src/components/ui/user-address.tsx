@@ -12,11 +12,13 @@ import DeleteAddressModal from "./modals/user-address-delete";
 interface IUserAddressListProps {
   addresses: TAddress[];
   primaryAddressId: string | null;
+  user_id: string;
 }
 
 export default function UserAddressList({
   addresses,
   primaryAddressId,
+  user_id,
 }: IUserAddressListProps) {
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [isDelete, setIsDelete] = useState<boolean>(false);
@@ -44,6 +46,7 @@ export default function UserAddressList({
           address={addressToEdit}
           isOpen={isEdit}
           onClose={onModalCloses}
+          user_id={user_id}
         />
       )}
 
