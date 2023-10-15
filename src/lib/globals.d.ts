@@ -17,6 +17,7 @@ type TProduct = {
   stock: number;
   variant: TProductVariant[];
   category_id: string | null;
+  category: TProductCategory | null;
   seller: Omit<TUser, "account" | "address" | "orders" | "products">;
   tags: string[];
   status: "APPROVED" | "PENDING" | "REJECTED";
