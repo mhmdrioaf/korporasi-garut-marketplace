@@ -19,13 +19,16 @@ import { ROUTES } from "@/lib/constants";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import ProductVariants from "./product-variant";
 import { useToast } from "./use-toast";
+import ProductDirectPurchase from "./product-direct-purchase";
 
 interface IProductDetailComponentProps {
   product: TProduct;
+  user_id: string | null;
 }
 
 export default function ProductDetail({
   product,
+  user_id,
 }: IProductDetailComponentProps) {
   const [withVariants, setWithVariants] = useState<boolean>(false);
   const [variantsValue, setVariantsValue] = useState<string | null>(null);
@@ -130,11 +133,14 @@ export default function ProductDetail({
           </Link>
 
           <div className="flex flex-col gap-1">
-            <p className="text-sm text-stone-500 uppercase">Nama Kategori</p>
+            <p className="text-sm text-stone-500 uppercase">
+              {product.category?.category_name}
+            </p>
             <p className="text-3xl font-bold">{product.title}</p>
           </div>
 
-          <div className="flex flex-row gap-2 items-center">
+          {/* TODO: Product ratings */}
+          {/* <div className="flex flex-row gap-2 items-center">
             <div className="flex flex-row gap-1 items-center">
               {[...Array(5)].map((_, idx) => (
                 <StarIcon
@@ -145,7 +151,7 @@ export default function ProductDetail({
             </div>
 
             <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
-          </div>
+          </div> */}
 
           <ProductVariants
             product={product}
@@ -210,10 +216,14 @@ export default function ProductDetail({
                 Stok tersedia: {product.stock} {product.unit}
               </p>
             </div>
+
             <div className="w-full flex flex-row gap-2 items-center">
-              <Button variant="default" className="w-full">
-                Beli Sekarang
-              </Button>
+              <ProductDirectPurchase
+                product={product}
+                product_quantity={productQuantity}
+                product_variant={variantsValue}
+                user_id={user_id}
+              />
               <Button
                 variant="outline"
                 className="w-full"
@@ -227,7 +237,8 @@ export default function ProductDetail({
       </div>
       <Separator />
 
-      <div className="w-full p-2 border border-input rounded-md flex flex-col gap-4">
+      {/* TODO: Product Reviews */}
+      {/* <div className="w-full p-2 border border-input rounded-md flex flex-col gap-4">
         <p className="text-xl font-bold">Penilaian Produk</p>
 
         <div className="w-full p-2 border border-input flex flex-col gap-2">
@@ -244,7 +255,7 @@ export default function ProductDetail({
             omnis quaerat ducimus ullam error?
           </p>
         </div>
-      </div>
+      </div> */}
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">
