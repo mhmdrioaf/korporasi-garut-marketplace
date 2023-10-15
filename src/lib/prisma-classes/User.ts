@@ -66,12 +66,18 @@ export default class Users {
         },
       },
       select: {
+        primary_address_id: true,
         account: true,
         email: true,
         phone_number: true,
         user_id: true,
         username: true,
         role: true,
+        address: {
+          include: {
+            city: true,
+          },
+        },
       },
     });
 
