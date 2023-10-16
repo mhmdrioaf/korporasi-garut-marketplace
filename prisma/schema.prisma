@@ -43,8 +43,9 @@ model address {
   recipient_name         String
   recipient_phone_number String
 
-  user user @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
-  city city @relation(fields: [city_id], references: [city_id])
+  user   user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+  city   city     @relation(fields: [city_id], references: [city_id])
+  orders orders[]
 }
 
 model city {
@@ -62,9 +63,12 @@ model orders {
   order_id             String       @id
   order_status         ORDER_STATUS @default(PENDING)
   order_date           DateTime     @default(now())
-  order_delivered_date DateTime
+  order_delivered_date DateTime?
   user_id              Int
+  total_price          Int
+  shipping_address     String?
 
+  address    address?     @relation(fields: [shipping_address], references: [address_id], onDelete: SetNull)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   order_item order_item[]
 }
