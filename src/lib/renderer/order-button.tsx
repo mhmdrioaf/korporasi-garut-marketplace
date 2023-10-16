@@ -3,10 +3,24 @@
 import { Button } from "@/components/ui/button";
 import { ORDER_STATUS } from "../globals";
 
-export default function ShowOrderButton({ status }: { status: ORDER_STATUS }) {
+interface IOrderButtonProps {
+  status: ORDER_STATUS;
+  onPaymentClick: () => void;
+  disabled: boolean;
+}
+
+export default function ShowOrderButton({
+  status,
+  onPaymentClick,
+  disabled,
+}: IOrderButtonProps) {
   switch (status) {
     case "PENDING":
-      return <Button variant="default">Bayar Pesanan</Button>;
+      return (
+        <Button variant="default" onClick={onPaymentClick} disabled={disabled}>
+          Bayar Pesanan
+        </Button>
+      );
     case "PAID":
       return (
         <Button variant="default" disabled>
