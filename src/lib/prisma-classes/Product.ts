@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import {
   permissionHelper,
   properizeWords,
@@ -6,7 +6,7 @@ import {
   variantItemsIdGenerator,
 } from "../helper";
 import { db } from "../db";
-import { TProduct, TProductVariant } from "../globals";
+import { TProductVariant } from "../globals";
 import supabase from "../supabase";
 
 type TProductVariantInput = {
@@ -215,7 +215,23 @@ export default class Product {
         },
       },
       include: {
-        seller: true,
+        seller: {
+          select: {
+            address: {
+              include: {
+                city: true,
+              },
+            },
+            phone_number: true,
+            user_id: true,
+            account: {
+              select: {
+                profile_picture: true,
+                user_name: true,
+              },
+            },
+          },
+        },
         variant: {
           include: {
             variant_item: true,

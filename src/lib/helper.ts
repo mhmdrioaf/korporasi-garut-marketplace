@@ -1,4 +1,9 @@
-import { TAddress, TProduct, ORDER_STATUS } from "./globals";
+import {
+  TAddress,
+  TProduct,
+  ORDER_STATUS,
+  TProductVariantItem,
+} from "./globals";
 import supabase from "./supabase";
 
 export const getAvatarInitial = (name: string): string => {
@@ -99,8 +104,15 @@ export const phoneNumberGenerator = (value: string) => {
   }
 };
 
-export const getTotalAmount = (price: number, quantity: number) => {
-  return price * quantity;
+export const getTotalAmount = (
+  price: number,
+  quantity: number,
+  variant_price: number | null
+) => {
+  const totalAmount = variant_price
+    ? (price + variant_price) * quantity
+    : price * quantity;
+  return totalAmount;
 };
 
 export const decimalDate = (num: number) => {
@@ -176,6 +188,22 @@ export const productCategoryIdGenerator = (maxId: number) => {
   return prefix + id;
 };
 
+export const customerOrderIdGenerator = (maxId: number) => {
+  const id = decimalsNumber(maxId, 100);
+  const prefix = "ORD";
+  return prefix + id;
+};
+
+export const customerOrderItemIdGenerator = (
+  maxId: number,
+  orderID: number
+) => {
+  const id = decimalsNumber(maxId, 100);
+  const _orderID = decimalsNumber(orderID, 100);
+  const prefix = "ORITM";
+  return prefix + _orderID + id;
+};
+
 export const NaNHandler = (value: number) => {
   return isNaN(value) ? 0 : value;
 };
@@ -239,5 +267,50 @@ export const userRoleConverter = (role: string) => {
 
     default:
       return "Tidak diketahui";
+  }
+};
+
+export const invoiceMaker = async (
+  user_id: string,
+  product: TProduct,
+  product_quantity: number,
+  shipping_address: TAddress,
+  product_variant: TProductVariantItem | null,
+  total_price: number
+) => {
+  try {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        user_id: user_id,
+        product: product,
+        product_quantity: product_quantity,
+        shipping_address: shipping_address,
+        product_variant: product_variant,
+        total_price: total_price,
+      }),
+    });
+
+    const response = await res.json();
+    if (!response.ok) {
+      return {
+        ok: false,
+        message:
+          "Terjadi kesalahan ketika melakukan pemesanan, silahkan coba lagi nanti.",
+      };
+    } else {
+      return {
+        ok: true,
+        message: "Pemesanan berhasil, mengarahkan ke halaman pesanan...",
+      };
+    }
+  } catch (error) {
+    console.error(error);
+    return {
+      ok: false,
+      message:
+        "Terjadi kesalahan ketika melakukan pemesanan, silahkan coba lagi nanti.",
+    };
   }
 };
