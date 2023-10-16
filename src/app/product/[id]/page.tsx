@@ -1,6 +1,7 @@
 import Loading from "@/app/loading";
 import authOptions from "@/lib/authOptions";
 import { getProductDetail } from "@/lib/helper";
+import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { Suspense, lazy } from "react";
 
@@ -10,6 +11,28 @@ interface IProductDetailPageProps {
   params: {
     id: string;
   };
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const product = await getProductDetail(params.id);
+  if (product) {
+    return {
+      title: `${product.title} | SMKs Korporasi Garut`,
+      description: product.description,
+      category: product.category?.category_name,
+      keywords: product.tags?.join(", "),
+      authors: [{ name: product.seller.account.user_name }],
+    };
+  } else {
+    return {
+      title: "Produk tidak ditemukan | SMKs Korporasi Garut",
+      description: "Produk tidak ditemukan",
+    };
+  }
 }
 
 export default async function ProductDetailPage({
