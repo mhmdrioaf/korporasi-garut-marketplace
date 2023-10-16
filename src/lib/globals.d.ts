@@ -18,7 +18,7 @@ type TProduct = {
   variant: TProductVariant[];
   category_id: string | null;
   category: TProductCategory | null;
-  seller: Omit<TUser, "account" | "address" | "orders" | "products">;
+  seller: TUser;
   tags: string[];
   status: "APPROVED" | "PENDING" | "REJECTED";
 };
@@ -63,7 +63,10 @@ type TOrder = {
   order_date: Date;
   order_delivered_date: Date | null;
   user_id: number;
+  shipping_addres: String;
+  total_price: number;
 
+  address: TAddress;
   user: TUser;
   order_item: TOrderItem[];
 };
@@ -93,8 +96,12 @@ type TCustomerOrder = {
   order_date: Date;
   order_delivered_date: Date | null;
   customer_id: string;
+  shipping_addres: String;
+  total_price: number;
 
-  order_items: TOrderItem[];
+  address: TAddress;
+  user: TUser;
+  order_item: TOrderItem[];
 };
 
 type TOrderItem = {
