@@ -16,7 +16,31 @@ async function handler(
       },
     },
     include: {
-      order_item: true,
+      order_item: {
+        include: {
+          product: {
+            include: {
+              seller: {
+                select: {
+                  account: {
+                    select: {
+                      profile_picture: true,
+                      user_name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+          variant: true,
+        },
+      },
+      address: true,
+      user: {
+        include: {
+          account: true,
+        },
+      },
     },
   });
 
