@@ -64,6 +64,7 @@ type TOrder = {
   order_delivered_date: Date | null;
   user_id: number;
   shipping_addres: String;
+  shipping_cost: number;
   total_price: number;
 
   address: TAddress;
@@ -97,6 +98,7 @@ type TCustomerOrder = {
   order_delivered_date: Date | null;
   customer_id: string;
   shipping_addres: String;
+  shipping_cost: number;
   total_price: number;
 
   address: TAddress;
@@ -147,4 +149,22 @@ type TCity = {
   province: string;
   type: string;
   postal_code: string;
+};
+
+type TShippingCost = {
+  code: string;
+  name: string;
+  costs: TShippingCostService[];
+};
+
+type TShippingCostService = {
+  service: string;
+  description: string;
+  cost: TShippingCostServiceCost[];
+};
+
+type TShippingCostServiceCost = {
+  value: number;
+  etd: string;
+  note: string;
 };

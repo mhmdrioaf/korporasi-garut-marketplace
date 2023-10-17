@@ -1,6 +1,7 @@
 import Loading from "@/app/loading";
 import authOptions from "@/lib/authOptions";
 import { getProductDetail } from "@/lib/helper";
+import { DirectPurchaseProvider } from "@/lib/hooks/context/useDirectPurchase";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { Suspense, lazy } from "react";
@@ -52,10 +53,12 @@ export default async function ProductDetailPage({
   else
     return (
       <Suspense fallback={<Loading />}>
-        <ProductDetail
+        <DirectPurchaseProvider
           product={product}
           user_id={session ? session.user.id : null}
-        />
+        >
+          <ProductDetail />
+        </DirectPurchaseProvider>
       </Suspense>
     );
 }

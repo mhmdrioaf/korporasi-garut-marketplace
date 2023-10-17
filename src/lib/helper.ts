@@ -188,20 +188,25 @@ export const productCategoryIdGenerator = (maxId: number) => {
   return prefix + id;
 };
 
-export const customerOrderIdGenerator = (maxId: number) => {
-  const id = decimalsNumber(maxId, 100);
+export const customerOrderIdGenerator = (maxId: number, user_id: number) => {
+  const orderId = decimalsNumber(maxId, 100);
+  const customerId = decimalsNumber(user_id, 100);
   const prefix = "ORD";
-  return prefix + id;
+  return prefix + customerId + orderId;
 };
 
 export const customerOrderItemIdGenerator = (
   maxId: number,
-  orderID: number
+  orderID: number,
+  productID: number,
+  user_id: number
 ) => {
   const id = decimalsNumber(maxId, 100);
   const _orderID = decimalsNumber(orderID, 100);
+  const _productID = decimalsNumber(productID, 100);
+  const _user_id = decimalsNumber(user_id, 100);
   const prefix = "ORITM";
-  return prefix + _orderID + id;
+  return prefix + _user_id + _orderID + _productID + id;
 };
 
 export const NaNHandler = (value: number) => {
@@ -275,6 +280,7 @@ export const invoiceMaker = async (
   product: TProduct,
   product_quantity: number,
   shipping_address: TAddress,
+  shipping_cost: number,
   product_variant: TProductVariantItem | null,
   total_price: number
 ) => {
@@ -289,6 +295,7 @@ export const invoiceMaker = async (
         shipping_address: shipping_address,
         product_variant: product_variant,
         total_price: total_price,
+        shipping_cost: shipping_cost,
       }),
     });
 

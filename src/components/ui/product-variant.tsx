@@ -1,26 +1,18 @@
 "use client";
 
-import { TProductVariant, TProductVariantItem } from "@/lib/globals";
+import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
-interface IProductVariantProps {
-  variants: TProductVariant[] | null;
-  variantsValue: TProductVariantItem | null;
-  onVariantChange: (variant: TProductVariantItem) => void;
-}
+export default function ProductVariants() {
+  const { variants, product } = useDirectPurchase();
 
-export default function ProductVariants({
-  variants,
-  variantsValue,
-  onVariantChange,
-}: IProductVariantProps) {
-  if (variants && variants.length > 0) {
+  if (product.variant && product.variant.length > 0) {
     return (
       <div className="w-full flex flex-col gap-4">
         <p className="text-sm font-bold">
           Harap memilih variant, jika tidak memilih, akan kami kirim secara
           acak.
         </p>
-        {variants.map((variant) => (
+        {product.variant.map((variant) => (
           <div
             key={variant.variant_id}
             className="w-full grid grid-cols-2 gap-2"
@@ -31,11 +23,12 @@ export default function ProductVariants({
                 <div
                   key={item.variant_item_id}
                   className={`p-1 w-full rounded-sm border border-input cursor-pointer text-center select-none ${
-                    variantsValue?.variant_item_id === item.variant_item_id
+                    variants.variantValue?.variant_item_id ===
+                    item.variant_item_id
                       ? "bg-green-950 text-white font-bold"
                       : ""
                   }`}
-                  onClick={() => onVariantChange(item)}
+                  onClick={() => variants.handler.onVariantsChange(item)}
                 >
                   <p>{item.variant_name}</p>
                 </div>

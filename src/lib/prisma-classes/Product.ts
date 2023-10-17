@@ -224,6 +224,7 @@ export default class Product {
             },
             phone_number: true,
             user_id: true,
+            primary_address_id: true,
             account: {
               select: {
                 profile_picture: true,

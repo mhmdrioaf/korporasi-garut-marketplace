@@ -1,11 +1,9 @@
 "use client";
 
-import { TProduct, TProductVariantItem } from "@/lib/globals";
 import { Container } from "./container";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MinusIcon, PlusIcon, StarIcon } from "lucide-react";
-import { ChangeEvent, useState } from "react";
+import { ArrowLeft, MinusIcon, PlusIcon } from "lucide-react";
 import { Button } from "./button";
 import {
   Accordion,
@@ -18,129 +16,12 @@ import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import ProductVariants from "./product-variant";
-import { useToast } from "./use-toast";
 import ProductDirectPurchase from "./product-direct-purchase";
+import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
-interface IProductDetailComponentProps {
-  product: TProduct;
-  user_id: string | null;
-}
-
-export default function ProductDetail({
-  product,
-  user_id,
-}: IProductDetailComponentProps) {
-  const [withVariants, setWithVariants] = useState<boolean>(false);
-  const [variantsValue, setVariantsValue] =
-    useState<TProductVariantItem | null>(null);
-  const [totalPrice, setTotalPrice] = useState<number>(product.price);
-  const [productQuantity, setProductQuantity] = useState(1);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  const { toast } = useToast();
-
-  const onQuantityChangeHandler = (option: "increase" | "decrease") => {
-    // TODO: Increase total amount based on quantity
-    if (option === "increase") {
-      setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
-      setTotalPrice((prev) =>
-        variantsValue
-          ? product.price + variantsValue.variant_price + prev
-          : prev + product.price
-      );
-    } else {
-      setProductQuantity((prev) => (prev === 1 ? 1 : prev - 1));
-      setTotalPrice((prev) =>
-        variantsValue
-          ? prev - (variantsValue.variant_price + product.price)
-          : prev - product.price
-      );
-    }
-  };
-
-  const onQuantityInputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-
-    if (!isNaN(value)) {
-      if (value > product.stock) {
-        setProductQuantity(product.stock);
-        setTotalPrice(
-          variantsValue
-            ? (variantsValue.variant_price + product.price) * product.stock
-            : product.price * product.stock
-        );
-      } else if (value < 1) {
-        setProductQuantity(1);
-        setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price + product.price
-            : product.price
-        );
-      } else {
-        setProductQuantity(value);
-        setTotalPrice(
-          variantsValue
-            ? (variantsValue.variant_price + product.price) * value
-            : product.price * value
-        );
-      }
-    } else {
-      setProductQuantity(1);
-      setTotalPrice(
-        variantsValue
-          ? variantsValue.variant_price + product.price
-          : product.price
-      );
-    }
-  };
-
-  const onAddToCart = () => {
-    if (product.variant.length > 0 && !withVariants)
-      toast({
-        variant: "destructive",
-        title: "Gagal menambahkan produk ke keranjang.",
-        description:
-          "Harap memilih salah satu variant untuk menambahkan ke keranjang.",
-      });
-    else {
-      setWithVariants(false);
-      setVariantsValue(null);
-      setProductQuantity(1);
-      setTotalPrice(product.price);
-      toast({
-        variant: "success",
-        title: "Berhasil menambahkan produk ke keranjang.",
-        description: "Produk telah berhasil ditambahkan ke keranjang anda.",
-      });
-      console.log({
-        totalPrice: totalPrice,
-        variantsValue: variantsValue,
-        withVariants: withVariants,
-        quantity: productQuantity,
-        productId: product.id,
-      });
-    }
-  };
-
-  const onVariantsChangeHandler = (item: TProductVariantItem) => {
-    setTotalPrice(product.price * productQuantity);
-    if (
-      variantsValue &&
-      variantsValue.variant_item_id === item.variant_item_id
-    ) {
-      setWithVariants(false);
-      setVariantsValue(null);
-      setTotalPrice(product.price * productQuantity);
-    } else if (item.variant_price === 0) {
-      setWithVariants(false);
-      setVariantsValue(item);
-    } else {
-      setWithVariants(true);
-      setVariantsValue(item);
-      setTotalPrice((product.price + item.variant_price) * productQuantity);
-    }
-  };
-
+export default function ProductDetail() {
+  const { product, image, price, variants, handler, quantity } =
+    useDirectPurchase();
   return product ? (
     <Container variant="column" className="overflow-hidden">
       <div className="w-full flex flex-col lg:flex-row gap-4 lg:gap-8">
@@ -148,7 +29,7 @@ export default function ProductDetail({
         <div className="w-full flex flex-col gap-2">
           <div className="w-full h-auto aspect-square rounded-lg overflow-hidden relative">
             <Image
-              src={remoteImageSource(product.images[activeImageIndex])}
+              src={remoteImageSource(product.images[image.activeImage])}
               alt="Foto produk"
               fill
               sizes="100vw"
@@ -162,7 +43,7 @@ export default function ProductDetail({
                 <div
                   key={source}
                   className="w-48 h-auto shrink-0 aspect-square rounded-lg overflow-hidden relative cursor-pointer"
-                  onClick={() => setActiveImageIndex(index)}
+                  onClick={() => image.setActiveImage(index)}
                 >
                   <Image
                     src={remoteImageSource(source)}
@@ -207,11 +88,7 @@ export default function ProductDetail({
             <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
           </div> */}
 
-          <ProductVariants
-            variants={product.variant}
-            variantsValue={variantsValue}
-            onVariantChange={onVariantsChangeHandler}
-          />
+          <ProductVariants />
 
           <Accordion
             type="single"
@@ -229,8 +106,10 @@ export default function ProductDetail({
           <div className="flex flex-col gap-1">
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
-              <p className="text-xl font-bold">{rupiahConverter(totalPrice)}</p>
-              {totalPrice !== product.price && withVariants && (
+              <p className="text-xl font-bold">
+                {rupiahConverter(price.totalPrice)}
+              </p>
+              {price.totalPrice !== product.price && variants.withVariants && (
                 <p className="text-sm font-bold text-green-950">
                   + Harga Varian
                 </p>
@@ -243,8 +122,8 @@ export default function ProductDetail({
               <Button
                 variant="destructive"
                 size="icon"
-                onClick={() => onQuantityChangeHandler("decrease")}
-                disabled={productQuantity === 1}
+                onClick={() => quantity.handler.onQuantityChange("decrease")}
+                disabled={quantity.productQuantity === 1}
               >
                 <MinusIcon className="w-4 h-4" />
               </Button>
@@ -252,15 +131,15 @@ export default function ProductDetail({
                 type="number"
                 min={1}
                 max={product.stock}
-                value={productQuantity}
-                onChange={onQuantityInputChangeHandler}
+                value={quantity.productQuantity}
+                onChange={quantity.handler.onQuantityInputChange}
                 className="w-[9ch] text-center appearance-none"
               />
               <Button
                 variant="default"
                 size="icon"
-                onClick={() => onQuantityChangeHandler("increase")}
-                disabled={productQuantity === product.stock}
+                onClick={() => quantity.handler.onQuantityChange("increase")}
+                disabled={quantity.productQuantity === product.stock}
               >
                 <PlusIcon className="w-4 h-4" />
               </Button>
@@ -270,17 +149,11 @@ export default function ProductDetail({
             </div>
 
             <div className="w-full flex flex-row gap-2 items-center">
-              <ProductDirectPurchase
-                product={product}
-                product_quantity={productQuantity}
-                product_variant={variantsValue}
-                user_id={user_id}
-                totalPrice={totalPrice}
-              />
+              <ProductDirectPurchase />
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={onAddToCart}
+                onClick={handler.onAddToCart}
               >
                 Tambahkan ke Keranjang
               </Button>

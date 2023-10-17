@@ -1,9 +1,7 @@
 "use client";
 
-import { TAddress, TProduct, TProductVariantItem } from "@/lib/globals";
 import { Separator } from "./separator";
 import {
-  invoiceMaker,
   phoneNumberGenerator,
   remoteImageSource,
   rupiahConverter,
@@ -16,67 +14,37 @@ import {
   AccordionTrigger,
 } from "./accordion";
 import { Button } from "./button";
-import { useToast } from "./use-toast";
-import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
+import DirectPurchaseShippingCost from "./direct-purchase-shipping-cost";
+import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
-interface IDirectPurchaseOrderDetailProps {
-  shipping_address: TAddress;
-  product: TProduct;
-  user_id: string | null;
-  product_quantity: number;
-  product_variant: TProductVariantItem | null;
-  totalPrice: number;
-  isOpen: boolean;
-  setOrderStep: (step: number | null) => void;
-}
+export default function DirectPurchaseOrderDetail() {
+  const {
+    order,
+    customer,
+    product,
+    quantity,
+    variants,
+    price,
+    shipping,
+    handler,
+  } = useDirectPurchase();
 
-export default function DirectPurchaseOrderDetail({
-  isOpen,
-  shipping_address,
-  product,
-  product_quantity,
-  product_variant,
-  user_id,
-  totalPrice,
-  setOrderStep,
-}: IDirectPurchaseOrderDetailProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const { toast } = useToast();
-
-  const onOrder = async () => {
-    setIsLoading(true);
-    if (!user_id) {
-      setIsLoading(false);
-      toast({
-        variant: "destructive",
-        title: "User ID tidak ditemukan!",
-      });
-    } else {
-      const makeOrder = await invoiceMaker(
-        user_id,
-        product,
-        product_quantity,
-        shipping_address,
-        product_variant,
-        totalPrice
-      );
-      if (!makeOrder.ok) {
-        setIsLoading(false);
-        toast({
-          variant: "destructive",
-          title: "Terjadi kesalahan ketika melakukan pemesanan",
-          description: makeOrder.message,
-        });
-      } else {
-        setIsLoading(false);
-        setOrderStep(3);
-      }
-    }
+  const onChangeAddressClick = () => {
+    order.setStep(1);
+    shipping.setChosenCourier(null);
+    customer.address.setChosenAddress(null);
+    handler.resetPrice();
   };
 
-  return isOpen ? (
+  const onCancelClick = () => {
+    order.setStep(null);
+    shipping.setChosenCourier(null);
+    customer.address.setChosenAddress(null);
+    handler.resetPrice();
+  };
+
+  return order.handler.isModalOpen(2) ? (
     <div className="w-full flex flex-col gap-4 text-sm">
       <div className="w-full flex flex-col gap-2">
         <p className="text-2xl font-bold text-primary">Detail Pemesanan</p>
@@ -89,26 +57,34 @@ export default function DirectPurchaseOrderDetail({
       <Separator />
       <div className="w-full flex flex-row items-center justify-between">
         <p className="font-bold">Detail Pengiriman</p>
-        <Button variant="default" size="sm" onClick={() => setOrderStep(1)}>
+        <Button variant="default" size="sm" onClick={onChangeAddressClick}>
           Ubah
         </Button>
       </div>
       <div className="w-full grid grid-cols-2 gap-2">
         <p>Penerima</p>
-        <p>{shipping_address.recipient_name}</p>
+        <p>{customer.address.chosenAddress!.recipient_name}</p>
         <p>Nomor telepon penerima</p>
-        <p>{phoneNumberGenerator(shipping_address.recipient_phone_number)}</p>
+        <p>
+          {phoneNumberGenerator(
+            customer.address.chosenAddress!.recipient_phone_number
+          )}
+        </p>
         <p>Alamat Lengkap</p>
         <p>
           <span className="font-bold">
-            {`${shipping_address.city.city_name}, ${shipping_address.city.province}`}
+            {`${customer.address.chosenAddress!.city.city_name}, ${
+              customer.address.chosenAddress!.city.province
+            }`}
             ,{" "}
           </span>
-          {shipping_address.full_address}
+          {customer.address.chosenAddress!.full_address}
         </p>
       </div>
 
       <Separator />
+      <DirectPurchaseShippingCost />
+
       <p className="font-bold">Detail Produk</p>
       <div className="w-full flex flex-col gap-2">
         <div className="flex flex-row items-center gap-2">
@@ -160,16 +136,16 @@ export default function DirectPurchaseOrderDetail({
           <p>{rupiahConverter(product.price)}</p>
           <p className="font-bold">Jumlah Barang</p>
           <p>
-            {product_quantity} {product.unit}
+            {quantity.productQuantity} {product.unit}
           </p>
-          {product_variant && (
+          {variants.variantValue && (
             <>
               <p className="font-bold">Varian Barang</p>
               <div className="flex flex-row items-center gap-1">
-                <p>{product_variant.variant_name}</p>
-                {product_variant.variant_price > 0 && (
+                <p>{variants.variantValue.variant_name}</p>
+                {variants.variantValue.variant_price > 0 && (
                   <p className="text-green-950">
-                    + {rupiahConverter(product_variant.variant_price)} /{" "}
+                    + {rupiahConverter(variants.variantValue.variant_price)} /{" "}
                     {product.unit}
                   </p>
                 )}
@@ -177,12 +153,18 @@ export default function DirectPurchaseOrderDetail({
             </>
           )}
           <p className="text-lg font-bold">Total Harga</p>
-          <p className="text-lg font-bold">{rupiahConverter(totalPrice)}</p>
+          <p className="text-lg font-bold">
+            {rupiahConverter(price.totalPrice)}
+          </p>
         </div>
       </div>
 
-      <Button variant="default" onClick={onOrder} disabled={isLoading}>
-        {isLoading ? (
+      <Button
+        variant="default"
+        onClick={order.handler.placeOrder}
+        disabled={order.loading}
+      >
+        {order.loading ? (
           <>
             <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
             <span>Memproses...</span>
@@ -191,7 +173,7 @@ export default function DirectPurchaseOrderDetail({
           "Lanjutkan"
         )}
       </Button>
-      <Button variant="secondary" onClick={() => setOrderStep(null)}>
+      <Button variant="secondary" onClick={onCancelClick}>
         Batalkan
       </Button>
     </div>
