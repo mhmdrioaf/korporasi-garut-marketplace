@@ -50,6 +50,7 @@ export function DirectPurchaseProvider({
   const [chosenAddress, setChosenAddress] = useState<TAddress | null>(null);
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderStep, setOrderStep] = useState<number | null>(null);
+  const [shippingCost, setShippingCost] = useState<number>(0);
 
   const defaultPrice = variantsValue
     ? (variantsValue.variant_price + product.price) * productQuantity
@@ -85,7 +86,6 @@ export function DirectPurchaseProvider({
   const router = useRouter();
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
-    // TODO: Increase total amount based on quantity
     if (option === "increase") {
       setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
       setTotalPrice((prev) =>
@@ -189,6 +189,7 @@ export function DirectPurchaseProvider({
   const onCourierChangeHandler = (courier: TShippingCostServiceCost) => {
     setChosenCourier(courier);
     setTotalPrice(defaultPrice + courier.value);
+    setShippingCost(courier.value);
   };
 
   const onAddressChoose = (chosenAddress: TAddress) => {
@@ -230,6 +231,7 @@ export function DirectPurchaseProvider({
           product,
           productQuantity,
           chosenAddress,
+          shippingCost,
           variantsValue,
           totalPrice
         );
@@ -250,6 +252,13 @@ export function DirectPurchaseProvider({
 
   const resetPrice = () => {
     setTotalPrice(defaultPrice);
+  };
+
+  const onResetAll = () => {
+    resetPrice();
+    setOrderStep(null);
+    setChosenCourier(null);
+    setChosenAddress(null);
   };
 
   const value: TDirectPurchaseContext = {
@@ -299,6 +308,7 @@ export function DirectPurchaseProvider({
     handler: {
       onAddToCart: onAddToCart,
       resetPrice: resetPrice,
+      resetAll: onResetAll,
     },
     customer: {
       user: user ? user.result : null,
