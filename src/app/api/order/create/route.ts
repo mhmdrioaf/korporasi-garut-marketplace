@@ -12,6 +12,7 @@ interface IOrderCreateBody {
   product_quantity: number;
   product_variant: TProductVariantItem | null;
   shipping_address: TAddress;
+  shipping_cost: number;
   total_price: number;
 }
 
@@ -33,13 +34,32 @@ async function handler(request: NextRequest) {
     const currentMaxId = Number(
       orderMaxId?.slice(orderMaxId.length - 3, orderMaxId.length) ?? 0
     );
-    const newOrderId = customerOrderIdGenerator(currentMaxId + 1);
+    const newOrderId = customerOrderIdGenerator(
+      currentMaxId + 1,
+      parseInt(body.user_id)
+    );
 
     const maxOrderItemID = await db.order_item.aggregate({
       where: {
-        order_id: {
-          contains: newOrderId,
-        },
+        AND: [
+          {
+            order_id: {
+              equals: newOrderId,
+            },
+          },
+          {
+            product_id: {
+              equals: body.product.id,
+            },
+          },
+          {
+            orders: {
+              user_id: {
+                equals: parseInt(body.user_id),
+              },
+            },
+          },
+        ],
       },
       _max: {
         order_item_id: true,
@@ -53,7 +73,9 @@ async function handler(request: NextRequest) {
     );
     const newOrderItemId = customerOrderItemIdGenerator(
       currentMaxItemId + 1,
-      currentMaxId + 1
+      currentMaxId + 1,
+      body.product.id,
+      parseInt(body.user_id)
     );
 
     const createOrder = await db.orders.create({
@@ -62,6 +84,7 @@ async function handler(request: NextRequest) {
         user_id: parseInt(body.user_id),
         total_price: body.total_price,
         shipping_address: body.shipping_address.address_id,
+        shipping_cost: body.shipping_cost,
         order_item: {
           connectOrCreate: {
             where: {

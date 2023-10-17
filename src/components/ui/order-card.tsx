@@ -116,16 +116,10 @@ export default function OrderCard({ order }: IOrderCardProps) {
                 </p>
               </>
             )}
+            <p>Ongkos Kirim</p>
+            <p>{rupiahConverter(order.shipping_cost)}</p>
             <p className="font-bold">Total Harga</p>
-            <p className="font-bold">
-              {rupiahConverter(
-                getTotalAmount(
-                  orderItem.product.price,
-                  orderItem.order_quantity,
-                  orderItem.variant?.variant_price ?? null
-                )
-              )}
-            </p>
+            <p className="font-bold">{rupiahConverter(order.total_price)}</p>
           </div>
 
           <Link
