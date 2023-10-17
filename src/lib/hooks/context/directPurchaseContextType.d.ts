@@ -70,6 +70,7 @@ type TDirectPurchaseContext = {
   handler: {
     onAddToCart: () => void;
     resetPrice: () => void;
+    resetAll: () => void;
   };
   order: {
     step: number | null;

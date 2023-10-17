@@ -10,16 +10,13 @@ import Link from "next/link";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
 export default function ProductDirectPurchase() {
-  const { order, customer } = useDirectPurchase();
+  const { order, customer, handler } = useDirectPurchase();
 
   const dotsStyles = "w-4 h-4 rounded-full ";
   return (
     <>
       {order.step && (
-        <Modal
-          defaultOpen={order.step !== null}
-          onClose={() => order.setStep(null)}
-        >
+        <Modal defaultOpen={order.step !== null} onClose={handler.resetAll}>
           <div className="w-full max-h-[85vh] overflow-y-auto flex flex-col gap-4">
             <div className="w-full flex flex-row items-center gap-2 justify-center">
               {[...Array(3)].map((_, index) => (
