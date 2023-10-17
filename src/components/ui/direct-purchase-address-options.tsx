@@ -53,7 +53,6 @@ export default function DirectPurchaseAddressOptions() {
               </div>
             </div>
 
-            {/* TODO: Calculate Shipping Cost*/}
             <Button
               variant="default"
               onClick={() => customer.address.handler.onAddressChange(address)}
@@ -67,7 +66,7 @@ export default function DirectPurchaseAddressOptions() {
       {customer.user?.address && customer.user.address.length < 1 && (
         <div className="flex flex-col gap-2">
           <p className="text-lg">Anda belum memiliki alamat</p>
-          <Link href={ROUTES.USER.ADDRESSES} className="font-bold text-lg">
+          <Link href={ROUTES.USER.ADD_ADDRESS} className="font-bold text-lg">
             Klik disini untuk menambahkan alamat.
           </Link>
         </div>
