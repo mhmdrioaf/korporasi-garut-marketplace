@@ -1,32 +1,16 @@
 "use client";
 
-import { TAddress, TUser } from "@/lib/globals";
 import { phoneNumberGenerator, properizeWords } from "@/lib/helper";
 import { Button } from "./button";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import { Separator } from "./separator";
+import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
-interface IDirectPurchaseAddressOptionsComponentProps {
-  isOpen: boolean;
-  user: TUser;
-  user_address: TAddress[] | null;
-  setOrderStep: (step: number | null) => void;
-  setChosenAddress: (address: TAddress) => void;
-}
+export default function DirectPurchaseAddressOptions() {
+  const { customer, order } = useDirectPurchase();
 
-export default function DirectPurchaseAddressOptions({
-  user_address,
-  setOrderStep,
-  user,
-  setChosenAddress,
-  isOpen,
-}: IDirectPurchaseAddressOptionsComponentProps) {
-  const onAddressChoose = (chosenAddress: TAddress) => {
-    setChosenAddress(chosenAddress);
-    setOrderStep(2);
-  };
-  return isOpen ? (
+  return order.handler.isModalOpen(1) ? (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
         <p className="text-2xl font-bold text-primary">Pemilihan Alamat</p>
@@ -35,9 +19,9 @@ export default function DirectPurchaseAddressOptions({
         </p>
       </div>
       <Separator />
-      {user_address &&
-        user_address.length > 0 &&
-        user_address.map((address) => (
+      {customer.user?.address &&
+        customer.user.address.length > 0 &&
+        customer.user.address.map((address) => (
           <div
             key={address.address_id}
             className="w-full rounded-md flex flex-row items-center gap-4 border border-input px-4 py-2"
@@ -45,7 +29,7 @@ export default function DirectPurchaseAddressOptions({
             <div className="w-full flex flex-col gap-4">
               <div className="flex flex-row items-center gap-1">
                 <p className="text-lg font-bold">{address.label}</p>
-                {user.primary_address_id === address.address_id && (
+                {customer.user?.primary_address_id === address.address_id && (
                   <div className="p-1 rounded-md grid place-items-center bg-primary text-primary-foreground font-bold">
                     <p>Utama</p>
                   </div>
@@ -72,7 +56,7 @@ export default function DirectPurchaseAddressOptions({
             {/* TODO: Calculate Shipping Cost*/}
             <Button
               variant="default"
-              onClick={() => onAddressChoose(address)}
+              onClick={() => customer.address.handler.onAddressChange(address)}
               className="shrink-0"
             >
               Pilih Alamat Ini
@@ -80,7 +64,7 @@ export default function DirectPurchaseAddressOptions({
           </div>
         ))}
 
-      {user_address && user_address.length < 1 && (
+      {customer.user?.address && customer.user.address.length < 1 && (
         <div className="flex flex-col gap-2">
           <p className="text-lg">Anda belum memiliki alamat</p>
           <Link href={ROUTES.USER.ADDRESSES} className="font-bold text-lg">
