@@ -148,3 +148,21 @@ type TCity = {
   type: string;
   postal_code: string;
 };
+
+type TShippingCost = {
+  code: string;
+  name: string;
+  costs: TShippingCostService[];
+};
+
+type TShippingCostService = {
+  service: string;
+  description: string;
+  cost: TShippingCostServiceCost[];
+};
+
+type TShippingCostServiceCost = {
+  value: number;
+  etd: string;
+  note: string;
+};
