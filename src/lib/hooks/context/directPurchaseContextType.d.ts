@@ -66,9 +66,7 @@ type TDirectPurchaseContext = {
       };
     };
   };
-
   handler: {
-    onAddToCart: () => void;
     resetPrice: () => void;
     resetAll: () => void;
   };
@@ -81,6 +79,13 @@ type TDirectPurchaseContext = {
       onOrder: () => void;
       isModalOpen: (currentStep: number) => boolean;
       placeOrder: () => void;
+    };
+  };
+  cart: {
+    loading: boolean;
+
+    handler: {
+      onAddToCart: () => void;
     };
   };
 };
