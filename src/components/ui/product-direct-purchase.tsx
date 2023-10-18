@@ -60,6 +60,7 @@ export default function ProductDirectPurchase() {
         variant="default"
         onClick={order.handler.onOrder}
         disabled={customer.loading}
+        className="w-fit shrink-0"
       >
         Beli Sekarang
       </Button>

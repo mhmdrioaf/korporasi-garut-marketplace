@@ -20,7 +20,7 @@ import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
 export default function ProductDetail() {
-  const { product, image, price, variants, handler, quantity } =
+  const { product, image, price, variants, cart, quantity } =
     useDirectPurchase();
   return product ? (
     <Container variant="column" className="overflow-hidden">
@@ -153,7 +153,8 @@ export default function ProductDetail() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={handler.onAddToCart}
+                onClick={cart.handler.onAddToCart}
+                disabled={cart.loading}
               >
                 Tambahkan ke Keranjang
               </Button>
