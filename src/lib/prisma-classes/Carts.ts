@@ -174,4 +174,42 @@ export default class Carts {
       };
     }
   }
+
+  async getCart(user_id: number) {
+    return await this.prismaCarts.findFirst({
+      where: {
+        user_id: {
+          equals: user_id,
+        },
+      },
+      include: {
+        cart_items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  select: {
+                    address: {
+                      select: {
+                        city: true,
+                        address_id: true,
+                      },
+                    },
+                    account: {
+                      select: {
+                        user_name: true,
+                      },
+                    },
+                    user_id: true,
+                    primary_address_id: true,
+                  },
+                },
+              },
+            },
+            variant: true,
+          },
+        },
+      },
+    });
+  }
 }
