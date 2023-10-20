@@ -394,96 +394,104 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
 
       return groupedCartItems && cart ? (
         <div className="w-full flex flex-col gap-8 divide-y-4">
-          {cart.map((sellerID) => (
-            <div
-              className="w-full flex flex-col gap-4 p-2 rounded-md divide-y"
-              key={sellerID}
-            >
-              <div className="flex flex-col gap-1">
-                <p className="font-bold">{getSellerName(parseInt(sellerID))}</p>
-                <p className="text-sm">
-                  {sellerAddress(parseInt(sellerID) ?? "")}
-                </p>
-              </div>
-
-              {groupedCartItems[parseInt(sellerID)].map((item) => (
-                <div
-                  key={item.cart_item_id}
-                  className="w-full p-2 grid grid-cols-2"
-                >
-                  <div className="w-full flex flex-row items-center gap-2">
-                    <Checkbox
-                      ref={(el) =>
-                        (itemRef.current[
-                          Number(
-                            item.cart_item_id.slice(
-                              item.cart_item_id.length - 5,
-                              item.cart_item_id.length
-                            )
-                          )
-                        ] = el)
-                      }
-                      onCheckedChange={(checked) =>
-                        onItemChecked(checked, item, parseInt(sellerID))
-                      }
-                    />
-                    <div className="w-16 h-16 rounded-sm overflow-hidden relative">
-                      <Image
-                        src={remoteImageSource(item.product.images[0])}
-                        sizes="100vw"
-                        alt="foto produk"
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      <p>
-                        {item.product.title}{" "}
-                        {item.variant ? `- ${item.variant.variant_name}` : ""}
-                      </p>
-                      <p className="font-bold">
-                        {rupiahConverter(calculateTotalPrice(item))}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row items-center gap-2 self-center justify-self-end">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={(event) => onDeleteButtonClicked(event, item)}
-                    >
-                      <Trash2Icon className="w-4 h-4" />
-                    </Button>
-
-                    <div className="min-h-full w-px bg-input" />
-
-                    <Button
-                      variant="destructive"
-                      disabled={item.quantity <= 1}
-                      onClick={(event) =>
-                        onQuantityChange(event, item, "decrease")
-                      }
-                      size="icon"
-                    >
-                      <MinusCircleIcon className="w-4 h-4" />
-                    </Button>
-                    <p className="text-sm">{item.quantity}</p>
-                    <Button
-                      variant="default"
-                      onClick={(event) =>
-                        onQuantityChange(event, item, "increase")
-                      }
-                      size="icon"
-                    >
-                      <PlusCircleIcon className="w-4 h-4" />
-                    </Button>
-                  </div>
+          {cart.length > 0 ? (
+            cart.map((sellerID) => (
+              <div
+                className="w-full flex flex-col gap-4 p-2 rounded-md divide-y"
+                key={sellerID}
+              >
+                <div className="flex flex-col gap-1">
+                  <p className="font-bold">
+                    {getSellerName(parseInt(sellerID))}
+                  </p>
+                  <p className="text-sm">
+                    {sellerAddress(parseInt(sellerID) ?? "")}
+                  </p>
                 </div>
-              ))}
+
+                {groupedCartItems[parseInt(sellerID)].map((item) => (
+                  <div
+                    key={item.cart_item_id}
+                    className="w-full p-2 grid grid-cols-2"
+                  >
+                    <div className="w-full flex flex-row items-center gap-2">
+                      <Checkbox
+                        ref={(el) =>
+                          (itemRef.current[
+                            Number(
+                              item.cart_item_id.slice(
+                                item.cart_item_id.length - 5,
+                                item.cart_item_id.length
+                              )
+                            )
+                          ] = el)
+                        }
+                        onCheckedChange={(checked) =>
+                          onItemChecked(checked, item, parseInt(sellerID))
+                        }
+                      />
+                      <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+                        <Image
+                          src={remoteImageSource(item.product.images[0])}
+                          sizes="100vw"
+                          alt="foto produk"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <p>
+                          {item.product.title}{" "}
+                          {item.variant ? `- ${item.variant.variant_name}` : ""}
+                        </p>
+                        <p className="font-bold">
+                          {rupiahConverter(calculateTotalPrice(item))}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row items-center gap-2 self-center justify-self-end">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(event) => onDeleteButtonClicked(event, item)}
+                      >
+                        <Trash2Icon className="w-4 h-4" />
+                      </Button>
+
+                      <div className="min-h-full w-px bg-input" />
+
+                      <Button
+                        variant="destructive"
+                        disabled={item.quantity <= 1}
+                        onClick={(event) =>
+                          onQuantityChange(event, item, "decrease")
+                        }
+                        size="icon"
+                      >
+                        <MinusCircleIcon className="w-4 h-4" />
+                      </Button>
+                      <p className="text-sm">{item.quantity}</p>
+                      <Button
+                        variant="default"
+                        onClick={(event) =>
+                          onQuantityChange(event, item, "increase")
+                        }
+                        size="icon"
+                      >
+                        <PlusCircleIcon className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))
+          ) : (
+            <div className="w-full text-center">
+              Anda belum menambahkan produk ke keranjang.
             </div>
-          ))}
+          )}
         </div>
       ) : (
         <div className="w-full text-center">
