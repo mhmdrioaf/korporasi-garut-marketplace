@@ -3,9 +3,6 @@ import {
   TProduct,
   ORDER_STATUS,
   TProductVariantItem,
-  TCustomerCart,
-  TCustomerCartGroupedBySeller,
-  TCustomerCartItem,
 } from "./globals";
 import supabase from "./supabase";
 
