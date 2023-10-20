@@ -51,6 +51,7 @@ export function DirectPurchaseProvider({
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderStep, setOrderStep] = useState<number | null>(null);
   const [shippingCost, setShippingCost] = useState<number>(0);
+  const [cartLoading, setCartLoading] = useState(false);
 
   const defaultPrice = variantsValue
     ? (variantsValue.variant_price + product.price) * productQuantity
@@ -78,6 +79,8 @@ export function DirectPurchaseProvider({
       .then((res) => res.json())
       .then((res) => res.result as TShippingCost[])
   );
+
+  const { mutate } = useSWRConfig();
 
   const sellerAddress = product.seller.address.find(
     (address) => address.address_id === product.seller.primary_address_id
@@ -139,30 +142,54 @@ export function DirectPurchaseProvider({
     }
   };
 
-  const onAddToCart = () => {
-    if (product.variant.length > 0 && !withVariants)
+  const onAddToCart = async () => {
+    setCartLoading(true);
+    try {
+      if (!user_id) {
+        router.push(ROUTES.AUTH.LOGIN);
+      } else {
+        const res = await fetch(process.env.NEXT_PUBLIC_API_CART_ADD_ITEM!, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: user_id,
+            product: product,
+            product_variant: variantsValue,
+            product_quantity: productQuantity,
+          }),
+        });
+
+        const response = await res.json();
+        if (!response.ok) {
+          setCartLoading(false);
+          toast({
+            variant: "destructive",
+            title: "Gagal menambahkan produk ke keranjang",
+            description: response.message,
+          });
+        } else {
+          setCartLoading(false);
+          toast({
+            variant: "success",
+            title: "Berhasil menambahkan produk ke keranjang",
+            description: response.message,
+          });
+          mutate("/api/cart-list");
+        }
+      }
+    } catch (error) {
+      setCartLoading(false);
+      console.error(
+        "An error occurred while adding product to the cart: ",
+        error
+      );
       toast({
         variant: "destructive",
-        title: "Gagal menambahkan produk ke keranjang.",
+        title: "Gagal menambahkan produk ke keranjang",
         description:
-          "Harap memilih salah satu variant untuk menambahkan ke keranjang.",
-      });
-    else {
-      setWithVariants(false);
-      setVariantsValue(null);
-      setProductQuantity(1);
-      setTotalPrice(product.price);
-      toast({
-        variant: "success",
-        title: "Berhasil menambahkan produk ke keranjang.",
-        description: "Produk telah berhasil ditambahkan ke keranjang anda.",
-      });
-      console.log({
-        totalPrice: totalPrice,
-        variantsValue: variantsValue,
-        withVariants: withVariants,
-        quantity: productQuantity,
-        productId: product.id,
+          "Telah terjadi kesalahan pada server. Silahkan coba lagi nanti; hubungi developer jika masalah terus berlanjut.",
       });
     }
   };
@@ -306,7 +333,6 @@ export function DirectPurchaseProvider({
       },
     },
     handler: {
-      onAddToCart: onAddToCart,
       resetPrice: resetPrice,
       resetAll: onResetAll,
     },
@@ -330,6 +356,13 @@ export function DirectPurchaseProvider({
         isModalOpen: isModalOpen,
         onOrder: onOrder,
         placeOrder: onPlaceOrder,
+      },
+    },
+    cart: {
+      loading: cartLoading,
+
+      handler: {
+        onAddToCart: onAddToCart,
       },
     },
   };

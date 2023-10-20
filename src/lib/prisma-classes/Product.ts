@@ -166,7 +166,20 @@ export default class Product {
             variant_item: true,
           },
         },
-        seller: true,
+        seller: {
+          include: {
+            address: {
+              include: {
+                city: true,
+              },
+            },
+          },
+        },
+        category: {
+          select: {
+            category_name: true,
+          },
+        },
       },
     });
 

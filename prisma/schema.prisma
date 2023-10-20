@@ -23,6 +23,7 @@ model user {
   address  address[]
   orders   orders[]
   products product[]
+  carts    customer_cart?
 }
 
 model account {
@@ -100,10 +101,11 @@ model product {
   tags        String[]
   status      PRODUCT_STATUS @default(PENDING)
 
-  category    product_category? @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
-  seller      user              @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
+  category    product_category?    @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
+  seller      user                 @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
   order_items order_item[]
   variant     product_variant[]
+  carts       customer_cart_item[]
 }
 
 model product_variant {
@@ -122,8 +124,9 @@ model product_variant_item {
   variant_price   Int    @default(0)
 
   variant_id  String
-  variant     product_variant @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
+  variant     product_variant      @relation(fields: [variant_id], references: [variant_id], onDelete: Cascade)
   order_items order_item[]
+  carts       customer_cart_item[]
 }
 
 model product_category {
@@ -131,6 +134,28 @@ model product_category {
   category_name String
 
   products product[]
+}
+
+model customer_cart {
+  cart_id      String @id
+  user_id      Int    @unique
+  total_price  Int
+  total_weight Int
+
+  cart_items customer_cart_item[]
+  user       user                 @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
+model customer_cart_item {
+  cart_item_id            String  @id
+  cart_id                 String
+  product_id              Int
+  quantity                Int
+  product_variant_item_id String?
+
+  cart    customer_cart         @relation(fields: [cart_id], references: [cart_id], onDelete: Cascade)
+  product product               @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  variant product_variant_item? @relation(fields: [product_variant_item_id], references: [variant_item_id], onDelete: Cascade)
 }
 
 enum USER_ROLE {

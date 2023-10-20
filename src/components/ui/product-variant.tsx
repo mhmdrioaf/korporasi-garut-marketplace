@@ -18,7 +18,7 @@ export default function ProductVariants() {
             className="w-full grid grid-cols-2 gap-2"
           >
             <p>{variant.variant_title}</p>
-            <div className="w-full grid grid-cols-4 gap-2">
+            <div className="w-full grid grid-cols-3 gap-2">
               {variant.variant_item.map((item) => (
                 <div
                   key={item.variant_item_id}

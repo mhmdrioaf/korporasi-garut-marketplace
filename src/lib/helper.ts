@@ -321,3 +321,32 @@ export const invoiceMaker = async (
     };
   }
 };
+
+export const cartIdGenerator = (user_id: number) => {
+  const _user_id = decimalsNumber(user_id, 100);
+  const prefix = "CRT";
+  return prefix + _user_id;
+};
+
+export const cartItemIdGenerator = (
+  user_id: number,
+  product_id: number,
+  max_item_id: number
+) => {
+  const _user_id = decimalsNumber(user_id, 100);
+  const _product_id = decimalsNumber(product_id, 100);
+  const _max_item_id = decimalsNumber(max_item_id, 100);
+  const prefix = "CRTITM";
+  return prefix + _user_id + _product_id + _max_item_id;
+};
+
+export const calculateCartCosts = (
+  product_price: number,
+  product_quantity: number,
+  product_variant_price: number
+) => {
+  const total_price = product_price * product_quantity;
+  const total_variant_price = product_variant_price * product_quantity;
+  const total_cost = total_price + total_variant_price;
+  return total_cost;
+};

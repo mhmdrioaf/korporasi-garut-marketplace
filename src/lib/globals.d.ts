@@ -55,6 +55,7 @@ type TUser = {
   address: TAddress[];
   orders: TOrder[];
   products: TProduct[];
+  cart: TCustomerCart | null;
 };
 
 type TOrder = {
@@ -167,4 +168,31 @@ type TShippingCostServiceCost = {
   value: number;
   etd: string;
   note: string;
+};
+
+type TCustomerCart = {
+  cart_id: string;
+  user_id: number;
+  total_price: number;
+  total_weight: number;
+
+  cart_items: TCustomerCartItem[];
+  user: TUser;
+};
+
+type TCustomerCartItem = {
+  cart_item_id: string;
+  cart_id: string;
+  product_id: number;
+  product_variant_id: string;
+  quantity: number;
+
+  cart: TCustomerCart;
+  product: TProduct;
+  variant: TProductVariantItem | null;
+};
+
+type TCustomerCartGroupedBySeller = {
+  seller: TUser;
+  products: TCustomerCartItem[];
 };
