@@ -3,10 +3,13 @@ import Link from "next/link";
 import logo from "../../../public/smk_logo.png";
 import {
   BellIcon,
+  BookKeyIcon,
+  BoxesIcon,
   FacebookIcon,
   GanttChartSquareIcon,
   InstagramIcon,
   LayoutDashboardIcon,
+  Loader2Icon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
@@ -33,6 +36,8 @@ import { Avatar, AvatarFallback } from "./avatar";
 import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
 import { signOut } from "next-auth/react";
+import useSWR from "swr";
+import { TCustomerCart } from "@/lib/globals";
 
 interface IHeaderComponentProps {
   session: Session | null;
@@ -41,6 +46,18 @@ interface IHeaderComponentProps {
 export default function Header({ session }: IHeaderComponentProps) {
   const router = useRouter();
   const { toast } = useToast();
+
+  const { data: cartData, isLoading: cartLoading } = useSWR(
+    "/api/cart-list",
+    (url) =>
+      fetch(url, {
+        headers: {
+          user_id: session ? session.user.id : "",
+        },
+      })
+        .then((res) => res.json())
+        .then((res) => res.result as TCustomerCart)
+  );
 
   const onButtonLinkClickHandler = (options: "LOGIN" | "REGISTER") => {
     if (options === "LOGIN") {
@@ -61,6 +78,7 @@ export default function Header({ session }: IHeaderComponentProps) {
       })
       .catch((err) => console.error(err));
   };
+
   return (
     <div className="w-full flex flex-col overflow-hidden sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
       <div className="w-full px-8 py-2 md:px-16 bg-slate-200 text-stone-800 flex flex-row items-center text-sm justify-between">
@@ -101,8 +119,18 @@ export default function Header({ session }: IHeaderComponentProps) {
         <SearchBar />
 
         <div className="flex flex-row items-center gap-2">
-          <Button variant="ghost" size="icon">
-            <ShoppingCartIcon className="w-4 h-4" />
+          <Button variant="ghost" size="icon" asChild>
+            <div className="relative">
+              <Link href={ROUTES.USER.CART}>
+                <ShoppingCartIcon className="w-4 h-4" />
+              </Link>
+              <div className="w-6 h-6 text-xs rounded-full p-1 text-center bg-destructive text-destructive-foreground absolute -top-1 -right-1">
+                {cartLoading && (
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                )}
+                {cartData ? <p>{cartData.cart_items.length}</p> : "0"}
+              </div>
+            </div>
           </Button>
           <span>|</span>
           <Button variant="ghost" size="icon">
@@ -132,8 +160,15 @@ export default function Header({ session }: IHeaderComponentProps) {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="w-52 mr-4">
-                <DropdownMenuLabel>
+                <DropdownMenuLabel className="flex flex-col gap-1">
                   <span>{session.user.username}</span>
+                  {session.user.role !== "CUSTOMER" && (
+                    <span className="text-xs font-normal">
+                      {session.user.role === "ADMIN"
+                        ? "Administrator"
+                        : "Penjual"}
+                    </span>
+                  )}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
@@ -146,6 +181,45 @@ export default function Header({ session }: IHeaderComponentProps) {
                       <span>Dashboard</span>
                     </Link>
                   </DropdownMenuItem>
+
+                  {session.user.role === "ADMIN" && (
+                    <>
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.ADMIN.DASHBOARD}
+                          className="w-full flex flex-row"
+                        >
+                          <BookKeyIcon className="w-4 h-4 mr-2" />
+                          <span>Admin Dashboard</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.USER.PRODUCTS_LIST}
+                          className="w-full flex flex-row"
+                        >
+                          <BoxesIcon className="w-4 h-4 mr-2" />
+                          <span>Manajemen Produk</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
+                  {session.user.role === "SELLER" && (
+                    <>
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.USER.PRODUCTS_LIST}
+                          className="w-full flex flex-row"
+                        >
+                          <BoxesIcon className="w-4 h-4 mr-2" />
+                          <span>Manajemen Produk</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
                   <DropdownMenuItem
                     className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
                     onClick={signOutHandler}

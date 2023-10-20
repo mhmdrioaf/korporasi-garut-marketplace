@@ -16,7 +16,7 @@ import {
   TShippingCostServiceCost,
 } from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { fetcher, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
@@ -79,6 +79,8 @@ export function DirectPurchaseProvider({
       .then((res) => res.json())
       .then((res) => res.result as TShippingCost[])
   );
+
+  const { mutate } = useSWRConfig();
 
   const sellerAddress = product.seller.address.find(
     (address) => address.address_id === product.seller.primary_address_id
@@ -174,6 +176,7 @@ export function DirectPurchaseProvider({
             title: "Berhasil menambahkan produk ke keranjang",
             description: response.message,
           });
+          mutate("/api/cart-list");
         }
       }
     } catch (error) {
