@@ -22,6 +22,14 @@ import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 export default function ProductDetail() {
   const { product, image, price, variants, cart, quantity } =
     useDirectPurchase();
+  const getSellerAddress = () => {
+    const primarySellerId = product.seller.primary_address_id;
+    const primaryAddress = product.seller.address.find(
+      (address) => address.address_id === primarySellerId
+    );
+
+    return primaryAddress ? primaryAddress.city.city_name : "Tidak diketahui";
+  };
   return product ? (
     <Container variant="column" className="overflow-hidden">
       <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
@@ -72,6 +80,28 @@ export default function ProductDetail() {
               {product.category?.category_name}
             </p>
             <p className="text-3xl font-bold">{product.title}</p>
+          </div>
+
+          <div className="w-full flex flex-row items-center gap-2">
+            {product.seller.account.profile_picture && (
+              <div className="w-8 h-8 rounded-sm overflow-hidden relative">
+                <Image
+                  src={remoteImageSource(
+                    product.seller.account.profile_picture
+                  )}
+                  fill
+                  className="object-cover"
+                  alt="foto penjual"
+                  sizes="75vw"
+                />
+              </div>
+            )}
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-bold">
+                {product.seller.account.user_name}
+              </p>
+              <p className="text-xs">{getSellerAddress()}</p>
+            </div>
           </div>
 
           {/* TODO: Product ratings */}
