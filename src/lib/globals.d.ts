@@ -191,3 +191,8 @@ type TCustomerCartItem = {
   product: TProduct;
   variant: TProductVariantItem | null;
 };
+
+type TCustomerCartGroupedBySeller = {
+  seller: TUser;
+  products: TCustomerCartItem[];
+};
