@@ -24,9 +24,9 @@ export default function ProductDetail() {
     useDirectPurchase();
   return product ? (
     <Container variant="column" className="overflow-hidden">
-      <div className="w-full flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="w-full grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8">
         {/* Product images */}
-        <div className="w-full flex flex-col gap-2">
+        <div className="col-span-1 flex flex-col gap-2 overflow-hidden">
           <div className="w-full h-auto aspect-square rounded-lg overflow-hidden relative">
             <Image
               src={remoteImageSource(product.images[image.activeImage])}
