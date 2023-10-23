@@ -109,7 +109,13 @@ export default function Header({ session }: IHeaderComponentProps) {
           href={ROUTES.LANDING_PAGE}
           className="flex flex-row gap-4 items-center shrink-0 select-none"
         >
-          <Image src={logo} width={64} height={64} alt="Logo SMK" />
+          <Image
+            src={logo}
+            width={64}
+            height={64}
+            alt="Logo SMK"
+            sizes="100vw"
+          />
           <div className="flex flex-col text-primary font-bold">
             <p>SMKs Korporasi Garut</p>
             <p>Marketplace</p>
@@ -150,6 +156,7 @@ export default function Header({ session }: IHeaderComponentProps) {
                         fill
                         className="object-cover"
                         alt="Foto profil"
+                        sizes="100vw"
                       />
                     ) : (
                       <p>{getAvatarInitial(session.user.name!)}</p>

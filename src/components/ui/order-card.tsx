@@ -89,6 +89,7 @@ export default function OrderCard({ order }: IOrderCardProps) {
                 alt="product image"
                 fill
                 className="object-cover"
+                sizes="100vw"
               />
             </div>
 
