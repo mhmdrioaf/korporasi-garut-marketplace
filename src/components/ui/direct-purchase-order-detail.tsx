@@ -94,6 +94,7 @@ export default function DirectPurchaseOrderDetail() {
               fill
               alt="foto produk"
               className="object-cover"
+              sizes="100vw"
             />
           </div>
 
@@ -109,6 +110,7 @@ export default function DirectPurchaseOrderDetail() {
                     alt="foto seller"
                     fill
                     className="object-cover"
+                    sizes="100vw"
                   />
                 </div>
               )}

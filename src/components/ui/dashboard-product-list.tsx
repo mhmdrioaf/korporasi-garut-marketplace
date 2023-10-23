@@ -85,6 +85,7 @@ export default function DashboardProductList({
                   fill
                   alt={product.title}
                   className="object-cover"
+                  sizes="100vw"
                 />
               </div>
 
