@@ -22,6 +22,8 @@ import { useToast } from "../use-toast";
 import Modal from "../modal";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "../scroll-area";
+import { ROUTES } from "@/lib/constants";
+import Link from "next/link";
 
 type TLoginOptions = "username" | "email";
 
@@ -199,6 +201,16 @@ export default function LoginModal() {
                   "Masuk"
                 )}
               </Button>
+              <p className="text-sm">
+                Belum mempunyai akun?{" "}
+                <Link
+                  href={ROUTES.AUTH.REGISTER}
+                  className="font-bold text-primary"
+                  replace
+                >
+                  Daftar disini.
+                </Link>
+              </p>
               <Separator />
               <Button
                 type="button"
