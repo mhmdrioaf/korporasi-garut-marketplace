@@ -12,15 +12,15 @@ export default async function RegisterPage() {
   else
     return (
       <Container className="min-h-[85vh] flex flex-col gap-8">
-        <div className="w-full flex items-start justify-start">
-          <div className="w-full flex flex-col gap-2">
-            <p className="text-xl lg:text-4xl">Daftar</p>
-            <p className="text-sm lg:text-base">
-              Segera daftar untuk dapat menggunakan layanan kami.
+        <div className="flex flex-col gap-4 px-4 py-2 border border-input rounded-md overflow-hidden">
+          <div className="flex flex-col gap-2">
+            <p className="text-2xl font-bold text-primary">Daftar</p>
+            <p className="text-sm">
+              Silahkan daftar untuk dapat segera menggunakan layanan kami.
             </p>
           </div>
+          <AuthRegister />
         </div>
-        <AuthRegister />
       </Container>
     );
 }
