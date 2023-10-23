@@ -72,6 +72,7 @@ export default function ProductImageAdd() {
                 alt="foto produk"
                 fill
                 className="object-cover"
+                sizes="100vw"
               />
             </div>
           ))}
@@ -94,6 +95,7 @@ export default function ProductImageAdd() {
                 alt={file.name}
                 fill
                 className="object-cover"
+                sizes="100vw"
               />
             </div>
           ))}
