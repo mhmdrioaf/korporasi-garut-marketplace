@@ -25,7 +25,13 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 
-export default function AuthRegister() {
+interface IAuthRegisterComponentProps {
+  referer?: "modal" | "page";
+}
+
+export default function AuthRegister({
+  referer = "page",
+}: IAuthRegisterComponentProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -93,13 +99,20 @@ export default function AuthRegister() {
           .then(() => {
             toast({
               title: "Proses daftar berhasil.",
-              description: "Mengarahkan ke halaman dashboard...",
+              description:
+                referer === "page"
+                  ? "Mengarahkan ke halaman dashboard..."
+                  : undefined,
               variant: "success",
             });
             setLoading(false);
             form.reset();
             router.refresh();
-            router.push(ROUTES.USER.DASHBOARD);
+            if (referer === "page") {
+              router.push(ROUTES.USER.DASHBOARD);
+            } else {
+              router.back();
+            }
           })
           .catch((err) => {
             console.error(err);
@@ -121,7 +134,7 @@ export default function AuthRegister() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="w-full lg:w2/3 rounded-lg overflow-hidden flex flex-col gap-4 lg:gap-8 border border-stone-300 p-4 lg:p-8"
+        className="w-full flex flex-col gap-4"
       >
         <FormField
           control={form.control}
