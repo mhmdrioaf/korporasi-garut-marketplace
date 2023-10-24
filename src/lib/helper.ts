@@ -188,25 +188,49 @@ export const productCategoryIdGenerator = (maxId: number) => {
   return prefix + id;
 };
 
-export const customerOrderIdGenerator = (maxId: number, user_id: number) => {
+export const customerOrderIdGenerator = (maxId: number) => {
+  const date = new Date();
+  const day = decimalsNumber(date.getDate(), 10);
+  const month = decimalsNumber(date.getMonth() + 1, 10);
+  const years = date.getFullYear().toString().slice(2, 3);
+
+  const fullDate = `${day}${month}${years}`;
   const orderId = decimalsNumber(maxId, 100);
-  const customerId = decimalsNumber(user_id, 100);
   const prefix = "ORD";
-  return prefix + customerId + orderId;
+  return prefix + fullDate + orderId;
 };
 
 export const customerOrderItemIdGenerator = (
-  maxId: number,
-  orderID: number,
-  productID: number,
-  user_id: number
+  productName: string,
+  currentProductCount: number
 ) => {
-  const id = decimalsNumber(maxId, 100);
-  const _orderID = decimalsNumber(orderID, 100);
-  const _productID = decimalsNumber(productID, 100);
-  const _user_id = decimalsNumber(user_id, 100);
-  const prefix = "ORITM";
-  return prefix + _user_id + _orderID + _productID + id;
+  const joinnedName = productName.split(" ");
+  const wordsLength = joinnedName.length;
+  const productCount = decimalsNumber(currentProductCount, 100);
+
+  if (wordsLength > 1) {
+    const words = [joinnedName[0], joinnedName[1]];
+    const first = words[0][0];
+    const second = words[0][2];
+    const last = words[1][0];
+    const prefix = `${first}${second}${last}${productCount}`.toUpperCase();
+
+    return prefix;
+  } else {
+    const words = joinnedName[0];
+    const _length = words.length;
+
+    const middleCharIndex = _length > 4 ? 2 : 1;
+    const lastCharIndex =
+      _length > 5 ? _length - 4 : _length > 4 ? _length - 2 : _length - 1;
+
+    const first = words[0];
+    const second = words[middleCharIndex];
+    const last = words[lastCharIndex];
+    const prefix = `${first}${second}${last}${productCount}`.toUpperCase();
+
+    return prefix;
+  }
 };
 
 export const NaNHandler = (value: number) => {

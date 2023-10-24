@@ -34,10 +34,7 @@ async function handler(request: NextRequest) {
     const currentMaxId = Number(
       orderMaxId?.slice(orderMaxId.length - 3, orderMaxId.length) ?? 0
     );
-    const newOrderId = customerOrderIdGenerator(
-      currentMaxId + 1,
-      parseInt(body.user_id)
-    );
+    const newOrderId = customerOrderIdGenerator(currentMaxId + 1);
 
     const maxOrderItemID = await db.order_item.aggregate({
       where: {
@@ -72,10 +69,8 @@ async function handler(request: NextRequest) {
         0
     );
     const newOrderItemId = customerOrderItemIdGenerator(
-      currentMaxItemId + 1,
-      currentMaxId + 1,
-      body.product.id,
-      parseInt(body.user_id)
+      body.product.title,
+      currentMaxItemId + 1
     );
 
     const createOrder = await db.orders.create({
