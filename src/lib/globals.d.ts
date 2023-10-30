@@ -15,7 +15,10 @@ type TProduct = {
   unit: string;
   weight: number;
   stock: number;
-  variant: TProductVariant[];
+  expire_date: Date;
+  storage_period: number;
+  capable_out_of_town: boolean;
+  variant: TProductVariant | null;
   category_id: string | null;
   category: TProductCategory | null;
   seller: TUser;
@@ -35,7 +38,7 @@ type TProductVariant = {
 type TProductVariantItem = {
   variant_item_id: string;
   variant_name: string;
-  variant_value: string;
+  variant_stock: number;
   variant_price: number;
 };
 

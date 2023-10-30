@@ -165,21 +165,25 @@ export const sortAddress = (address: TAddress, primaryAddressId: string) => {
   }
 };
 
-export const variantIdGenerator = (productId: number, variantId: number) => {
-  const product = decimalsNumber(productId, 100);
-  const variant = decimalsNumber(variantId, 100);
-  const prefix = "PV";
-  return prefix + product + variant;
+export const variantIdGenerator = (
+  productName: string,
+  variantName: string
+) => {
+  const productPrefix = prefixMaker(productName, "triple");
+  const variantPrefix = prefixMaker(variantName, "single");
+  return `${productPrefix}${variantPrefix}`;
 };
 
 export const variantItemsIdGenerator = (
-  productId: number,
-  variantId: number
+  productName: string,
+  variantName: string,
+  variantItemName: string
 ) => {
-  const product = decimalsNumber(productId, 100);
-  const variant = decimalsNumber(variantId, 100);
-  const prefix = "PVI";
-  return prefix + product + variant;
+  const productPrefix = prefixMaker(productName, "triple");
+  const variantPrefix = prefixMaker(variantName, "single");
+  const variantItemPrefix = prefixMaker(variantItemName, "triple");
+
+  return `${productPrefix}${variantPrefix}${variantItemPrefix}`;
 };
 
 export const productCategoryIdGenerator = (maxId: number) => {
@@ -198,6 +202,41 @@ export const customerOrderIdGenerator = (maxId: number) => {
   const orderId = decimalsNumber(maxId, 100);
   const prefix = "ORD";
   return prefix + fullDate + orderId;
+};
+
+export const prefixMaker = (value: string, options: "single" | "triple") => {
+  const joinnedName = value.split(" ");
+  const wordsLength = joinnedName.length;
+
+  if (wordsLength > 1) {
+    const words = [joinnedName[0], joinnedName[1]];
+    const first = words[0][0];
+    const second = words[0][2];
+    const last = words[1][0];
+    const prefix =
+      options === "triple"
+        ? `${first}${second}${last}`.toUpperCase()
+        : `${first}`.toUpperCase();
+
+    return prefix;
+  } else {
+    const words = joinnedName[0];
+    const _length = words.length;
+
+    const middleCharIndex = _length > 4 ? 2 : 1;
+    const lastCharIndex =
+      _length > 5 ? _length - 4 : _length > 4 ? _length - 2 : _length - 1;
+
+    const first = words[0];
+    const second = words[middleCharIndex];
+    const last = words[lastCharIndex];
+    const prefix =
+      options === "triple"
+        ? `${first}${second}${last}`.toUpperCase()
+        : `${first}`.toUpperCase();
+
+    return prefix;
+  }
 };
 
 export const customerOrderItemIdGenerator = (
@@ -373,4 +412,8 @@ export const calculateCartCosts = (
   const total_variant_price = product_variant_price * product_quantity;
   const total_cost = total_price + total_variant_price;
   return total_cost;
+};
+
+export const convertStringToBoolean = (value: "true" | "false") => {
+  return value === "true";
 };

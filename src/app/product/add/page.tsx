@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/container";
-import ProductAddForm from "@/components/ui/product-add-form";
+import ProductAddForm from "@/components/ui/product-input";
 import authOptions from "@/lib/authOptions";
-import { ProductProvider } from "@/lib/hooks/context/useProductContext";
+import { ProductProvider } from "@/lib/hooks/context/useProduct";
 import { getServerSession } from "next-auth";
 
 export default async function AddProductPage() {
@@ -18,7 +18,7 @@ export default async function AddProductPage() {
     );
   } else {
     return (
-      <ProductProvider session={session} product={null}>
+      <ProductProvider session={session}>
         <Container>
           <ProductAddForm />
         </Container>
