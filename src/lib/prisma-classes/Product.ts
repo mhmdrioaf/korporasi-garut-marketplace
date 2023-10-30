@@ -7,13 +7,8 @@ import {
   variantItemsIdGenerator,
 } from "../helper";
 import { db } from "../db";
-import { TProductVariant } from "../globals";
 import supabase from "../supabase";
 import { IProductInput } from "../hooks/context/productContextType";
-
-type TProductVariantInput = {
-  variant_title: string;
-};
 
 type TProductVariantItemInput = {
   variant_name: string;
@@ -29,11 +24,6 @@ type TNewProductVariantInput = {
 interface IProductData extends IProductInput {
   id: string;
   tags: string[];
-}
-
-interface IProductVariantUpdate {
-  product_id: string;
-  variant: Omit<TProductVariant, "product_id" | "product">[];
 }
 
 export interface IAddProductVariant {
@@ -232,104 +222,105 @@ export default class Product {
     });
   }
 
-  async productVariantUpdate(data: IProductVariantUpdate) {
-    const upsertVariantItems = (
-      variant: Omit<TProductVariant, "product_id" | "product">
-    ) => {
-      const variantItems = variant.variant_item;
+  async productVariantUpdate(data: IProductData) {
+    const upsertVariantItems = () => {
+      const variantItems = data.variant!.variant_item;
 
-      return variantItems.map((item, index) => ({
+      return variantItems.map((item) => ({
         where: {
-          variant_item_id: item.variant_item_id,
+          variant_item_id: variantItemsIdGenerator(
+            data.product.title,
+            data.variant!.variant_title,
+            item.variant_item_name
+          ),
         },
         create: {
-          variant_item_id: item.variant_item_id,
-          variant_name: item.variant_name,
-          variant_price: item.variant_price,
-          variant_stock: item.variant_stock,
+          variant_item_id: variantItemsIdGenerator(
+            data.product.title,
+            data.variant!.variant_title,
+            item.variant_item_name
+          ),
+          variant_name: item.variant_item_name,
+          variant_price: item.variant_item_price,
+          variant_stock: item.variant_item_stock,
         },
         update: {
-          variant_name: item.variant_name,
-          variant_price: item.variant_price,
-          variant_stock: item.variant_stock,
+          variant_name: item.variant_item_name,
+          variant_price: item.variant_item_price,
+          variant_stock: item.variant_item_stock,
         },
       }));
     };
 
-    return await db.$transaction(
-      data.variant.map((variant) =>
-        db.product_variant.upsert({
-          where: {
-            variant_id: variant.variant_id,
+    return await db.product_variant.upsert({
+      where: {
+        variant_id: variantIdGenerator(
+          data.product.title,
+          data.variant!.variant_title
+        ),
+      },
+      create: {
+        variant_id: variantIdGenerator(
+          data.product.title,
+          data.variant!.variant_title
+        ),
+        variant_title: data.variant!.variant_title,
+        variant_item: {
+          createMany: {
+            data: data.variant!.variant_item.map((item) => ({
+              variant_item_id: variantItemsIdGenerator(
+                data.product.title,
+                data.variant!.variant_title,
+                item.variant_item_name
+              ),
+              variant_name: item.variant_item_name,
+              variant_price: item.variant_item_price,
+              variant_stock: item.variant_item_stock,
+            })),
           },
-          create: {
-            variant_id: variant.variant_id,
-            variant_title: variant.variant_title,
-            variant_item: {
-              createMany: {
-                data: variant.variant_item.map((item) => ({
-                  variant_item_id: item.variant_item_id,
-                  variant_name: item.variant_name,
-                  variant_price: item.variant_price,
-                  variant_stock: item.variant_stock,
-                })),
-                skipDuplicates: true,
-              },
-            },
-            product_id: parseInt(data.product_id),
-          },
-          update: {
-            variant_title: variant.variant_title,
-            variant_item: {
-              upsert: upsertVariantItems(variant),
-            },
-          },
-        })
-      )
-    );
+        },
+        product_id: parseInt(data.id),
+      },
+      update: {
+        variant_title: data.variant!.variant_title,
+        variant_item: {
+          upsert: upsertVariantItems(),
+        },
+      },
+    });
+
+    // return await db.$transaction(
+    //   data.variant.map((variant) =>
+    //     db.product_variant.upsert({
+    //       where: {
+    //         variant_id: variant.variant_id,
+    //       },
+    //       create: {
+    //         variant_id: variant.variant_id,
+    //         variant_title: variant.variant_title,
+    //         variant_item: {
+    //           createMany: {
+    //             data: variant.variant_item.map((item) => ({
+    //               variant_item_id: item.variant_item_id,
+    //               variant_name: item.variant_name,
+    //               variant_price: item.variant_price,
+    //               variant_stock: item.variant_stock,
+    //             })),
+    //             skipDuplicates: true,
+    //           },
+    //         },
+    //         product_id: parseInt(data.product_id),
+    //       },
+    //       update: {
+    //         variant_title: variant.variant_title,
+    //         variant_item: {
+    //           upsert: upsertVariantItems(variant),
+    //         },
+    //       },
+    //     })
+    //   )
+    // );
   }
-
-  // async addProductVariant(data: IAddProductVariant) {
-  //   const getMaxVariants = await this.prismaProductVariant?.aggregate({
-  //     where: {
-  //       product_id: {
-  //         equals: parseInt(data.product_id),
-  //       },
-  //     },
-  //     _max: {
-  //       variant_id: true,
-  //     },
-  //   });
-
-  //   const maxVariants = getMaxVariants?._max.variant_id;
-  //   const maxVariantsId = Number(
-  //     maxVariants?.slice(maxVariants.length - 3, maxVariants.length) ?? 0
-  //   );
-
-  //   const createManyVariantsItem = data.variant.variant_item.map(
-  //     (item, index) => ({
-  //       variant_item_id: variantItemsIdGenerator(),
-  //       variant_name: item.variant_name,
-  //       variant_price: item.variant_price,
-  //       variant_value: item.variant_value,
-  //     })
-  //   );
-
-  //   return await this.prismaProductVariant?.create({
-  //     data: {
-  //       variant_id: variantIdGenerator(
-  //         parseInt(data.product_id),
-  //         maxVariantsId + 1
-  //       ),
-  //       variant_title: data.variant.variant_title,
-  //       variant_item: {
-  //         createMany: {
-  //           data: createManyVariantsItem,
-  //         },
-  //       },
-  //     },
-  //   });
-  // }
 
   async getVariantDetail(product_id: string) {
     const _maxVariantItemId = this.prismaProductVariantItems?.aggregate({
