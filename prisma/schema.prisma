@@ -88,23 +88,26 @@ model order_item {
 }
 
 model product {
-  id          Int            @id @default(autoincrement())
-  title       String
-  description String
-  price       Int
-  images      String[]
-  unit        String
-  weight      Int
-  stock       Int            @default(1)
-  seller_id   Int
-  category_id String?
-  tags        String[]
-  status      PRODUCT_STATUS @default(PENDING)
+  id                  Int            @id @default(autoincrement())
+  title               String
+  description         String
+  price               Int
+  images              String[]
+  unit                String
+  weight              Int
+  stock               Int            @default(1)
+  expire_date         DateTime
+  storage_period      Int            @default(3)
+  capable_out_of_town Boolean
+  seller_id           Int
+  category_id         String?
+  tags                String[]
+  status              PRODUCT_STATUS @default(PENDING)
 
   category    product_category?    @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user                 @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
   order_items order_item[]
-  variant     product_variant[]
+  variant     product_variant?
   carts       customer_cart_item[]
 }
 
@@ -112,7 +115,7 @@ model product_variant {
   variant_id    String @id
   variant_title String
 
-  product_id   Int?
+  product_id   Int?                   @unique
   product      product?               @relation(fields: [product_id], references: [id], onDelete: Cascade)
   variant_item product_variant_item[]
 }
@@ -120,7 +123,7 @@ model product_variant {
 model product_variant_item {
   variant_item_id String @id
   variant_name    String
-  variant_value   String
+  variant_stock   Int    @default(0)
   variant_price   Int    @default(0)
 
   variant_id  String
