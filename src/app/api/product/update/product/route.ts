@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { IProductInput } from "@/lib/hooks/context/productContextType";
 import Product from "@/lib/prisma-classes/Product";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IProductUpdateRequestBody extends IProductInput {
@@ -12,47 +13,56 @@ interface IProductUpdateRequestBody extends IProductInput {
 
 async function handler(request: NextRequest) {
   const body: IProductUpdateRequestBody = await request.json();
+  const secret = request.headers.get("secret");
 
   const { deletedVariant, deletedVariantItems, ...productData } = body;
 
-  try {
-    const products = new Product(
-      db.product,
-      db.product_variant,
-      db.product_variant_item
-    );
-    const updateProduct = await products.updateProduct(productData);
+  if (secret === process.env.NEXT_PUBLIC_SELLER_TOKEN!) {
+    try {
+      const products = new Product(
+        db.product,
+        db.product_variant,
+        db.product_variant_item
+      );
+      const updateProduct = await products.updateProduct(productData);
 
-    if (body.variant) {
-      await products.productVariantUpdate(productData);
-    }
-
-    if (body.deletedVariantItems && body.deletedVariantItems.length > 0) {
-      for (const id of body.deletedVariantItems) {
-        await products.deleteProductVariantItems(id);
+      if (body.variant) {
+        await products.productVariantUpdate(productData);
       }
-    }
 
-    if (body.deletedVariant) {
-      await products.deleteProductVariant(deletedVariant);
-    }
+      if (body.deletedVariantItems && body.deletedVariantItems.length > 0) {
+        for (const id of body.deletedVariantItems) {
+          await products.deleteProductVariantItems(id);
+        }
+      }
 
-    if (updateProduct) {
-      return NextResponse.json({
-        ok: true,
-        message: "Berhasil mengubah data produk.",
-      });
-    } else {
+      if (body.deletedVariant) {
+        await products.deleteProductVariant(deletedVariant);
+      }
+
+      if (updateProduct) {
+        revalidateTag("product-detail");
+        return NextResponse.json({
+          ok: true,
+          message: "Berhasil mengubah data produk.",
+        });
+      } else {
+        return NextResponse.json({
+          ok: false,
+          message: "Telah terjadi kesalahan ketika mengubah data produk.",
+        });
+      }
+    } catch (err) {
+      console.error(err);
       return NextResponse.json({
         ok: false,
         message: "Telah terjadi kesalahan ketika mengubah data produk.",
       });
     }
-  } catch (err) {
-    console.error(err);
+  } else {
     return NextResponse.json({
       ok: false,
-      message: "Telah terjadi kesalahan ketika mengubah data produk.",
+      message: "Anda tidak mempunyai akses untuk melakukan permintaan ini!",
     });
   }
 }

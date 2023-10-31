@@ -9,6 +9,9 @@ async function getProductDetail(id: string) {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
+    next: {
+      tags: ["product-detail"],
+    },
   });
 
   const response = await res.json();
