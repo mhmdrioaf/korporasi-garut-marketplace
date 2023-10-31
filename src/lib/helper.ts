@@ -181,7 +181,9 @@ export const variantItemsIdGenerator = (
 ) => {
   const productPrefix = prefixMaker(productName, "triple");
   const variantPrefix = prefixMaker(variantName, "single");
-  const variantItemPrefix = prefixMaker(variantItemName, "triple");
+  const variantItemPrefix = variantItemName
+    .slice(0, variantItemName.length >= 3 ? 3 : variantItemName.length)
+    .toUpperCase();
 
   return `${productPrefix}${variantPrefix}${variantItemPrefix}`;
 };
