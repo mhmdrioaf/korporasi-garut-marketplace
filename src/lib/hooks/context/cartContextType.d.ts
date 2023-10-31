@@ -28,7 +28,30 @@ type TCartContext = {
     };
   };
 
-  render: {
-    items: () => JSX.Element;
+  cart: {
+    data: TCustomerCart | undefined;
+    error: any;
+    loading: boolean;
+
+    itemRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>;
+
+    items: { [sellerId: number]: TCustomerCartItem[] } | null;
+
+    itemPrice: (item: TCustomerCartItem) => number;
+
+    handler: {
+      getSellerName: (sellerId: number) => string;
+      getSellerAddress: (sellerId: number) => string | undefined;
+
+      deleteItem: (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        deletedItem: TCustomerCartItem
+      ) => void;
+      itemQuantityChange: (
+        event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        item: TCustomerCartItem,
+        options: "decrease" | "increase"
+      ) => Promise<void>;
+    };
   };
 };
