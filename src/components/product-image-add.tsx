@@ -1,32 +1,24 @@
 "use client";
 
-import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { createImagePreview, remoteImageSource } from "@/lib/helper";
-import { useContext, useRef } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { PlusIcon, Trash2Icon } from "lucide-react";
 import { Button } from "./ui/button";
-import { ProductContext } from "@/lib/hooks/context/useProductContext";
-import { TProductContextType } from "@/lib/hooks/context/productContextType";
+import { useProduct } from "@/lib/hooks/context/useProduct";
 
 // TODO: Add product thumbnail input
 
 export default function ProductImageAdd() {
-  const {
-    addImages,
-    removeImage,
-    productImages,
-    currentImages,
-    removeCurrentImage,
-  } = useContext(ProductContext) as TProductContextType;
+  const { images, state } = useProduct();
 
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
   const onImagesChanges = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target;
     if (files && files.length > 0) {
-      addImages(files[0]);
+      images.handler.add(files[0]);
     }
   };
 
@@ -37,8 +29,8 @@ export default function ProductImageAdd() {
   };
 
   const onImageDelete = (index: number) => {
-    const imageToDelete = productImages[index];
-    removeImage(imageToDelete);
+    const imageToDelete = images.images[index];
+    images.handler.remove(imageToDelete);
 
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
@@ -46,24 +38,25 @@ export default function ProductImageAdd() {
   };
 
   const onCurrentImageDelete = (url: string) => {
-    removeCurrentImage(url);
+    images.handler.currentImageRemove(url);
   };
 
   return (
     <div className="flex flex-col gap-2">
-      <Label>Foto Produk</Label>
-      <div className="grid grid-cols-3 lg:grid-cols-4 gap-2">
-        {currentImages.length > 0 &&
-          currentImages.map((source: string) => (
+      <p>Foto 1:1</p>
+      <div className="flex flex-row items-center gap-2 flex-wrap">
+        {images.current.length > 0 &&
+          images.current.map((source: string) => (
             <div
               key={source}
-              className="w-full h-full aspect-square rounded-md overflow-hidden relative"
+              className="w-16 h-16 aspect-square rounded-md overflow-hidden relative shrink-0"
             >
               <Button
                 variant="destructive"
-                size="icon"
-                className="absolute top-4 right-4 z-30"
+                className="w-full h-full absolute top-0 right-0 z-30 opacity-5 hover:opacity-100 transition-opacity"
                 onClick={() => onCurrentImageDelete(source)}
+                type="button"
+                disabled={state.uploading}
               >
                 <Trash2Icon className="w-4 h-4" />
               </Button>
@@ -76,17 +69,18 @@ export default function ProductImageAdd() {
               />
             </div>
           ))}
-        {productImages.length > 0 &&
-          productImages.map((file, index) => (
+        {images.images.length > 0 &&
+          images.images.map((file, index) => (
             <div
               key={file.name}
-              className="w-full h-full aspect-square rounded-md overflow-hidden relative"
+              className="w-16 h-16 aspect-square rounded-md overflow-hidden relative shrink-0"
             >
               <Button
                 variant="destructive"
-                size="icon"
-                className="absolute top-4 right-4 z-30"
+                className="w-full h-full absolute top-0 right-0 z-30 opacity-5 hover:opacity-100 transition-opacity"
                 onClick={() => onImageDelete(index)}
+                type="button"
+                disabled={state.uploading}
               >
                 <Trash2Icon className="w-4 h-4" />
               </Button>
@@ -101,7 +95,7 @@ export default function ProductImageAdd() {
           ))}
 
         <div
-          className="w-full h-full aspect-square grid place-items-center rounded-md border border-input cursor-pointer"
+          className="w-16 h-16 aspect-square grid place-items-center rounded-md border border-input cursor-pointer"
           onClick={() => onImageInputClicked()}
         >
           <PlusIcon className="w-4 h-4" />
@@ -112,6 +106,7 @@ export default function ProductImageAdd() {
           onChange={onImagesChanges}
           ref={imageInputRef}
           className="hidden"
+          disabled={state.uploading}
         />
       </div>
     </div>
