@@ -26,15 +26,24 @@ export default function ProductInput() {
   );
 
   useEffect(() => {
-    if (form.variant.items.length < 1) {
+    if (form.variant.items.length < 1 && !state.isEdit) {
       form.variant.handler.add("false");
     }
-  }, [form.variant.items, form.variant.handler.add, form.variant.handler]);
+  }, [
+    form.variant.items,
+    form.variant.handler.add,
+    form.variant.handler,
+    state.isEdit,
+  ]);
 
   return (
     <form
       className="w-full flex flex-col gap-8"
-      onSubmit={form.productForm.handleSubmit(form.handler.submitProduct)}
+      onSubmit={
+        state.isEdit
+          ? form.productForm.handleSubmit(form.handler.updateProduct)
+          : form.productForm.handleSubmit(form.handler.submitProduct)
+      }
     >
       {/* Product Informations */}
       <div className="w-full flex flex-col gap-8 rounded-md border border-input p-2">

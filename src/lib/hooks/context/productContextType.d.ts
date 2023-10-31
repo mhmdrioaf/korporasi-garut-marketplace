@@ -16,6 +16,7 @@ type TProductContext = {
     };
     handler: {
       submitProduct: SubmitHandler<IProductInput>;
+      updateProduct: SubmitHandler<IProductInput>;
     };
   };
 
@@ -40,10 +41,12 @@ type TProductContext = {
 
   state: {
     uploading: boolean;
+    isEdit: boolean;
   };
 };
 
 type TVariantItemsInput = {
+  variant_item_id: string;
   variant_item_name: string;
   variant_item_stock: number;
   variant_item_price: number;
@@ -60,7 +63,7 @@ type TProductInput = {
   unit: string;
   seller_id: string;
   category_id: string | null;
-  expire_date: Date;
+  expire_date: string;
   storage_period: number;
   capable_out_of_town: boolean;
 };
@@ -72,6 +75,7 @@ type TProductVariantInput = {
 };
 
 type TProductVariantItemInput = {
+  variant_item_id: string;
   variant_item_name: string;
   variant_item_price: number;
   variant_item_stock: number;

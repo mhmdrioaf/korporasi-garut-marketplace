@@ -2,13 +2,21 @@
 
 import { TProduct } from "@/lib/globals";
 import { Session } from "next-auth";
-import { ReactNode, createContext, useContext, useState } from "react";
+import {
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
 import { IProductInput, TProductContext } from "./productContextType";
 import { fetcher, uploadImage } from "@/lib/helper";
 import imageCompression from "browser-image-compression";
 import useSWR from "swr";
 import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { ROUTES } from "@/lib/constants";
 
 interface IProductProviderProps {
   children: ReactNode;
@@ -32,24 +40,24 @@ export function ProductProvider({
     product?.images ?? []
   );
 
+  const [defaultTags] = useState<string[]>(["smk", "korporasi", "garut"]);
+
   const [deletedVariantItems, setDeletedVariantItems] = useState<string[]>([]);
   const [deletedVariant, setDeletedVariant] = useState<string | null>(null);
 
   const [withVariants, setWithVariants] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const [productTags, setProductTags] = useState<string[]>(
-    product ? product.tags : ["smk korporasi garut", "smk", "agribisnis"]
+    product ? product.tags : defaultTags
   );
 
   const [uploading, setUploading] = useState(false);
 
-  const { data: productCategories, isLoading: categoriesLoading } = useSWR(
-    "/api/category/list",
-    fetcher
-  );
   const { data: productsList } = useSWR("/api/product/list", fetcher);
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<IProductInput>({
     mode: "onBlur",
@@ -58,7 +66,9 @@ export function ProductProvider({
         title: product?.title,
         unit: product?.unit,
         description: product?.description,
-        expire_date: product?.expire_date,
+        expire_date: product
+          ? new Date(product.expire_date).toISOString().substring(0, 10)
+          : undefined,
         price: product?.price,
         stock: product?.stock,
         capable_out_of_town: product?.capable_out_of_town ?? false,
@@ -71,6 +81,7 @@ export function ProductProvider({
       variant: {
         variant_id: product?.variant?.variant_id,
         variant_item: product?.variant?.variant_item.map((item) => ({
+          variant_item_id: item.variant_item_id,
           variant_item_name: item.variant_name,
           variant_item_price: item.variant_price,
           variant_item_stock: item.variant_stock,
@@ -79,8 +90,6 @@ export function ProductProvider({
       },
     },
   });
-
-  const variantName = form.watch("variant.variant_title");
 
   const variantItems = useFieldArray({
     name: "variant.variant_item",
@@ -101,19 +110,30 @@ export function ProductProvider({
   const onWithVariantsChangeHandler = (value: "true" | "false") => {
     setWithVariants(value === "true");
     if (value === "true") {
-      variantItems.append({
-        variant_item_name: "",
-        variant_item_price: 0,
-        variant_item_stock: 0,
-      });
+      if (product && product.variant) {
+        setDeletedVariant(null);
+      } else {
+        variantItems.append({
+          variant_item_id: "",
+          variant_item_name: "",
+          variant_item_price: 0,
+          variant_item_stock: 0,
+        });
+      }
     } else {
-      variantItems.remove();
-      form.setValue("variant", null);
+      if (product && product.variant) {
+        setDeletedVariant(product.variant.variant_id);
+        setWithVariants(false);
+      } else {
+        variantItems.remove();
+        form.setValue("variant", null);
+      }
     }
   };
 
   const onAddVariantItemsHandler = () => {
     variantItems.append({
+      variant_item_id: "",
       variant_item_name: "",
       variant_item_price: 0,
       variant_item_stock: 0,
@@ -121,6 +141,13 @@ export function ProductProvider({
   };
 
   const onRemoveVariantItemsHandler = (index: number) => {
+    const variantItemToDelete = variantItems.fields[index];
+    const { variant_item_id } = variantItemToDelete;
+
+    if (variant_item_id.length) {
+      setDeletedVariantItems((prev) => [...prev, variant_item_id]);
+    }
+
     variantItems.remove(index);
   };
 
@@ -132,6 +159,10 @@ export function ProductProvider({
   const onRemoveCurrentVariantHandler = (id: string) => {
     setDeletedVariant(id);
     form.setValue("variant", null);
+  };
+
+  const onRemoveCurrentVariantItemHandler = (id: string) => {
+    setDeletedVariantItems((prev) => [...prev, id]);
   };
 
   const onProductImageAddHandler = (newImage: File) => {
@@ -177,6 +208,8 @@ export function ProductProvider({
   function resetForm() {
     form.reset();
     variantItems.remove();
+    setProductTags(defaultTags);
+    setProductImages([]);
   }
 
   const onSubmit: SubmitHandler<IProductInput> = async (data) => {
@@ -233,12 +266,88 @@ export function ProductProvider({
           description: response.message,
         });
         resetForm();
+        router.push(ROUTES.USER.PRODUCTS_LIST);
       }
     } catch (error) {
       setUploading(false);
       console.error("An error occurred: ", error);
     }
   };
+
+  const onUpdate: SubmitHandler<IProductInput> = async (data) => {
+    setUploading(true);
+
+    if (!product) {
+      setUploading(false);
+      console.error("Produk tidak ditemukan");
+    } else {
+      const { stock, seller_id, images, ...productData } = data.product;
+
+      try {
+        const imagesURL = await uploadImages(product.id);
+
+        const res = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_UPDATE!, {
+          method: "PATCH",
+          headers: {
+            secret: session.user.token,
+          },
+          body: JSON.stringify({
+            product: {
+              ...productData,
+              seller_id: session.user.id,
+              stock:
+                controlledVariantItems.length > 0
+                  ? controlledVariantItems.reduce(
+                      (acc, item) => acc + item.variant_item_stock,
+                      0
+                    )
+                  : stock,
+              images: imagesURL,
+            },
+            variant: data.variant,
+            tags: productTags,
+            id: product.id,
+            deletedVariant: deletedVariant,
+            deletedVariantItems: deletedVariantItems,
+          }),
+        });
+
+        const response = await res.json();
+        if (!response.ok) {
+          setUploading(false);
+          toast({
+            variant: "destructive",
+            title: "Gagal mengubah data produk",
+            description: response.message,
+          });
+        } else {
+          setUploading(false);
+          toast({
+            variant: "success",
+            title: "Berhasil mengubah data produk",
+            description: response.message,
+          });
+          router.push(ROUTES.USER.PRODUCTS_LIST);
+          router.refresh();
+        }
+      } catch (error) {
+        setUploading(false);
+        console.error("An error occurred: ", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (product && product.variant && !deletedVariant) {
+      setWithVariants(true);
+    }
+  }, [product, deletedVariant]);
+
+  useEffect(() => {
+    if (product) {
+      setIsEdit(true);
+    }
+  }, [product]);
 
   const value: TProductContext = {
     form: {
@@ -256,6 +365,7 @@ export function ProductProvider({
       },
       handler: {
         submitProduct: onSubmit,
+        updateProduct: onUpdate,
       },
     },
     images: {
@@ -275,6 +385,7 @@ export function ProductProvider({
     },
     state: {
       uploading: uploading,
+      isEdit: isEdit,
     },
   };
 

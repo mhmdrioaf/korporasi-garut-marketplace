@@ -26,6 +26,11 @@ interface IProductData extends IProductInput {
   tags: string[];
 }
 
+interface IProductUpdateData extends IProductInput {
+  id: string;
+  tags: string[];
+}
+
 export interface IAddProductVariant {
   product_id: string;
   variant: TNewProductVariantInput;
@@ -218,21 +223,22 @@ export default class Product {
         weight: data.product.weight,
         category_id: data.product.category_id,
         tags: data.tags,
+        capable_out_of_town: convertStringToBoolean(
+          `${data.product.capable_out_of_town}`
+        ),
+        expire_date: data.product.expire_date,
+        storage_period: data.product.storage_period,
       },
     });
   }
 
-  async productVariantUpdate(data: IProductData) {
+  async productVariantUpdate(data: IProductUpdateData) {
     const upsertVariantItems = () => {
       const variantItems = data.variant!.variant_item;
 
       return variantItems.map((item) => ({
         where: {
-          variant_item_id: variantItemsIdGenerator(
-            data.product.title,
-            data.variant!.variant_title,
-            item.variant_item_name
-          ),
+          variant_item_id: item.variant_item_id,
         },
         create: {
           variant_item_id: variantItemsIdGenerator(
@@ -245,6 +251,11 @@ export default class Product {
           variant_stock: item.variant_item_stock,
         },
         update: {
+          variant_item_id: variantItemsIdGenerator(
+            data.product.title,
+            data.variant!.variant_title,
+            item.variant_item_name
+          ),
           variant_name: item.variant_item_name,
           variant_price: item.variant_item_price,
           variant_stock: item.variant_item_stock,
@@ -419,6 +430,11 @@ export default class Product {
               mode: "insensitive",
             },
           },
+          {
+            tags: {
+              has: query,
+            },
+          },
         ],
       },
       include: {
@@ -427,20 +443,30 @@ export default class Product {
             variant_item: true,
           },
         },
-        seller: true,
+        seller: {
+          include: {
+            address: {
+              include: {
+                city: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    if (productsQuerySearch.length < 1) {
-      return await db.$queryRaw`
-        SELECT * FROM product
-        WHERE EXISTS (
-        SELECT FROM unnest(tags) tags
-        WHERE tags LIKE ${`%${query}%`}
-     )`;
-    } else {
-      return productsQuerySearch;
-    }
+    return productsQuerySearch;
+
+    // if (productsQuerySearch.length < 1) {
+    //   return await db.$queryRaw`
+    //     SELECT * FROM product
+    //     WHERE EXISTS (
+    //     SELECT FROM unnest(tags) tags
+    //     WHERE tags LIKE ${`%${query}%`}
+    //  )`;
+    // } else {
+    //   return productsQuerySearch;
+    // }
   }
 
   async chageProductStatus(
