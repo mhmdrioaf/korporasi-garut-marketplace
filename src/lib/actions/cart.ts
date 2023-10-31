@@ -11,7 +11,7 @@ export async function cartItemsQuantityChangeHandler(cart: TCustomerCart) {
   const response = await res.json();
 
   if (!response.ok) {
-    return new Error("Gagal memperbaharui kuantitas keranjang.");
+    return undefined;
   } else {
     return response.result as TCustomerCart;
   }
@@ -28,7 +28,7 @@ export async function cartItemDeleteHandler(cartItem: TCustomerCartItem) {
   const response = await res.json();
 
   if (!response.ok) {
-    return new Error("Gagal memperbaharui keranjang.");
+    return undefined;
   } else {
     return response.result as TCustomerCart;
   }
