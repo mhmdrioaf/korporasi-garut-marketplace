@@ -68,18 +68,13 @@ export default function AdminProductDetailComponent({
           </div>
 
           <div className="flex flex-col gap-2">
-            {product.variant.length > 0 && (
+            {product.variant && (
               <>
                 <p className="font-bold">Varian Produk</p>
-                {product.variant.map((variant) => (
-                  <div
-                    key={variant.variant_id}
-                    className="flex flex-row items-center gap-4"
-                  >
-                    <p>{variant.variant_title}</p>
-                    <p>{showVariantItems(variant.variant_item)}</p>
-                  </div>
-                ))}
+                <div className="flex flex-row items-center gap-4">
+                  <p>{product.variant.variant_title}</p>
+                  <p>{showVariantItems(product.variant.variant_item)}</p>
+                </div>
               </>
             )}
           </div>

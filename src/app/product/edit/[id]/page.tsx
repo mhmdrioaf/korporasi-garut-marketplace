@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/container";
-import ProductAddForm from "@/components/ui/product-add-form";
+import ProductAddForm from "@/components/ui/product-input";
 import authOptions from "@/lib/authOptions";
-import { ProductProvider } from "@/lib/hooks/context/useProductContext";
+import { ProductProvider } from "@/lib/hooks/context/useProduct";
 import { getServerSession } from "next-auth";
 
 async function getProductDetail(id: string) {
@@ -9,6 +9,9 @@ async function getProductDetail(id: string) {
     method: "GET",
     headers: { "Content-Type": "application/json" },
     cache: "no-store",
+    next: {
+      tags: ["product-detail"],
+    },
   });
 
   const response = await res.json();

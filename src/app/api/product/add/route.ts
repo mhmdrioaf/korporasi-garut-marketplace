@@ -1,37 +1,17 @@
 import { db } from "@/lib/db";
+import { IProductInput } from "@/lib/hooks/context/productContextType";
 import Product from "@/lib/prisma-classes/Product";
 import { NextRequest, NextResponse } from "next/server";
 
-type TProductVariantInput = {
-  variant_title: string;
-};
-
-type TProductVariantItemInput = {
-  variant_name: string;
-  variant_value: string;
-  variant_price: number;
-};
-
-interface IProductRequestBody {
-  title: string;
-  description: string;
-  images: string[];
-  price: number;
-  unit: string;
-  weight: number;
-  stock: number;
-  seller_id: string;
-  variant: TProductVariantInput[] | null;
-  variant_items: TProductVariantItemInput[] | null;
-  category_id: string | null;
-  secret: string;
+interface IProductRequestBody extends IProductInput {
   id: string;
   tags: string[];
 }
 
 async function handler(request: NextRequest) {
   const body: IProductRequestBody = await request.json();
-  const { secret, ...data } = body;
+  const headers = request.headers;
+  const secret = headers.get("secret") || "";
 
   if (
     secret === process.env.NEXT_PUBLIC_SELLER_TOKEN ||
@@ -43,7 +23,7 @@ async function handler(request: NextRequest) {
         db.product_variant,
         db.product_variant_item
       );
-      const newProduct = await products.addProduct(data);
+      const newProduct = await products.addProduct(body);
 
       if (newProduct) {
         return NextResponse.json({
