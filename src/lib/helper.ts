@@ -395,14 +395,14 @@ export const cartIdGenerator = (user_id: number) => {
 
 export const cartItemIdGenerator = (
   user_id: number,
-  product_id: number,
+  product_name: string,
   max_item_id: number
 ) => {
   const _user_id = decimalsNumber(user_id, 100);
-  const _product_id = decimalsNumber(product_id, 100);
+  const _product_name = prefixMaker(product_name, "triple");
   const _max_item_id = decimalsNumber(max_item_id, 100);
-  const prefix = "CRTITM";
-  return prefix + _user_id + _product_id + _max_item_id;
+  const prefix = "CRTI";
+  return prefix + _user_id + _product_name + _max_item_id;
 };
 
 export const calculateCartCosts = (
