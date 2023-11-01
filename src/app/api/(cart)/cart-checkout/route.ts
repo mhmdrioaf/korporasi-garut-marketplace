@@ -14,8 +14,6 @@ interface ICartCheckoutBody {
 async function handler(request: NextRequest) {
   const body: ICartCheckoutBody = await request.json();
 
-  console.log(body.items);
-
   try {
     const maxId = await db.orders.aggregate({
       where: {
