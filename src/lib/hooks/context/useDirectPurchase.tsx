@@ -4,7 +4,9 @@ import {
   ChangeEvent,
   ReactNode,
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import { TDirectPurchaseContext } from "./directPurchaseContextType";
@@ -52,6 +54,8 @@ export function DirectPurchaseProvider({
   const [orderStep, setOrderStep] = useState<number | null>(null);
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [cartLoading, setCartLoading] = useState(false);
+
+  const [isWarning, setIsWarning] = useState(false);
 
   const defaultPrice = variantsValue
     ? variantsValue.variant_price * productQuantity
@@ -192,21 +196,24 @@ export function DirectPurchaseProvider({
     }
   };
 
-  const onVariantsChangeHandler = (item: TProductVariantItem) => {
-    setTotalPrice(product.price * productQuantity);
-    if (
-      variantsValue &&
-      variantsValue.variant_item_id === item.variant_item_id
-    ) {
-      setWithVariants(false);
-      setVariantsValue(null);
+  const onVariantsChangeHandler = useCallback(
+    (item: TProductVariantItem) => {
       setTotalPrice(product.price * productQuantity);
-    } else {
-      setWithVariants(true);
-      setVariantsValue(item);
-      setTotalPrice(item.variant_price * productQuantity);
-    }
-  };
+      if (
+        variantsValue &&
+        variantsValue.variant_item_id === item.variant_item_id
+      ) {
+        setWithVariants(false);
+        setVariantsValue(null);
+        setTotalPrice(product.price * productQuantity);
+      } else {
+        setWithVariants(true);
+        setVariantsValue(item);
+        setTotalPrice(item.variant_price * productQuantity);
+      }
+    },
+    [product.price, productQuantity, variantsValue]
+  );
 
   const onCourierChangeHandler = (courier: TShippingCostServiceCost) => {
     setChosenCourier(courier);
@@ -282,6 +289,32 @@ export function DirectPurchaseProvider({
     setChosenCourier(null);
     setChosenAddress(null);
   };
+
+  useEffect(() => {
+    const unsub = () => {
+      if (product.variant && !variantsValue) {
+        setIsWarning(true);
+        const defaultVariant = product.variant.variant_item.find(
+          (variant) => variant.variant_price === product.price
+        );
+        if (defaultVariant) {
+          onVariantsChangeHandler(defaultVariant);
+          setWithVariants(true);
+          setIsWarning(false);
+        } else {
+          setIsWarning(true);
+        }
+      }
+    };
+
+    return () => unsub();
+  }, [product.price, onVariantsChangeHandler, product.variant, variantsValue]);
+
+  useEffect(() => {
+    if (product.variant && !variantsValue) {
+      setIsWarning(true);
+    }
+  }, [product.variant, variantsValue]);
 
   const value: TDirectPurchaseContext = {
     quantity: {
@@ -359,6 +392,9 @@ export function DirectPurchaseProvider({
       handler: {
         onAddToCart: onAddToCart,
       },
+    },
+    state: {
+      isWarning: isWarning,
     },
   };
 
