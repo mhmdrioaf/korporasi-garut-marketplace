@@ -18,6 +18,42 @@ export default function ProductCard({ product }: TProductCardProps) {
 
     return primaryAddress ? primaryAddress.city.city_name : "Tidak diketahui";
   };
+
+  const productPrices = () => {
+    if (product.variant) {
+      const variantPrices = product.variant.variant_item.map(
+        (item) => item.variant_price
+      );
+      const prices = [product.price, ...variantPrices];
+      const maxPrice = prices.reduce(
+        (acc, curr) => Math.max(acc, curr),
+        -Infinity
+      );
+      const minPrice = Math.min(...prices);
+      return {
+        default: product.price,
+        min: minPrice,
+        max: maxPrice,
+      };
+    } else {
+      return {
+        default: product.price,
+        min: 0,
+        max: 0,
+      };
+    }
+  };
+
+  const showProductPrices = () => {
+    const prices = productPrices();
+
+    if (prices.min > 0) {
+      return `${rupiahConverter(prices.min)} - ${rupiahConverter(prices.max)}`;
+    } else {
+      return `${rupiahConverter(prices.default)}`;
+    }
+  };
+
   return (
     <Link
       href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
@@ -50,7 +86,7 @@ export default function ProductCard({ product }: TProductCardProps) {
             Rp. 25.000,.
           </p> */}
           <p className="text-base font-bold text-green-950">
-            {rupiahConverter(product.price)}
+            {showProductPrices()}
           </p>
         </div>
 
