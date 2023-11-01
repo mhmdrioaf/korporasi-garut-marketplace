@@ -54,7 +54,7 @@ export function DirectPurchaseProvider({
   const [cartLoading, setCartLoading] = useState(false);
 
   const defaultPrice = variantsValue
-    ? (variantsValue.variant_price + product.price) * productQuantity
+    ? variantsValue.variant_price * productQuantity
     : product.price * productQuantity;
 
   const { toast } = useToast();
@@ -93,14 +93,14 @@ export function DirectPurchaseProvider({
       setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
       setTotalPrice((prev) =>
         variantsValue
-          ? product.price + variantsValue.variant_price + prev
+          ? variantsValue.variant_price + prev
           : prev + product.price
       );
     } else {
       setProductQuantity((prev) => (prev === 1 ? 1 : prev - 1));
       setTotalPrice((prev) =>
         variantsValue
-          ? prev - (variantsValue.variant_price + product.price)
+          ? prev - variantsValue.variant_price
           : prev - product.price
       );
     }
@@ -114,21 +114,19 @@ export function DirectPurchaseProvider({
         setProductQuantity(product.stock);
         setTotalPrice(
           variantsValue
-            ? (variantsValue.variant_price + product.price) * product.stock
+            ? variantsValue.variant_price * product.stock
             : product.price * product.stock
         );
       } else if (value < 1) {
         setProductQuantity(1);
         setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price + product.price
-            : product.price
+          variantsValue ? variantsValue.variant_price : product.price
         );
       } else {
         setProductQuantity(value);
         setTotalPrice(
           variantsValue
-            ? (variantsValue.variant_price + product.price) * value
+            ? variantsValue.variant_price * value
             : product.price * value
         );
       }
@@ -203,13 +201,10 @@ export function DirectPurchaseProvider({
       setWithVariants(false);
       setVariantsValue(null);
       setTotalPrice(product.price * productQuantity);
-    } else if (item.variant_price === 0) {
-      setWithVariants(false);
-      setVariantsValue(item);
     } else {
       setWithVariants(true);
       setVariantsValue(item);
-      setTotalPrice((product.price + item.variant_price) * productQuantity);
+      setTotalPrice(item.variant_price * productQuantity);
     }
   };
 
