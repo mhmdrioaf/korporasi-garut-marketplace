@@ -101,6 +101,7 @@ export default function ProductVariantInput() {
                     <TableCell>
                       <Input
                         type="number"
+                        min={1}
                         {...form.productForm.register(
                           `variant.variant_item.${index}.variant_item_price` as const,
                           {

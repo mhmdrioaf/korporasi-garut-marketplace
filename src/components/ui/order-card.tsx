@@ -6,7 +6,6 @@ import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import {
   getDateString,
-  getTotalAmount,
   orderStatusConverter,
   rupiahConverter,
 } from "@/lib/helper";
@@ -55,19 +54,24 @@ export default function OrderCard({ order }: IOrderCardProps) {
   };
   return (
     <div className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input">
-      <div className="w-full flex flex-row items-start justify-between">
-        <div className="w-fit grid grid-cols-2 gap-2">
+      <div className="w-full grid grid-cols-3">
+        <div className="col-span-2 grid grid-cols-2 gap-2">
           <p className="font-bold">ID Pesanan</p>
           <p>{order.order_id}</p>
           <p className="font-bold">Tanggal Pesanan</p>
           <p>{getDateString(order.order_date)}</p>
           <p className="font-bold">Alamat Pengiriman</p>
-          <p className="max-w-[16ch]">{order.address.full_address}</p>
+          <p>{order.address.full_address}</p>
+          <p className="font-bold">Ongkos Kirim</p>
+          <p>{rupiahConverter(order.shipping_cost)}</p>
         </div>
 
-        <div className="w-fit flex flex-col gap-2">
+        <div className="flex flex-col gap-2 justify-self-end self-center">
           <p className="font-bold">
             Status Pesanan: {orderStatusConverter(order.order_status)}
+          </p>
+          <p className="font-bold">
+            Total Harga: {rupiahConverter(order.total_price)}
           </p>
           <ShowOrderButton
             status={order.order_status}
@@ -94,7 +98,12 @@ export default function OrderCard({ order }: IOrderCardProps) {
             </div>
 
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-bold">{orderItem.product.title}</p>
+              <p className="text-sm font-bold">
+                {orderItem.product.title}
+                {orderItem.variant
+                  ? ` - ${orderItem.variant.variant_name}`
+                  : ""}
+              </p>
               <p className="text-sm">
                 {orderItem.product.seller.account.user_name}
               </p>
@@ -103,24 +112,25 @@ export default function OrderCard({ order }: IOrderCardProps) {
 
           <div className="grid grid-cols-2 gap-1 text-sm">
             <p>Harga Produk</p>
-            <p>{rupiahConverter(orderItem.product.price)}</p>
+            <p>
+              {rupiahConverter(
+                orderItem.variant
+                  ? orderItem.variant.variant_price
+                  : orderItem.product.price
+              )}
+            </p>
             <p>Jumlah Pesanan</p>
             <p>
               {orderItem.order_quantity} {orderItem.product.unit}
             </p>
-            {orderItem.variant && orderItem.variant.variant_price > 0 && (
-              <>
-                <p>Harga Varian Produk</p>
-                <p>
-                  {rupiahConverter(orderItem.variant.variant_price)}/
-                  {orderItem.product.unit}
-                </p>
-              </>
-            )}
-            <p>Ongkos Kirim</p>
-            <p>{rupiahConverter(order.shipping_cost)}</p>
             <p className="font-bold">Total Harga</p>
-            <p className="font-bold">{rupiahConverter(order.total_price)}</p>
+            <p className="font-bold">
+              {rupiahConverter(
+                orderItem.variant
+                  ? orderItem.variant.variant_price * orderItem.order_quantity
+                  : orderItem.product.price * orderItem.order_quantity
+              )}
+            </p>
           </div>
 
           <Link

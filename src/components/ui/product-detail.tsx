@@ -3,7 +3,12 @@
 import { Container } from "./container";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, MinusIcon, PlusIcon } from "lucide-react";
+import {
+  AlertTriangleIcon,
+  ArrowLeft,
+  MinusIcon,
+  PlusIcon,
+} from "lucide-react";
 import { Button } from "./button";
 import {
   Accordion,
@@ -20,7 +25,7 @@ import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
 export default function ProductDetail() {
-  const { product, image, price, variants, cart, quantity } =
+  const { product, image, price, variants, cart, quantity, state } =
     useDirectPurchase();
   const getSellerAddress = () => {
     const primarySellerId = product.seller.primary_address_id;
@@ -148,6 +153,15 @@ export default function ProductDetail() {
           </div>
 
           <div className="w-full flex flex-col gap-4">
+            {state.isWarning && (
+              <div className="w-full bg-yellow-400 text-stone-500 flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
+                <AlertTriangleIcon className="w-4 h-4" />
+                <p>
+                  Harap pilih varian produk, jika tidak akan kami kirim secara
+                  acak.
+                </p>
+              </div>
+            )}
             <div className="w-fit rounded-md flex flex-row items-center gap-2">
               <Button
                 variant="destructive"

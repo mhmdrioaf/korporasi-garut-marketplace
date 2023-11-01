@@ -88,4 +88,8 @@ type TDirectPurchaseContext = {
       onAddToCart: () => void;
     };
   };
+
+  state: {
+    isWarning: boolean;
+  };
 };

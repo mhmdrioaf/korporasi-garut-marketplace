@@ -5,16 +5,13 @@ import {
   BellIcon,
   BookKeyIcon,
   BoxesIcon,
-  FacebookIcon,
   GanttChartSquareIcon,
-  InstagramIcon,
   LayoutDashboardIcon,
   Loader2Icon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
   ShoppingCartIcon,
-  TwitterIcon,
   User2Icon,
 } from "lucide-react";
 import Image from "next/image";
@@ -81,29 +78,6 @@ export default function Header({ session }: IHeaderComponentProps) {
 
   return (
     <div className="w-full flex flex-col overflow-hidden sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
-      <div className="w-full px-8 py-2 md:px-16 bg-slate-200 text-stone-800 flex flex-row items-center text-sm justify-between">
-        <div className="flex flex-row items-center gap-1">
-          <p>Ikuti kami di</p>
-          <Link target="_blank" href="https://facebook.com/mr.r3v">
-            <FacebookIcon className="w-4 h-4" />
-          </Link>
-          <Link target="_blank" href="https://instagram.com/mhmdrioaf">
-            <InstagramIcon className="w-4 h-4" />
-          </Link>
-          <Link target="_blank" href="https://twitter.com/oirioir">
-            <TwitterIcon className="w-4 h-4" />
-          </Link>
-        </div>
-
-        <div className="flex flex-row items-center gap-1 min-h-full">
-          <Link href="#">Tentang SMKs Korporasi Garut</Link>
-          <span>|</span>
-          <Link href="#">Bantuan</Link>
-          <span>|</span>
-          <Link href="#">Promo</Link>
-        </div>
-      </div>
-
       <div className="w-full flex flex-row items-center self-stretch justify-center gap-4 px-8 py-2 md:px-16">
         <Link
           href={ROUTES.LANDING_PAGE}
