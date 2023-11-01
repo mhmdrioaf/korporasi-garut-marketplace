@@ -198,7 +198,7 @@ export const customerOrderIdGenerator = (maxId: number) => {
   const date = new Date();
   const day = decimalsNumber(date.getDate(), 10);
   const month = decimalsNumber(date.getMonth() + 1, 10);
-  const years = date.getFullYear().toString().slice(2, 3);
+  const years = date.getFullYear().toString().slice(2, 4);
 
   const fullDate = `${day}${month}${years}`;
   const orderId = decimalsNumber(maxId, 100);

@@ -4,25 +4,25 @@ import {
   TAddress,
   TCustomerCart,
   TCustomerCartItem,
-  TUser,
+  TShippingCost,
+  TShippingCostServiceCost,
 } from "@/lib/globals";
-import { ReactNode, createContext, useContext, useRef, useState } from "react";
-import { TCartContext } from "./cartContextType";
-import { Button } from "@/components/ui/button";
 import {
-  MinusCircleIcon,
-  MinusIcon,
-  PlusCircleIcon,
-  PlusIcon,
-  Trash2Icon,
-} from "lucide-react";
-import { ROUTES } from "@/lib/constants";
+  ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useRef,
+  useState,
+} from "react";
+import {
+  ICourierBySeller,
+  IProductsBySeller,
+  ITotalCostBySeller,
+  TCartContext,
+} from "./cartContextType";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { remoteImageSource, rupiahConverter } from "@/lib/helper";
-import { Separator } from "@radix-ui/react-dropdown-menu";
-import { Checkbox } from "@/components/ui/checkbox";
-import Image from "next/image";
-import Link from "next/link";
+import { fetcher } from "@/lib/helper";
 import useSWR from "swr";
 import {
   cartItemDeleteHandler,
@@ -33,10 +33,6 @@ import { useToast } from "@/components/ui/use-toast";
 interface ICartContextProps {
   children: ReactNode;
   user_id: string;
-}
-
-interface IProductsBySeller {
-  [sellerId: number]: { [cartItemId: string]: TCustomerCartItem };
 }
 
 export const CartContext = createContext<TCartContext | null>(null);
@@ -53,6 +49,12 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     null
   );
 
+  const [checkoutStep, setCheckoutStep] = useState<number | null>(null);
+  const [chosenAddress, setChosenAddress] = useState<TAddress | null>(null);
+  const [chosenCourier, setChosenCourier] = useState<ICourierBySeller>({});
+
+  const [isOrdering, setIsOrdering] = useState<boolean>(false);
+
   const {
     data: cartData,
     isLoading: cartLoading,
@@ -66,6 +68,11 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     })
       .then((res) => res.json())
       .then((res) => res.result as TCustomerCart)
+  );
+
+  const { data: userData, isLoading: userLoading } = useSWR(
+    "/api/get-detail/" + user_id,
+    fetcher
   );
 
   const sellerAddress = (sellerID: number) => {
@@ -124,7 +131,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
   const calculateTotalPrice = (item: TCustomerCartItem) => {
     const productPrice = item.product.price;
     const variantPrice = item.variant?.variant_price ?? 0;
-    const totalPrice = productPrice + variantPrice;
+    const totalPrice = variantPrice > 0 ? variantPrice : productPrice;
 
     return totalPrice;
   };
@@ -155,7 +162,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
         const quantity = cartItem.quantity;
 
         if (variant) {
-          totalPrice += (variant.variant_price + product.price) * quantity;
+          totalPrice += variant.variant_price * quantity;
         } else {
           totalPrice += product.price * quantity;
         }
@@ -197,307 +204,6 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       return groupedCartItems;
     } else {
       return null;
-    }
-  }
-
-  function renderProductItemsBySeller() {
-    if (cartLoading) {
-      return (
-        <div className="w-full flex flex-col gap-8">
-          <div className="w-full flex flex-col gap-4 p-2">
-            <div className="flex flex-col gap-1">
-              <div className="w-[8ch] h-8 rounded-sm bg-stone-300 animate-pulse" />
-              <div className="w-[16ch] h-4 rounded-sm bg-stone-300 animate-pulse" />
-            </div>
-          </div>
-
-          {[...Array(4)].map((_, idx) => (
-            <div className="w-full grid grid-cols-2 p-2" key={idx}>
-              <div className="w-full flex flex-row items-center gap-2">
-                <div className="w-3 h-3 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="w-16 h-16 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="flex flex-col gap-1">
-                  <div className="w-[12ch] h-3 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="w-[9ch] h-2 rounded-sm bg-stone-300 animate-pulse" />
-                </div>
-              </div>
-
-              <div className="flex flex-row items-center gap-2 self-center justify-self-end">
-                <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="w-px min-h-full rounded-sm bg-stone-300" />
-                <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    } else if (!cartData) {
-      return (
-        <div className="w-full text-center">
-          Anda belum menambahkan produk ke keranjang.
-        </div>
-      );
-    } else if (cartError) {
-      return (
-        <div className="w-full text-center">
-          Gagal mendapatkan data keranjang.
-        </div>
-      );
-    } else {
-      const groupedCartItems = groupCartItemsBySeller();
-      const cart = groupedCartItems ? Object.keys(groupedCartItems) : null;
-
-      // return groupedCartItems ? (
-      //   <div className="w-full flex flex-col gap-8 mb-24">
-      //     {Object.keys(groupedCartItems).map((sellerId) => (
-      //       <div
-      //         className="w-full flex flex-col gap-4 rounded-md border border-input px-4 py-2"
-      //         key={sellerId}
-      //       >
-      //         <p className="font-bold text-xl">
-      //           {getSellerName(parseInt(sellerId))}
-      //         </p>
-      //         <Separator />
-      //         {groupedCartItems[parseInt(sellerId)].map((item) => (
-      //           <div
-      //             className="w-full rounded-md grid grid-cols-5 p-2 border border-input cursor-pointer relative"
-      //             key={item.cart_item_id}
-      //           >
-      //             <div
-      //               className="absolute top-0 left-0 w-full h-full z-10"
-      //               onClick={() =>
-      //                 onItemCardClick(
-      //                   Number(
-      //                     item.cart_item_id.slice(
-      //                       item.cart_item_id.length - 5,
-      //                       item.cart_item_id.length
-      //                     )
-      //                   )
-      //                 )
-      //               }
-      //             />
-      //             <div className="col-span-1 w-full flex flex-row items-center gap-2">
-      //               <Checkbox
-      //                 ref={(el) =>
-      //                   (itemRef.current[
-      //                     Number(
-      //                       item.cart_item_id.slice(
-      //                         item.cart_item_id.length - 5,
-      //                         item.cart_item_id.length
-      //                       )
-      //                     )
-      //                   ] = el)
-      //                 }
-      //                 onCheckedChange={(checked) =>
-      //                   onItemChecked(checked, item, parseInt(sellerId))
-      //                 }
-      //               />
-      //               <div className="relative w-48 h-auto aspect-square rounded-sm overflow-hidden">
-      //                 <Image
-      //                   src={remoteImageSource(item.product.images[0])}
-      //                   fill
-      //                   className="object-cover"
-      //                   alt="Foto produk"
-      //                   sizes="100vw"
-      //                 />
-      //               </div>
-      //             </div>
-
-      //             <div className="flex flex-col gap-2 place-self-center">
-      //               <p className="text-xl font-semibold">
-      //                 {item.product.title}
-      //               </p>
-      //               <p className="text-sm">
-      //                 {item.product.seller.account.user_name} -{" "}
-      //                 {sellerAddress(item.product.seller) ?? ""}
-      //               </p>
-      //             </div>
-
-      //             <div className="grid grid-cols-2 gap-2 place-self-center text-sm col-span-2">
-      //               <p className="font-bold">Harga Produk</p>
-      //               <p>{rupiahConverter(item.product.price)}</p>
-      //               <p className="font-bold">Total Produk</p>
-      //               <p>
-      //                 {item.quantity} {item.product.unit} ={" "}
-      //                 {rupiahConverter(item.quantity * item.product.price)}
-      //               </p>
-      //               {item.variant && (
-      //                 <>
-      //                   <p className="font-bold">Varian Produk</p>
-      //                   <p>{item.variant.variant_name}</p>
-      //                   <p className="font-bold">Harga Varian</p>
-      //                   <p>
-      //                     {rupiahConverter(item.variant.variant_price)}/
-      //                     {item.product.unit} ={" "}
-      //                     {rupiahConverter(
-      //                       item.variant.variant_price * item.quantity
-      //                     )}
-      //                   </p>
-      //                 </>
-      //               )}
-      //               <p className="font-bold text-lg">Total Harga</p>
-      //               <p className="font-bold text-lg">
-      //                 {rupiahConverter(calculateTotalPrice(item))}
-      //               </p>
-      //             </div>
-
-      //             <div className="flex flex-col gap-2 place-self-center col-span-1 z-20">
-      //               <div className="flex flex-row items-center gap-2 justify-between">
-      //                 <Button
-      //                   variant="destructive"
-      //                   size="sm"
-      //                   onClick={(event) =>
-      //                     onQuantityChange(event, item, "decrease")
-      //                   }
-      //                 >
-      //                   <MinusIcon className="w-4 h-4" />
-      //                 </Button>
-      //                 <p className="font-bold text-center">{item.quantity}</p>
-      //                 <Button
-      //                   variant="default"
-      //                   size="sm"
-      //                   onClick={(event) =>
-      //                     onQuantityChange(event, item, "increase")
-      //                   }
-      //                 >
-      //                   <PlusIcon className="w-4 h-4" />
-      //                 </Button>
-      //               </div>
-
-      //               <Button variant="default" asChild>
-      //                 <Link
-      //                   href={ROUTES.PRODUCT.DETAIL(item.product_id.toString())}
-      //                 >
-      //                   Lihat Produk
-      //                 </Link>
-      //               </Button>
-      //               <Button
-      //                 className="w-full"
-      //                 variant="destructive"
-      //                 onClick={(event) => onDeleteButtonClicked(event, item)}
-      //               >
-      //                 Hapus dari Keranjang
-      //               </Button>
-      //             </div>
-      //           </div>
-      //         ))}
-      //       </div>
-      //     ))}
-      //   </div>
-      // ) : (
-      //   <div className="w-full text-center">
-      //     Anda belum menambahkan produk ke keranjang.
-      //   </div>
-      // );
-
-      return groupedCartItems && cart ? (
-        <div className="w-full flex flex-col gap-8 divide-y-4">
-          {cart.length > 0 ? (
-            cart.map((sellerID) => (
-              <div
-                className="w-full flex flex-col gap-4 p-2 rounded-md divide-y"
-                key={sellerID}
-              >
-                <div className="flex flex-col gap-1">
-                  <p className="font-bold">
-                    {getSellerName(parseInt(sellerID))}
-                  </p>
-                  <p className="text-sm">
-                    {sellerAddress(parseInt(sellerID) ?? "")}
-                  </p>
-                </div>
-
-                {groupedCartItems[parseInt(sellerID)].map((item) => (
-                  <div
-                    key={item.cart_item_id}
-                    className="w-full p-2 grid grid-cols-2"
-                  >
-                    <div className="w-full flex flex-row items-center gap-2">
-                      <Checkbox
-                        ref={(el) =>
-                          (itemRef.current[
-                            Number(
-                              item.cart_item_id.slice(
-                                item.cart_item_id.length - 5,
-                                item.cart_item_id.length
-                              )
-                            )
-                          ] = el)
-                        }
-                        onCheckedChange={(checked) =>
-                          onItemChecked(checked, item, parseInt(sellerID))
-                        }
-                      />
-                      <div className="w-16 h-16 rounded-sm overflow-hidden relative">
-                        <Image
-                          src={remoteImageSource(item.product.images[0])}
-                          sizes="100vw"
-                          alt="foto produk"
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-1">
-                        <p>
-                          {item.product.title}{" "}
-                          {item.variant ? `- ${item.variant.variant_name}` : ""}
-                        </p>
-                        <p className="font-bold">
-                          {rupiahConverter(calculateTotalPrice(item))}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-row items-center gap-2 self-center justify-self-end">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(event) => onDeleteButtonClicked(event, item)}
-                      >
-                        <Trash2Icon className="w-4 h-4" />
-                      </Button>
-
-                      <div className="min-h-full w-px bg-input" />
-
-                      <Button
-                        variant="destructive"
-                        disabled={item.quantity <= 1}
-                        onClick={(event) =>
-                          onQuantityChange(event, item, "decrease")
-                        }
-                        size="icon"
-                      >
-                        <MinusCircleIcon className="w-4 h-4" />
-                      </Button>
-                      <p className="text-sm">{item.quantity}</p>
-                      <Button
-                        variant="default"
-                        onClick={(event) =>
-                          onQuantityChange(event, item, "increase")
-                        }
-                        size="icon"
-                      >
-                        <PlusCircleIcon className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))
-          ) : (
-            <div className="w-full text-center">
-              Anda belum menambahkan produk ke keranjang.
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="w-full text-center">
-          Anda belum menambahkan produk ke keranjang.
-        </div>
-      );
     }
   }
 
@@ -615,6 +321,256 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     setItemToDelete(deletedItem);
   }
 
+  const calculcateCheckoutItemPrice = (item: TCustomerCartItem) => {
+    const productPrice = item.product.price;
+    const variantPrice = item.variant?.variant_price ?? 0;
+    const productQuantity = item.quantity;
+
+    if (variantPrice > 0) {
+      return productQuantity * variantPrice;
+    } else {
+      return productQuantity * productPrice;
+    }
+  };
+
+  const onAddressChoose = (chosenAddress: TAddress) => {
+    setChosenAddress(chosenAddress);
+    setCheckoutStep(2);
+  };
+
+  const checkoutItems = useCallback(() => {
+    const cartItems: { [sellerId: number]: TCustomerCartItem[] } = {};
+    for (const seller in checkedItems) {
+      const items = checkedItems[seller];
+
+      for (const itemId in items) {
+        const _cartItem = items[itemId];
+
+        if (!cartItems[seller]) {
+          cartItems[seller] = [];
+        }
+
+        cartItems[seller].push(_cartItem);
+      }
+    }
+
+    return cartItems;
+  }, [checkedItems]);
+
+  const totalCost = useCallback(() => {
+    const items = checkoutItems();
+    const sellers = Object.keys(items);
+    let total = 0;
+
+    sellers.forEach((sellerID) => {
+      const sellerItems = items[parseInt(sellerID)];
+      const itemsPrice = sellerItems.reduce(
+        (acc, curr) =>
+          curr.variant
+            ? acc + curr.variant.variant_price * curr.quantity
+            : acc + curr.product.price * curr.quantity,
+        0
+      );
+
+      const courier = chosenCourier && chosenCourier[parseInt(sellerID)];
+      const sellerShippingCourier = courier
+        ? Object.keys(chosenCourier[parseInt(sellerID)])
+        : null;
+      const shippingPrice = sellerShippingCourier
+        ? parseInt(sellerShippingCourier[0])
+        : 0;
+
+      const totalPrice = itemsPrice + shippingPrice;
+
+      total += totalPrice;
+    });
+
+    return total;
+  }, [chosenCourier, checkoutItems]);
+
+  const checkedItemsSellers = Object.keys(checkoutItems());
+
+  const totalSellerCost = () => {
+    const items = checkoutItems();
+    let _totalSellerCost: ITotalCostBySeller = {};
+    for (const sellerID of checkedItemsSellers) {
+      const sellerName = getSellerName(parseInt(sellerID));
+      const sellerItems = items[parseInt(sellerID)];
+      const itemsPrice = sellerItems.reduce(
+        (acc, curr) =>
+          curr.variant
+            ? acc + curr.variant.variant_price * curr.quantity
+            : acc + curr.product.price * curr.quantity,
+        0
+      );
+      const isCourierChosen =
+        chosenCourier && chosenCourier[parseInt(sellerID)];
+      const chosenSellerCourier = isCourierChosen
+        ? Object.keys(chosenCourier[parseInt(sellerID)])
+        : null;
+      const shippingCost = chosenSellerCourier
+        ? parseInt(chosenSellerCourier[0])
+        : 0;
+
+      if (!_totalSellerCost[parseInt(sellerID)]) {
+        const sellerCostValue = {
+          itemsCost: itemsPrice,
+          sellerName: sellerName,
+          shippingCost: shippingCost,
+        };
+
+        _totalSellerCost[parseInt(sellerID)] = sellerCostValue;
+      }
+    }
+    return _totalSellerCost;
+  };
+
+  const calculateShippingCost = async (
+    sellerAddress: TAddress,
+    totalWeight: number
+  ) => {
+    if (!chosenAddress) return null;
+    try {
+      const res = await fetch("/api/shipping/cost", {
+        method: "POST",
+        body: JSON.stringify({
+          origin: sellerAddress.city.city_id,
+          destination: chosenAddress.city.city_id,
+          weight: totalWeight,
+        }),
+        cache: "no-store",
+      });
+
+      const response = await res.json();
+      if (response.ok) {
+        return response.result as TShippingCost[];
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(
+        "Terjadi kesalahan ketika menghitung ongkos kirim: ",
+        error
+      );
+      return null;
+    }
+  };
+
+  const calculateTotalWeight = (items: TCustomerCartItem[]) => {
+    return items.reduce(
+      (acc, curr) => acc + curr.product.weight * curr.quantity,
+      0
+    );
+  };
+
+  const onCourierChangeHandler = (
+    sellerId: number,
+    courier: TShippingCostServiceCost
+  ) => {
+    setChosenCourier((prev) => ({
+      ...prev,
+      [sellerId]: {
+        [courier.value]: courier,
+      },
+    }));
+  };
+
+  const resetCheckoutState = () => {
+    setChosenAddress(null);
+    setChosenCourier({});
+    setCheckoutStep(null);
+  };
+
+  const onCheckoutStepChanges = (value: number | null) => {
+    if (value === 1) {
+      setChosenCourier({});
+    }
+
+    setCheckoutStep(value);
+  };
+
+  const totalChosenCourier = useCallback(() => {
+    if (chosenCourier) {
+      return Object.keys(chosenCourier).length;
+    } else {
+      return 0;
+    }
+  }, [chosenCourier]);
+
+  const totalCheckedSeller = useCallback(() => {
+    const items = checkoutItems();
+    if (items) {
+      return Object.keys(items).length;
+    } else {
+      return 0;
+    }
+  }, [checkoutItems]);
+
+  const onCheckout = async () => {
+    setIsOrdering(true);
+
+    if (!chosenAddress) {
+      toast({
+        variant: "destructive",
+        title: "Anda belum memilih alamat untuk pengiriman.",
+        description: "Harap ulangi dan pilih alamat untuk pengiriman.",
+      });
+      return new Error("Alamat pengiriman tidak ditemukan.");
+    }
+
+    let totalShippingCost: number = 0;
+    let items: TCustomerCartItem[] = [];
+
+    checkedItemsSellers.forEach((sellerID) => {
+      const _items = checkoutItems();
+      const sellerItems = _items[parseInt(sellerID)];
+      const courier = chosenCourier && chosenCourier[parseInt(sellerID)];
+      const sellerShippingCourier = courier
+        ? Object.keys(chosenCourier[parseInt(sellerID)])
+        : null;
+      const shippingPrice = sellerShippingCourier
+        ? parseInt(sellerShippingCourier[0])
+        : 0;
+
+      totalShippingCost += shippingPrice;
+      sellerItems.forEach((item) => items.push(item));
+    });
+
+    try {
+      const res = await fetch(process.env.NEXT_PUBLIC_API_CART_CHECKOUT!, {
+        method: "POST",
+        body: JSON.stringify({
+          items: items,
+          total_price: totalCost(),
+          total_shipping_cost: totalShippingCost,
+          customer_id: user_id,
+          shipping_address: chosenAddress.address_id,
+        }),
+      });
+
+      const response = await res.json();
+      if (!response.ok) {
+        setIsOrdering(false);
+        toast({
+          variant: "destructive",
+          title: "Gagal melakukan pemesanan.",
+          description: response.message,
+        });
+      } else {
+        setIsOrdering(false);
+        toast({
+          variant: "success",
+          title: "Berhasil melakukan pemesanan.",
+          description: response.message,
+        });
+        onCheckoutStepChanges(3);
+      }
+    } catch (error) {
+      setIsOrdering(false);
+      console.error("Error terjadi ketika membuat pesanan: ", error);
+    }
+  };
+
   const values: TCartContext = {
     cartItems: {
       checkbox: itemRef,
@@ -631,10 +587,54 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
         delete: onCartItemDelete,
       },
     },
-    render: {
-      items: renderProductItemsBySeller,
-    },
     currentCart: cartData!,
+    cart: {
+      data: cartData,
+      error: cartError,
+      loading: cartLoading,
+      items: groupCartItemsBySeller(),
+      itemRefs: itemRef,
+      itemPrice: calculateTotalPrice,
+
+      handler: {
+        deleteItem: onDeleteButtonClicked,
+        getSellerAddress: sellerAddress,
+        getSellerName: getSellerName,
+        itemQuantityChange: onQuantityChange,
+      },
+    },
+    checkout: {
+      step: checkoutStep,
+      items: checkedItems,
+      chosenAddress: chosenAddress,
+      customer: {
+        data: userData ? userData.result : null,
+        loading: userLoading,
+      },
+
+      chosenCourier: chosenCourier,
+      _items: checkoutItems(),
+      _totalCost: totalCost(),
+      _totalSellerCost: totalSellerCost(),
+      _sellers: checkedItemsSellers,
+
+      totalChosenCourier: totalChosenCourier(),
+      totalProductSellers: totalCheckedSeller(),
+
+      loading: isOrdering,
+
+      handler: {
+        changeStep: onCheckoutStepChanges,
+        itemPrice: calculcateCheckoutItemPrice,
+        chooseAddress: onAddressChoose,
+        shippingCost: calculateShippingCost,
+        totalWeight: calculateTotalWeight,
+
+        changeCourier: onCourierChangeHandler,
+        resetCheckoutState: resetCheckoutState,
+        order: onCheckout,
+      },
+    },
   };
 
   return <CartContext.Provider value={values}>{children}</CartContext.Provider>;

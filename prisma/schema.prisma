@@ -76,7 +76,7 @@ model orders {
 }
 
 model order_item {
-  order_item_id      String  @id
+  order_item_id      String  @id @default(cuid())
   order_quantity     Int
   order_id           String
   product_id         Int
