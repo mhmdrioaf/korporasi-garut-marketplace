@@ -187,7 +187,7 @@ type TCustomerCartItem = {
   cart_item_id: string;
   cart_id: string;
   product_id: number;
-  product_variant_id: string;
+  product_variant_item_id: string;
   quantity: number;
 
   cart: TCustomerCart;

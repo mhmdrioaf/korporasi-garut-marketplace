@@ -8,9 +8,12 @@ import { Separator } from "./separator";
 import { Checkbox } from "./checkbox";
 import Image from "next/image";
 import { MinusCircleIcon, PlusCircleIcon, Trash2Icon } from "lucide-react";
+import CartCheckout from "./cart-checkout";
+import CartCheckoutProductsDetail from "./cart-checkout-products-detail";
+import CartCheckoutAddress from "./cart-checkout-address";
 
 export default function UserCartList() {
-  const { cart, cartItems } = useCart();
+  const { cart, cartItems, checkout } = useCart();
 
   function showCartItems() {
     const cartData = cart.items ? Object.keys(cart.items) : null;
@@ -42,7 +45,7 @@ export default function UserCartList() {
                     <div className="w-full flex flex-row items-center gap-2">
                       <Checkbox
                         ref={(el) =>
-                          (cart.itemRefs.current[
+                          (cartItems.checkbox.current[
                             Number(
                               item.cart_item_id.slice(
                                 item.cart_item_id.length - 5,
@@ -142,6 +145,10 @@ export default function UserCartList() {
     }
   }
 
+  function onCheckoutButtonClicked() {
+    checkout.handler.changeStep(1);
+  }
+
   return (
     <div className="w-full grid grid-cols-4 relative">
       <div className="w-full flex flex-col gap-4 col-span-3">
@@ -211,12 +218,21 @@ export default function UserCartList() {
         </div>
 
         <Separator />
-        <Button variant="default">
+        <Button
+          variant="default"
+          disabled={cartItems.checkedItemsCount < 1}
+          onClick={onCheckoutButtonClicked}
+        >
           Checkout ({cartItems.checkedItemsCount})
         </Button>
       </div>
 
       <CartItemDeleteModal />
+
+      <CartCheckout open={checkout.step !== null}>
+        <CartCheckoutAddress />
+        <CartCheckoutProductsDetail />
+      </CartCheckout>
     </div>
   );
 }

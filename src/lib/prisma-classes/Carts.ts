@@ -103,7 +103,7 @@ export default class Carts {
                   : null,
                 cart_item_id: cartItemIdGenerator(
                   parseInt(data.user_id),
-                  data.product.title,
+                  data.product.id,
                   max_item_id
                 ),
               },
@@ -118,7 +118,7 @@ export default class Carts {
               create: {
                 cart_item_id: cartItemIdGenerator(
                   parseInt(data.user_id),
-                  data.product.title,
+                  data.product.id,
                   max_item_id + whole_max_item_id
                 ),
                 product_id: data.product.id,
@@ -140,7 +140,7 @@ export default class Carts {
             create: {
               cart_item_id: cartItemIdGenerator(
                 parseInt(data.user_id),
-                data.product.title,
+                data.product.id,
                 max_item_id
               ),
               product_id: data.product.id,
