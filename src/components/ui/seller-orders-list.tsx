@@ -71,6 +71,7 @@ export default function SellerOrderList({
         title: "Berhasil mengubah status pesanan",
         description: response.message,
       });
+      onModalClose();
       router.refresh();
     }
   };
@@ -82,7 +83,22 @@ export default function SellerOrderList({
   ) => {
     let buttonTitle: string | null = null;
     let orderStatus: ORDER_STATUS | null = null;
+    let isButtonDisabled = false;
+    let returnNothing = false;
     switch (order_status) {
+      case "PENDING":
+        buttonTitle = "Kemas Pesanan";
+        orderStatus = order_status;
+        isButtonDisabled = true;
+        break;
+      // case "DELIVERED":
+      //   buttonTitle = "Pesanan telah Dikirim";
+      //   orderStatus = order_status;
+      //   isButtonDisabled = true;
+      // case "FINISHED":
+      //   buttonTitle = "Pesanan telah Selesai";
+      //   orderStatus = order_status;
+      //   isButtonDisabled = true;
       case "PAID":
         buttonTitle = "Kemas Pesanan";
         orderStatus = "PACKED";
@@ -100,12 +116,10 @@ export default function SellerOrderList({
         orderStatus = "SHIPPED";
         break;
       default:
-        buttonTitle = null;
-        orderStatus = null;
-        setDeliveryReceipt(false);
+        returnNothing = true;
         break;
     }
-    return buttonTitle && orderStatus ? (
+    return !returnNothing ? (
       <Button
         variant="default"
         onClick={
@@ -113,7 +127,7 @@ export default function SellerOrderList({
             ? () => changeOrderStatus(orderStatus, order_id, null)
             : () => setDeliveryReceipt(true)
         }
-        disabled={updating}
+        disabled={updating || isButtonDisabled}
       >
         {updating ? (
           <>
@@ -156,7 +170,6 @@ export default function SellerOrderList({
     "PACKED",
     "SHIPPED",
     "DELIVERED",
-    "FINISHED",
   ];
   const orderShownLabels = (order_status: TOrderShown) => {
     switch (order_status) {
@@ -170,12 +183,12 @@ export default function SellerOrderList({
         return "Dikemas";
       case "SHIPPED":
         return "Sedang Dikirim";
-      case "DELIVERED":
-        return "Diterima";
-      case "FINISHED":
-        return "Selesai";
       default:
-        return "Semua";
+        if (order_status === "DELIVERED" || order_status === "FINISHED") {
+          return "Selesai";
+        } else {
+          return "Semua";
+        }
     }
   };
   const orderShownButtonStyle = (isActive: boolean) => {
@@ -184,6 +197,20 @@ export default function SellerOrderList({
     const activeStyle = " bg-primary text-primary-foreground";
 
     return isActive ? defaultStyle + activeStyle : defaultStyle;
+  };
+
+  const showPaymentProofButton = (paymentProof: string | null) => {
+    if (paymentProof) {
+      return (
+        <Button variant="ghost" asChild>
+          <Link href={paymentProof} target="_blank">
+            Bukti Pembayaran
+          </Link>
+        </Button>
+      );
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -241,6 +268,7 @@ export default function SellerOrderList({
                       order.order_id,
                       order.delivery_receipt
                     )}
+                    {showPaymentProofButton("https://google.com")}
                     <OrderDeliveryReceipt
                       isLoading={updating}
                       isOpen={deliveryReceipt}
