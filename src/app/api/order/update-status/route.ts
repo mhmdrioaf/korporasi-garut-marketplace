@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { ORDER_STATUS } from "@/lib/globals";
+import { permissionHelper } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IUpdateStatusBody {
@@ -12,7 +13,10 @@ async function handler(request: NextRequest) {
   const body: IUpdateStatusBody = await request.json();
   const token = request.headers.get("token");
 
-  if (token && token === process.env.NEXT_PUBLIC_SELLER_TOKEN!) {
+  if (
+    token &&
+    permissionHelper(token, process.env.NEXT_PUBLIC_SELLER_TOKEN!.toString())
+  ) {
     if (body.order_status) {
       try {
         const updateOrderStatus = await db.orders.update({

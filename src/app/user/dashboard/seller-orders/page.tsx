@@ -15,7 +15,7 @@ async function getSellerOrders() {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_SELLER_ORDERS!, {
       method: "POST",
       headers: {
-        token: session.user.token,
+        token: session.user.token.toString(),
       },
       body: JSON.stringify({
         seller_id: session.user.id,
