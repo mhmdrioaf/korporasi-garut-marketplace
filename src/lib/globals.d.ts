@@ -70,10 +70,44 @@ type TOrder = {
   shipping_addres: String;
   shipping_cost: number;
   total_price: number;
+  delivery_receipt: string | null;
+  payment_proof: string | null;
 
   address: TAddress;
   user: TUser;
   order_item: TOrderItem[];
+};
+
+type TSellerOrder = {
+  order_id: string;
+  order_status: ORDER_STATUS;
+  order_date: Date;
+  order_delivered_date: Date | null;
+  user_id: number;
+  shipping_cost: number;
+  total_price: number;
+  delivery_receipt: string | null;
+  payment_proof: string | null;
+
+  address: TAddress | null;
+  user: {
+    account: TAccount | null;
+  };
+  order_item: {
+    order_quantity: number;
+    variant: TProductVariantItem | null;
+    product: {
+      title: string;
+      capable_out_of_town: boolean;
+      images: string[];
+      id: number;
+      price: number;
+      stock: number;
+      storage_period: number;
+      expire_date: Date;
+      unit: string;
+    };
+  }[];
 };
 
 type TOrderItem = {
@@ -104,6 +138,8 @@ type TCustomerOrder = {
   shipping_addres: String;
   shipping_cost: number;
   total_price: number;
+  delivery_receipt: string | null;
+  payment_proof: string | null;
 
   address: TAddress;
   user: TUser;

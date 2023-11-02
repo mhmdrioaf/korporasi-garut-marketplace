@@ -148,12 +148,12 @@ export const orderStatusConverter = (status: ORDER_STATUS) => {
       return "Sedang Dikemas";
     case "SHIPPED":
       return "Sedang Dikirim";
-    case "DELIVERED":
-      return "Telah Dikirim";
-    case "FINISHED":
-      return "Telah Diterima";
     default:
-      return "Tidak Diketahui";
+      if (status === "DELIVERED" || status === "FINISHED") {
+        return "Telah Diterima Pelanggan";
+      } else {
+        return "Tidak Diketahui";
+      }
   }
 };
 

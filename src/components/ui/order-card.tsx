@@ -1,6 +1,6 @@
 "use client";
 
-import { TCustomerOrder } from "@/lib/globals";
+import { ORDER_STATUS, TCustomerOrder } from "@/lib/globals";
 import Image from "next/image";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
@@ -13,6 +13,7 @@ import ShowOrderButton from "@/lib/renderer/order-button";
 import { useToast } from "./use-toast";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "./button";
 
 interface IOrderCardProps {
   order: TCustomerOrder;
@@ -52,6 +53,33 @@ export default function OrderCard({ order }: IOrderCardProps) {
       }
     }
   };
+
+  const showPaymentProof = (
+    orderStatus: ORDER_STATUS,
+    paymentProof: string | null
+  ) => {
+    if (paymentProof) {
+      if (orderStatus !== "PENDING") {
+        return (
+          <Button asChild variant="ghost">
+            <Link href={paymentProof} target="_blank">
+              Lihat Bukti Pembayaran
+            </Link>
+          </Button>
+        );
+      } else {
+        return (
+          <Button asChild variant="default">
+            <Link href={paymentProof} target="_blank">
+              Lanjutkan Pembayaran
+            </Link>
+          </Button>
+        );
+      }
+    } else {
+      return null;
+    }
+  };
   return (
     <div className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input">
       <div className="w-full grid grid-cols-3">
@@ -76,8 +104,9 @@ export default function OrderCard({ order }: IOrderCardProps) {
           <ShowOrderButton
             status={order.order_status}
             onPaymentClick={() => onPaymentClick(order)}
-            disabled={buttonLoading}
+            disabled={buttonLoading || order.payment_proof !== null}
           />
+          {showPaymentProof(order.order_status, order.payment_proof)}
         </div>
       </div>
 
