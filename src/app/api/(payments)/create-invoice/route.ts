@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import { TOrder } from "@/lib/globals";
 import { NextRequest, NextResponse } from "next/server";
 import Xendit from "xendit-node";
@@ -20,13 +21,22 @@ async function handler(request: NextRequest) {
         amount: body.order.total_price,
         currency: "IDR",
         description: `Pembayaran untuk pesanan anda di SMKs Korporasi Garut Marketplace, dengan nomor pesanan ${body.order.order_id}. Untuk detail harga dan produk, silahkan cek di halaman pesanan.`,
-        items: body.order.order_item.map((item) => ({
-          name: item.variant
-            ? `${item.product.title} - ${item.variant.variant_name}`
-            : item.product.title,
-          price: item.variant ? item.variant.variant_price : item.product.price,
-          quantity: item.order_quantity,
-        })),
+        items: [
+          ...body.order.order_item.map((item) => ({
+            name: item.variant
+              ? `${item.product.title} - ${item.variant.variant_name}`
+              : item.product.title,
+            price: item.variant
+              ? item.variant.variant_price
+              : item.product.price,
+            quantity: item.order_quantity,
+          })),
+          {
+            name: "Ongkos Kirim",
+            price: body.order.shipping_cost,
+            quantity: 1,
+          },
+        ],
         customer: {
           givenNames: body.order.address.recipient_name,
           email: body.order.user.email,
@@ -55,6 +65,15 @@ async function handler(request: NextRequest) {
     });
 
     if (resp) {
+      await db.orders.update({
+        where: {
+          order_id: body.order.order_id,
+        },
+        data: {
+          payment_proof: resp.invoiceUrl,
+        },
+      });
+
       return NextResponse.json({
         ok: true,
         message:
