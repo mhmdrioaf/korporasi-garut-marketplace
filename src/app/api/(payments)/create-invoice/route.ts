@@ -21,8 +21,10 @@ async function handler(request: NextRequest) {
         currency: "IDR",
         description: `Pembayaran untuk pesanan anda di SMKs Korporasi Garut Marketplace, dengan nomor pesanan ${body.order.order_id}. Untuk detail harga dan produk, silahkan cek di halaman pesanan.`,
         items: body.order.order_item.map((item) => ({
-          name: item.product.title,
-          price: item.product.price,
+          name: item.variant
+            ? `${item.product.title} - ${item.variant.variant_name}`
+            : item.product.title,
+          price: item.variant ? item.variant.variant_price : item.product.price,
           quantity: item.order_quantity,
         })),
         customer: {
