@@ -71,6 +71,7 @@ type TOrder = {
   shipping_cost: number;
   total_price: number;
   delivery_receipt: string | null;
+  payment_proof: string | null;
 
   address: TAddress;
   user: TUser;
@@ -86,6 +87,7 @@ type TSellerOrder = {
   shipping_cost: number;
   total_price: number;
   delivery_receipt: string | null;
+  payment_proof: string | null;
 
   address: TAddress | null;
   user: {
@@ -136,6 +138,8 @@ type TCustomerOrder = {
   shipping_addres: String;
   shipping_cost: number;
   total_price: number;
+  delivery_receipt: string | null;
+  payment_proof: string | null;
 
   address: TAddress;
   user: TUser;
