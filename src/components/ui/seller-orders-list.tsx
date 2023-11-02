@@ -199,8 +199,11 @@ export default function SellerOrderList({
     return isActive ? defaultStyle + activeStyle : defaultStyle;
   };
 
-  const showPaymentProofButton = (paymentProof: string | null) => {
-    if (paymentProof) {
+  const showPaymentProofButton = (
+    orderStatus: ORDER_STATUS,
+    paymentProof: string | null
+  ) => {
+    if (paymentProof && orderStatus !== "PENDING") {
       return (
         <Button variant="ghost" asChild>
           <Link href={paymentProof} target="_blank">
@@ -268,7 +271,10 @@ export default function SellerOrderList({
                       order.order_id,
                       order.delivery_receipt
                     )}
-                    {showPaymentProofButton("https://google.com")}
+                    {showPaymentProofButton(
+                      order.order_status,
+                      order.payment_proof
+                    )}
                     <OrderDeliveryReceipt
                       isLoading={updating}
                       isOpen={deliveryReceipt}
