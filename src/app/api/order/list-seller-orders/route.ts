@@ -1,28 +1,25 @@
 import { db } from "@/lib/db";
-import { TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 
-interface IListSellerOrdersBody {
-  seller_id: string;
-}
-
 async function handler(request: NextRequest) {
-  const body: IListSellerOrdersBody = await request.json();
-  const token = request.headers.get("token");
+  const headers = request.headers;
+  const token = headers.get("token");
+  const seller_id = headers.get("id");
 
   if (
     token &&
-    permissionHelper(token, process.env.NEXT_PUBLIC_SELLER_TOKEN!.toString())
+    permissionHelper(token, process.env.NEXT_PUBLIC_SELLER_TOKEN!.toString()) &&
+    seller_id
   ) {
     try {
-      const sellerOrders: TSellerOrder[] = await db.orders.findMany({
+      const sellerOrders = await db.orders.findMany({
         where: {
           order_item: {
             every: {
               product: {
                 seller_id: {
-                  equals: parseInt(body.seller_id),
+                  equals: parseInt(seller_id),
                 },
               },
             },
@@ -62,16 +59,28 @@ async function handler(request: NextRequest) {
       });
 
       if (sellerOrders) {
-        return NextResponse.json({ ok: true, result: sellerOrders });
+        return NextResponse.json({
+          ok: true,
+          result: sellerOrders,
+          message: "Seller order has been succesfully listed.",
+        });
       } else {
-        return NextResponse.json({ ok: false, result: null });
+        return NextResponse.json({
+          ok: false,
+          result: null,
+          message: "No seller order listed",
+        });
       }
     } catch (error) {
       console.error(
         "An error occurred when listing the seller orders: ",
         error
       );
-      return NextResponse.json({ ok: false, result: null });
+      return NextResponse.json({
+        ok: false,
+        result: null,
+        message: "An error occurred when listing the seller orders.",
+      });
     }
   } else {
     return NextResponse.json({
@@ -82,4 +91,4 @@ async function handler(request: NextRequest) {
   }
 }
 
-export { handler as POST };
+export { handler as GET };
