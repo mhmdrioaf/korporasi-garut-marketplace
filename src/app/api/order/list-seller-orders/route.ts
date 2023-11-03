@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { TSellerOrder } from "@/lib/globals";
+import { permissionHelper } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IListSellerOrdersBody {
@@ -10,7 +11,10 @@ async function handler(request: NextRequest) {
   const body: IListSellerOrdersBody = await request.json();
   const token = request.headers.get("token");
 
-  if (token && token === process.env.NEXT_PUBLIC_SELLER_TOKEN!) {
+  if (
+    token &&
+    permissionHelper(token, process.env.NEXT_PUBLIC_SELLER_TOKEN!.toString())
+  ) {
     try {
       const sellerOrders: TSellerOrder[] = await db.orders.findMany({
         where: {
@@ -72,6 +76,7 @@ async function handler(request: NextRequest) {
   } else {
     return NextResponse.json({
       ok: false,
+      result: null,
       message: "You have no access to make this request!",
     });
   }
