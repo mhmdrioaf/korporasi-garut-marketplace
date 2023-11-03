@@ -18,7 +18,7 @@ import { useToast } from "./use-toast";
 import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import OrderDeliveryReceipt from "./order-delivery-receipt";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 
 interface ISellerOrderListProps {
   seller_id: string;
@@ -54,6 +54,8 @@ export default function SellerOrderList({
       .then((res) => res.json())
       .then((res) => res.result)
   );
+
+  const { mutate } = useSWRConfig();
 
   const orders: TSellerOrder[] = orderData ? orderData : [];
 
@@ -91,6 +93,7 @@ export default function SellerOrderList({
         title: "Berhasil mengubah status pesanan",
         description: response.message,
       });
+      mutate("/api/order/list-seller-orders");
       onModalClose();
       router.refresh();
     }
