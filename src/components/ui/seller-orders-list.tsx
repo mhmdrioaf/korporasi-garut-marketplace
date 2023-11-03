@@ -18,16 +18,17 @@ import { useToast } from "./use-toast";
 import { useState } from "react";
 import { Loader2Icon } from "lucide-react";
 import OrderDeliveryReceipt from "./order-delivery-receipt";
+import useSWR from "swr";
 
 interface ISellerOrderListProps {
-  orders: TSellerOrder[];
+  seller_id: string;
   seller_token: string;
 }
 
 type TOrderShown = "ALL" | ORDER_STATUS;
 
 export default function SellerOrderList({
-  orders,
+  seller_id,
   seller_token,
 }: ISellerOrderListProps) {
   const [updating, setUpdating] = useState(false);
@@ -36,6 +37,25 @@ export default function SellerOrderList({
 
   const router = useRouter();
   const { toast } = useToast();
+
+  const {
+    data: orderData,
+    isLoading: orderLoading,
+    error: orderError,
+  } = useSWR("/api/order/list-seller-orders", (url) =>
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        id: seller_id,
+        token: seller_token,
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => res.result)
+  );
+
+  const orders: TSellerOrder[] = orderData ? orderData : [];
 
   const changeOrderStatus = async (
     order_status: ORDER_STATUS | null,
@@ -191,12 +211,18 @@ export default function SellerOrderList({
         }
     }
   };
-  const orderShownButtonStyle = (isActive: boolean) => {
+  const orderShownButtonStyle = (isActive: boolean, isLoading: boolean) => {
     const defaultStyle =
       "w-fit px-4 py-2 rounded-md text-center hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer select-none shrink-0";
     const activeStyle = " bg-primary text-primary-foreground";
+    const loadingStyle =
+      "w-fit px-4 py-2 rounded-md bg-input animate-pulse text-transparent";
 
-    return isActive ? defaultStyle + activeStyle : defaultStyle;
+    return isActive && !isLoading
+      ? defaultStyle + activeStyle
+      : !isActive && !isLoading
+      ? defaultStyle
+      : loadingStyle;
   };
 
   const showPaymentProofButton = (
@@ -216,21 +242,40 @@ export default function SellerOrderList({
     }
   };
 
-  return (
-    <Container variant="column">
-      <div className="flex flex-col gap-2">
-        <p className="text-2xl text-primary font-bold">Daftar pesanan datang</p>
-        <p className="text-sm">
-          Berikut merupakan daftar pesanan yang datang untuk produk yang telah
-          anda unggah.
-        </p>
-      </div>
-
+  return orderLoading ? (
+    <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-row items-center justify-between gap-2 overflow-x-auto">
         {orderShownList.map((value) => (
           <div
             key={value}
-            className={orderShownButtonStyle(orderShown === value)}
+            className={orderShownButtonStyle(
+              orderShown === value,
+              orderLoading
+            )}
+          >
+            {orderShownLabels(value)}
+          </div>
+        ))}
+      </div>
+
+      <div className="w-full flex flex-col gap-4 text-sm">
+        <div className="w-full rounded-md bg-input animate-pulse h-96" />
+      </div>
+    </div>
+  ) : orderError ? (
+    <Container className="text-center">
+      <p>Gagal mendapatkan data pesanan.</p>
+    </Container>
+  ) : (
+    <div className="w-full flex flex-col gap-4">
+      <div className="w-full flex flex-row items-center justify-between gap-2 overflow-x-auto">
+        {orderShownList.map((value) => (
+          <div
+            key={value}
+            className={orderShownButtonStyle(
+              orderShown === value,
+              orderLoading
+            )}
             onClick={() => onOrderShownChanges(value)}
           >
             {orderShownLabels(value)}
@@ -376,6 +421,6 @@ export default function SellerOrderList({
           </div>
         )}
       </div>
-    </Container>
+    </div>
   );
 }

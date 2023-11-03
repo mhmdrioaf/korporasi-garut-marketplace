@@ -1,51 +1,36 @@
+import { Container } from "@/components/ui/container";
 import NoAccess from "@/components/ui/no-access";
 import SellerOrderList from "@/components/ui/seller-orders-list";
 import authOptions from "@/lib/authOptions";
-import { TSellerOrder } from "@/lib/globals";
+import { permissionHelper } from "@/lib/helper";
 import { getServerSession } from "next-auth";
 
-async function getSellerOrders() {
+export default async function SellerOrder() {
   const session = await getServerSession(authOptions);
 
   if (!session) {
-    return null;
-  } else if (session.user.role !== "SELLER") {
-    return null;
-  } else {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_SELLER_ORDERS!, {
-      method: "POST",
-      headers: {
-        token: session.user.token.toString(),
-      },
-      body: JSON.stringify({
-        seller_id: session.user.id,
-      }),
-    });
-
-    const response = await res.json();
-
-    if (!response.ok) {
-      return null;
-    } else {
-      return {
-        result: response.result as TSellerOrder[],
-        seller_token: session.user.token,
-      };
-    }
-  }
-}
-
-export default async function SellerOrder() {
-  const sellerOrders = await getSellerOrders();
-
-  if (!sellerOrders) {
+    return <NoAccess />;
+  } else if (
+    !permissionHelper(session.user.token, process.env.NEXT_PUBLIC_SELLER_TOKEN!)
+  ) {
     return <NoAccess />;
   } else {
     return (
-      <SellerOrderList
-        orders={sellerOrders.result}
-        seller_token={sellerOrders.seller_token}
-      />
+      <Container variant="column">
+        <div className="flex flex-col gap-2">
+          <p className="text-2xl text-primary font-bold">
+            Daftar pesanan datang
+          </p>
+          <p className="text-sm">
+            Berikut merupakan daftar pesanan yang datang untuk produk yang telah
+            anda unggah.
+          </p>
+        </div>
+        <SellerOrderList
+          seller_id={session.user.id}
+          seller_token={session.user.token}
+        />
+      </Container>
     );
   }
 }
