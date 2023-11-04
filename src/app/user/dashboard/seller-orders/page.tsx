@@ -16,6 +16,9 @@ async function getSellerOrders(seller_id: string, seller_token: string) {
       id: seller_id,
       "Content-Type": "application/json",
     },
+    next: {
+      tags: ["seller-orders"],
+    },
   });
 
   const response = await res.json();
