@@ -25,7 +25,7 @@ export default async function DashboardLayout({
   const session = await getServerSession(authOptions);
   return (
     <div className="w-full flex flex-col lg:flex-row items-start">
-      <div className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen fixed bottom-0 lg:top-[7.25rem] left-0 border-t border-r-0 border-t-input lg:border-t-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal">
+      <div className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen fixed bottom-0 lg:top-[5.25rem] left-0 border-t border-r-0 border-t-input lg:border-t-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal">
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
           href={ROUTES.USER.DASHBOARD}
@@ -37,7 +37,11 @@ export default async function DashboardLayout({
 
         <Link
           className="w-full lg:w-fit grid place-items-center p-2"
-          href={ROUTES.USER.ORDERS}
+          href={
+            session?.user.role === "SELLER"
+              ? ROUTES.USER.ORDERS_MANAGEMENT
+              : ROUTES.USER.ORDERS
+          }
           title="Pesanan"
         >
           <ShoppingBagIcon className="w-6 h-6" />
