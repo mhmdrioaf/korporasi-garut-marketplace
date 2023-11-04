@@ -1,7 +1,6 @@
 "use client";
 
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
-import { Container } from "./container";
+import { ORDER_STATUS } from "@/lib/globals";
 import {
   getDateString,
   orderStatusConverter,
@@ -13,207 +12,12 @@ import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import { Separator } from "./separator";
 import { Button } from "./button";
-import { useRouter } from "next/navigation";
-import { useToast } from "./use-toast";
-import { useState } from "react";
-import { Loader2Icon } from "lucide-react";
 import OrderDeliveryReceipt from "./order-delivery-receipt";
-import useSWR, { useSWRConfig } from "swr";
+import { useOrderManagement } from "@/lib/hooks/context/useOrderManagement";
 
-interface ISellerOrderListProps {
-  seller_id: string;
-  seller_token: string;
-}
+export default function SellerOrderList() {
+  const { orders, renderer } = useOrderManagement();
 
-type TOrderShown = "ALL" | ORDER_STATUS;
-
-export default function SellerOrderList({
-  seller_id,
-  seller_token,
-}: ISellerOrderListProps) {
-  const [updating, setUpdating] = useState(false);
-  const [deliveryReceipt, setDeliveryReceipt] = useState(false);
-  const [orderShown, setOrderShown] = useState<TOrderShown | "ALL">("ALL");
-
-  const router = useRouter();
-  const { toast } = useToast();
-
-  const {
-    data: orderData,
-    isLoading: orderLoading,
-    error: orderError,
-  } = useSWR("/api/order/list-seller-orders", (url) =>
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        id: seller_id,
-        token: seller_token,
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => res.result)
-  );
-
-  const { mutate } = useSWRConfig();
-
-  const orders: TSellerOrder[] = orderData ? orderData : [];
-
-  const changeOrderStatus = async (
-    order_status: ORDER_STATUS | null,
-    order_id: string,
-    delivery_receipt: string | null
-  ) => {
-    setUpdating(true);
-    const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_UPDATE_STATUS!, {
-      method: "PATCH",
-      headers: {
-        token: seller_token,
-      },
-      body: JSON.stringify({
-        order_id: order_id,
-        order_status: order_status,
-        delivery_receipt: delivery_receipt,
-      }),
-    });
-
-    const response = await res.json();
-
-    if (!response.ok) {
-      setUpdating(false);
-      toast({
-        variant: "destructive",
-        title: "Gagal mengubah status pesanan",
-        description: response.message,
-      });
-    } else {
-      setUpdating(false);
-      toast({
-        variant: "success",
-        title: "Berhasil mengubah status pesanan",
-        description: response.message,
-      });
-      mutate("/api/order/list-seller-orders");
-      onModalClose();
-      router.refresh();
-    }
-  };
-
-  const showActionButton = (
-    order_status: ORDER_STATUS,
-    order_id: string,
-    delivery_receipt: string | null
-  ) => {
-    let buttonTitle: string | null = null;
-    let orderStatus: ORDER_STATUS | null = null;
-    let isButtonDisabled = false;
-    let returnNothing = false;
-    switch (order_status) {
-      case "PENDING":
-        buttonTitle = "Kemas Pesanan";
-        orderStatus = order_status;
-        isButtonDisabled = true;
-        break;
-      // case "DELIVERED":
-      //   buttonTitle = "Pesanan telah Dikirim";
-      //   orderStatus = order_status;
-      //   isButtonDisabled = true;
-      // case "FINISHED":
-      //   buttonTitle = "Pesanan telah Selesai";
-      //   orderStatus = order_status;
-      //   isButtonDisabled = true;
-      case "PAID":
-        buttonTitle = "Kemas Pesanan";
-        orderStatus = "PACKED";
-        break;
-      case "PACKED":
-        buttonTitle = "Kirim Pesanan";
-        orderStatus = "SHIPPED";
-        break;
-      case "SHIPPED":
-        if (delivery_receipt) {
-          buttonTitle = "Ubah Resi";
-        } else {
-          buttonTitle = "Kirim Resi Pengiriman";
-        }
-        orderStatus = "SHIPPED";
-        break;
-      default:
-        returnNothing = true;
-        break;
-    }
-    return !returnNothing ? (
-      <Button
-        variant="default"
-        onClick={
-          orderStatus !== "SHIPPED"
-            ? () => changeOrderStatus(orderStatus, order_id, null)
-            : () => setDeliveryReceipt(true)
-        }
-        disabled={updating || isButtonDisabled}
-      >
-        {updating ? (
-          <>
-            <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-            <span>Mengubah status...</span>
-          </>
-        ) : (
-          <span>{buttonTitle}</span>
-        )}
-      </Button>
-    ) : null;
-  };
-
-  const conditionalOrders = () => {
-    let orderToShown = orders;
-    switch (orderShown) {
-      case "ALL":
-        return orderToShown;
-      default:
-        orderToShown = orders.filter(
-          (order) => order.order_status === orderShown
-        );
-        return orderToShown;
-    }
-  };
-
-  const onModalClose = () => {
-    setDeliveryReceipt(false);
-    setUpdating(false);
-  };
-
-  const onOrderShownChanges = (options: TOrderShown) => {
-    setOrderShown(options);
-  };
-
-  const orderShownList: TOrderShown[] = [
-    "ALL",
-    "PENDING",
-    "PAID",
-    "PACKED",
-    "SHIPPED",
-    "DELIVERED",
-  ];
-  const orderShownLabels = (order_status: TOrderShown) => {
-    switch (order_status) {
-      case "ALL":
-        return "Semua";
-      case "PENDING":
-        return "Menunggu Pembayaran";
-      case "PAID":
-        return "Menunggu Pengiriman";
-      case "PACKED":
-        return "Dikemas";
-      case "SHIPPED":
-        return "Sedang Dikirim";
-      default:
-        if (order_status === "DELIVERED" || order_status === "FINISHED") {
-          return "Selesai";
-        } else {
-          return "Semua";
-        }
-    }
-  };
   const orderShownButtonStyle = (isActive: boolean, isLoading: boolean) => {
     const defaultStyle =
       "w-fit px-4 py-2 rounded-md text-center hover:bg-primary hover:text-primary-foreground transition-all cursor-pointer select-none shrink-0";
@@ -245,50 +49,26 @@ export default function SellerOrderList({
     }
   };
 
-  return orderLoading ? (
+  return (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-row items-center justify-between gap-2 overflow-x-auto">
-        {orderShownList.map((value) => (
+        {orders.shown.list.map((value) => (
           <div
             key={value}
             className={orderShownButtonStyle(
-              orderShown === value,
-              orderLoading
+              orders.shown.active === value,
+              false
             )}
+            onClick={() => orders.shown.handler.onOrderShownChanges(value)}
           >
-            {orderShownLabels(value)}
+            {orders.shown.labels(value)}
           </div>
         ))}
       </div>
 
       <div className="w-full flex flex-col gap-4 text-sm">
-        <div className="w-full rounded-md bg-input animate-pulse h-96" />
-      </div>
-    </div>
-  ) : orderError ? (
-    <Container className="text-center">
-      <p>Gagal mendapatkan data pesanan.</p>
-    </Container>
-  ) : (
-    <div className="w-full flex flex-col gap-4">
-      <div className="w-full flex flex-row items-center justify-between gap-2 overflow-x-auto">
-        {orderShownList.map((value) => (
-          <div
-            key={value}
-            className={orderShownButtonStyle(
-              orderShown === value,
-              orderLoading
-            )}
-            onClick={() => onOrderShownChanges(value)}
-          >
-            {orderShownLabels(value)}
-          </div>
-        ))}
-      </div>
-
-      <div className="w-full flex flex-col gap-4 text-sm">
-        {conditionalOrders().length > 0 ? (
-          conditionalOrders().map((order) => (
+        {orders.data.length > 0 ? (
+          orders.data.map((order) => (
             <div
               key={order.order_id}
               className="w-full flex flex-col gap-2 rounded-md border border-input px-4 py-2"
@@ -314,11 +94,7 @@ export default function SellerOrderList({
                     <p className="font-bold">
                       Total Harga: {rupiahConverter(order.total_price)}
                     </p>
-                    {showActionButton(
-                      order.order_status,
-                      order.order_id,
-                      order.delivery_receipt
-                    )}
+                    {renderer.actionButton(order)}
                     {showPaymentProofButton(
                       order.order_status,
                       order.payment_proof
@@ -409,19 +185,6 @@ export default function SellerOrderList({
                   </Link>
                 </div>
               ))}
-
-              <OrderDeliveryReceipt
-                key={order.order_id}
-                isLoading={updating}
-                isOpen={deliveryReceipt}
-                onClose={onModalClose}
-                orderStatusChanger={changeOrderStatus}
-                order_detail={{
-                  order_id: order.order_id,
-                  order_status: "SHIPPED",
-                }}
-                defaultValue={order.delivery_receipt}
-              />
             </div>
           ))
         ) : (
@@ -430,6 +193,8 @@ export default function SellerOrderList({
           </div>
         )}
       </div>
+
+      <OrderDeliveryReceipt />
     </div>
   );
 }
