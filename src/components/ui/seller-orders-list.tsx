@@ -323,17 +323,6 @@ export default function SellerOrderList({
                       order.order_status,
                       order.payment_proof
                     )}
-                    <OrderDeliveryReceipt
-                      isLoading={updating}
-                      isOpen={deliveryReceipt}
-                      onClose={onModalClose}
-                      orderStatusChanger={changeOrderStatus}
-                      order_detail={{
-                        order_id: order.order_id,
-                        order_status: "SHIPPED",
-                      }}
-                      defaultValue={order.delivery_receipt}
-                    />
                   </div>
                 </div>
                 <Separator />
@@ -359,7 +348,11 @@ export default function SellerOrderList({
               {order.order_item.map((orderItem) => (
                 <div
                   className="w-full rounded-sm overflow-hidden p-2 grid grid-cols-3 gap-4 border border-input"
-                  key={orderItem.product.id}
+                  key={`${order.order_id} - ${
+                    orderItem.variant
+                      ? orderItem.variant.variant_item_id
+                      : orderItem.product.id
+                  }`}
                 >
                   <div className="flex flex-row items-center gap-2">
                     <div className="w-14 h-14 rounded-sm overflow-hidden relative">
@@ -416,6 +409,19 @@ export default function SellerOrderList({
                   </Link>
                 </div>
               ))}
+
+              <OrderDeliveryReceipt
+                key={order.order_id}
+                isLoading={updating}
+                isOpen={deliveryReceipt}
+                onClose={onModalClose}
+                orderStatusChanger={changeOrderStatus}
+                order_detail={{
+                  order_id: order.order_id,
+                  order_status: "SHIPPED",
+                }}
+                defaultValue={order.delivery_receipt}
+              />
             </div>
           ))
         ) : (
