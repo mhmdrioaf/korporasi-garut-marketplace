@@ -41,6 +41,7 @@ export const ROUTES = {
     ADD_ADDRESS: "/user/dashboard/address/create",
     PRODUCTS_LIST: "/user/dashboard/product-list",
     CART: "/user/dashboard/cart",
+    ORDERS_MANAGEMENT: "/user/dashboard/seller-orders",
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,

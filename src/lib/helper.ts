@@ -121,8 +121,8 @@ export const decimalDate = (num: number) => {
 
 export const getDateString = (value: any) => {
   const date = new Date(value);
-  const day = decimalDate(date.getDay());
-  const month = decimalDate(date.getMonth());
+  const day = decimalDate(date.getDate());
+  const month = decimalDate(date.getMonth() + 1);
   const years = date.getFullYear();
   const hours = decimalDate(date.getHours());
   const minutes = decimalDate(date.getMinutes());

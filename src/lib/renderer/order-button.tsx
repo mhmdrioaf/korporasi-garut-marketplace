@@ -28,11 +28,11 @@ export default function ShowOrderButton({
         </Button>
       );
     case "SHIPPED":
-      return <Button variant="default">Lacak Pesanan</Button>;
+      return <Button variant="outline">Lacak Pesanan</Button>;
     case "DELIVERED":
-      return <Button variant="default">Pesanan Diterima</Button>;
+      return null;
     case "FINISHED":
-      return <Button variant="default">Berikan Rating</Button>;
+      return null;
     default:
       return null;
   }
