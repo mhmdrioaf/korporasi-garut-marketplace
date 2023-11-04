@@ -3,7 +3,15 @@ import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TOrderManagementContext = {
   orders: {
-    data: TSellerOrder[];
+    data: {
+      ALL: TSellerOrder[];
+      PENDING: TSellerOrder[];
+      PAID: TSellerOrder[];
+      PACKED: TSellerOrder[];
+      SHIPPED: TSellerOrder[];
+      DELIVERED: TSellerOrder[];
+      FINISHED: TSellerOrder[];
+    };
 
     shown: {
       list: TOrderShown[];

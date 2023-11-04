@@ -50,15 +50,16 @@ export function OrderManagementContextProvider({
     },
   });
 
-  const orders = () => {
-    switch (orderShownOptions) {
-      case "ALL":
-        return orders_data;
-      default:
-        return orders_data.filter(
-          (order) => order.order_status === orderShownOptions
-        );
-    }
+  const orders = {
+    ALL: orders_data,
+    PENDING: orders_data.filter((order) => order.order_status === "PENDING"),
+    PAID: orders_data.filter((order) => order.order_status === "PAID"),
+    PACKED: orders_data.filter((order) => order.order_status === "PACKED"),
+    SHIPPED: orders_data.filter((order) => order.order_status === "SHIPPED"),
+    DELIVERED: orders_data.filter(
+      (order) => order.order_status === "DELIVERED"
+    ),
+    FINISHED: orders_data.filter((order) => order.order_status === "FINISHED"),
   };
 
   const ordersShown = {
@@ -226,7 +227,7 @@ export function OrderManagementContextProvider({
 
   const value: TOrderManagementContext = {
     orders: {
-      data: orders(),
+      data: orders,
       shown: {
         list: ordersShown.list,
         labels: ordersShown.labels,
