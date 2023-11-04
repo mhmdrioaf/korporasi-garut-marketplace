@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { ORDER_STATUS } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
+import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IUpdateStatusBody {
@@ -30,6 +31,7 @@ async function handler(request: NextRequest) {
         });
 
         if (updateOrderStatus) {
+          revalidateTag("seller-orders");
           return NextResponse.json({
             ok: true,
             message: "Berhasil mengubah status pesanan.",
