@@ -12,30 +12,9 @@ async function handler(request: NextRequest) {
       where: {
         order_id: orderID,
       },
-      select: {
-        order_item: {
-          select: {
-            order_quantity: true,
-            product: true,
-          },
-        },
-      },
     });
 
     if (productOrder) {
-      for (const orderItem of productOrder.order_item) {
-        await db.product.update({
-          where: {
-            id: orderItem.product.id,
-          },
-          data: {
-            stock: {
-              decrement: orderItem.order_quantity,
-            },
-          },
-        });
-      }
-
       await db.orders
         .update({
           where: {
