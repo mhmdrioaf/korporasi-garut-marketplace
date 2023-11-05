@@ -135,7 +135,7 @@ export function OrderManagementContextProvider({
 
     const action =
       status !== "SHIPPED"
-        ? () => changeOrderStatus(status, order.order_id, null)
+        ? () => changeOrderStatus(status, order.order_id, null, null)
         : () => {
             setOrderToUpdate(order);
             setIsGivingReceipt(true);
@@ -177,7 +177,8 @@ export function OrderManagementContextProvider({
   async function changeOrderStatus(
     order_status: ORDER_STATUS | null,
     order_id: string,
-    delivery_receipt: string | null
+    delivery_receipt: string | null,
+    order_items: Pick<TSellerOrder, "order_item"> | null
   ) {
     setUpdating(true);
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_UPDATE_STATUS!, {
@@ -189,6 +190,7 @@ export function OrderManagementContextProvider({
         order_id: order_id,
         order_status: order_status,
         delivery_receipt: delivery_receipt,
+        order_items: order_items,
       }),
     });
 
@@ -221,7 +223,9 @@ export function OrderManagementContextProvider({
       throw new Error("Data pesanan belum disediakan!");
     } else {
       const { order_id } = orderToUpdate;
-      return await changeOrderStatus("SHIPPED", order_id, delivery_receipt);
+      return await changeOrderStatus("SHIPPED", order_id, delivery_receipt, {
+        order_item: orderToUpdate.order_item,
+      });
     }
   };
 
