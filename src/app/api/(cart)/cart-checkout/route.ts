@@ -54,6 +54,20 @@ async function handler(request: NextRequest) {
     });
 
     if (newOrder) {
+      await db.customer_cart.update({
+        where: {
+          user_id: parseInt(body.customer_id),
+        },
+        data: {
+          cart_items: {
+            deleteMany: {
+              cart_item_id: {
+                in: body.items.map((item) => item.cart_item_id),
+              },
+            },
+          },
+        },
+      });
       return NextResponse.json({
         ok: true,
         message:
