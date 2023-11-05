@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { ORDER_STATUS } from "@/lib/globals";
+import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface IUpdateStatusBody {
   order_id: string;
   order_status: ORDER_STATUS | null;
+  order_items: Pick<TSellerOrder, "order_item">;
   delivery_receipt: string | null;
 }
 
@@ -20,6 +21,33 @@ async function handler(request: NextRequest) {
   ) {
     if (body.order_status) {
       try {
+        if (body.order_status === "SHIPPED" && body.order_items) {
+          for (const item of body.order_items.order_item) {
+            if (item.variant) {
+              await db.product_variant_item.update({
+                where: {
+                  variant_item_id: item.variant.variant_item_id,
+                },
+                data: {
+                  variant_stock: {
+                    decrement: item.order_quantity,
+                  },
+                },
+              });
+            }
+            await db.product.update({
+              where: {
+                id: item.product.id,
+              },
+              data: {
+                stock: {
+                  decrement: item.order_quantity,
+                },
+              },
+            });
+          }
+        }
+
         const updateOrderStatus = await db.orders.update({
           where: {
             order_id: body.order_id,

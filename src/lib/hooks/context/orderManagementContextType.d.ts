@@ -34,7 +34,8 @@ type TOrderManagementContext = {
       changeStatus: (
         order_status: ORDER_STATUS | null,
         order_id: string,
-        delivery_receipt: string | null
+        delivery_receipt: string | null,
+        order_items: Pick<TSellerOrder, "order_item"> | null
       ) => void;
       closeModal: () => void;
       deliveryReceiptForm: UseFormReturn<
