@@ -59,6 +59,7 @@ type TUser = {
   orders: TOrder[];
   products: TProduct[];
   cart: TCustomerCart | null;
+  notification: TNotification | null;
 };
 
 type TOrder = {
@@ -235,3 +236,21 @@ type TCustomerCartGroupedBySeller = {
   seller: TUser;
   products: TCustomerCartItem[];
 };
+
+type TNotification = {
+  notification_id: string;
+  subscriber_id: number;
+  items: TNotificationItem[]
+}
+
+type TNotificationItem = {
+  notification_item_id: string;
+  notification_id: string;
+  title: string;
+  description: string | null;
+  redirect_url: string | null;
+  show_action_button: boolean;
+  status: NOTIFICATION_STATUS;
+}
+
+type NOTIFICATION_STATUS = "UNREAD" | "READ"
