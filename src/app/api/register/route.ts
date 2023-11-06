@@ -20,6 +20,18 @@ async function handler(request: NextRequest) {
     const newUser = await users.register(body);
 
     if (newUser) {
+      const initializeNotification = await db.notification.create({
+        data: {
+          subscriber_id: newUser.user_id,
+        },
+      });
+
+      if (!initializeNotification) {
+        console.error(
+          "An error occurred when initializing the notification."
+        );
+      }
+
       return NextResponse.json(
         {
           ok: true,
