@@ -24,6 +24,7 @@ model user {
   orders   orders[]
   products product[]
   carts    customer_cart?
+  notifications notification?
 }
 
 model account {
@@ -163,6 +164,27 @@ model customer_cart_item {
   variant product_variant_item? @relation(fields: [product_variant_item_id], references: [variant_item_id], onDelete: Cascade)
 }
 
+model notification {
+  notification_id String  @id @default(cuid())
+  subscriber_id   Int  @unique
+  items notification_item[]
+  
+  subscriber      user    @relation(fields: [subscriber_id], references: [user_id], onDelete: Cascade)
+}
+
+model notification_item {
+  notification_item_id String @id @default(cuid())
+  notification_id String
+  title   String
+  description String?
+  redirect_url  String?
+  show_action_button  Boolean @default(true)
+  notifiedAt DateTime @default(now())
+  status NOTIFICATION_STATUS @default(UNREAD)
+
+  notification notification @relation(fields: [notification_id], references: [notification_id], onDelete: Cascade)
+}
+
 enum USER_ROLE {
   ADMIN
   SELLER
@@ -182,4 +204,9 @@ enum PRODUCT_STATUS {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum NOTIFICATION_STATUS {
+  UNREAD
+  READ
 }

@@ -35,6 +35,7 @@ import { useToast } from "./use-toast";
 import { signOut } from "next-auth/react";
 import useSWR from "swr";
 import { TCustomerCart } from "@/lib/globals";
+import NotificationsProvider from "./notifications-provider";
 
 interface IHeaderComponentProps {
   session: Session | null;
@@ -77,7 +78,7 @@ export default function Header({ session }: IHeaderComponentProps) {
   };
 
   return (
-    <div className="w-full flex flex-col overflow-hidden sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
+    <div className="w-full flex flex-col sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
       <div className="w-full flex flex-row items-center self-stretch justify-center gap-4 px-8 py-2 md:px-16">
         <Link
           href={ROUTES.LANDING_PAGE}
@@ -113,9 +114,13 @@ export default function Header({ session }: IHeaderComponentProps) {
             </div>
           </Button>
           <span>|</span>
-          <Button variant="ghost" size="icon">
-            <BellIcon className="w-4 h-4" />
+          {!session ? (
+            <Button variant="ghost" size="icon" asChild>
+            <Link href={ROUTES.AUTH.LOGIN}><BellIcon className="w-4 h-4" /></Link>
           </Button>
+          ) : (
+            <NotificationsProvider subscriber_id={session.user.id} />
+          )}
         </div>
 
         {session && (
