@@ -13,7 +13,11 @@ async function handler (request: NextRequest) {
                     subscriber_id: parseInt(session.user.id)
                 },
                 include: {
-                    items: true
+                    items: {
+                        orderBy: {
+                            status: "asc"
+                        }
+                    }
                 }
             });
 
