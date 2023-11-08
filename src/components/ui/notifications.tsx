@@ -7,7 +7,6 @@ import { TNotificationItem } from "@/lib/globals";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Separator } from "./separator";
-import Link from "next/link";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { getDateString } from "@/lib/helper";
 
@@ -35,6 +34,7 @@ export function NotificationTrigger() {
 }
 
 export function NotificationCard({ notification, variant }: { notification: TNotificationItem, variant: VariantProps<typeof notificationCardVariants>["variant"] }) {
+    const { handler } = useNotifications();
     const notificationCardVariants = cva(
         "w-full rounded-sm shadow-sm flex flex-row items-center gap-2 p-4 relative font-bold",
         {
@@ -55,7 +55,7 @@ export function NotificationCard({ notification, variant }: { notification: TNot
                 <div className="w-full flex flex-row items-center justify-between">
                     <p>{notification.title}</p>
                     <DropdownMenu>
-                        <DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon">
                                 <MoreVerticalIcon className="w-4 h-4" />
                             </Button>
@@ -64,7 +64,10 @@ export function NotificationCard({ notification, variant }: { notification: TNot
                         <DropdownMenuContent>
                             {notification.status === "UNREAD" && (
                                 <DropdownMenuItem>
-                                <Button className="w-full items-center justify-start" variant="ghost" size="sm">
+                                <Button className="w-full items-center justify-start" variant="ghost" size="sm" onClick={() => handler.read({
+                                    notification_id: notification.notification_id,
+                                    notification_item_id: notification.notification_item_id
+                                })}>
                                     <MailOpenIcon className="w-4 h-4 mr-2" />
                                     <span>Tandai telah dibaca</span>
                                 </Button>
@@ -83,10 +86,16 @@ export function NotificationCard({ notification, variant }: { notification: TNot
                 {notification.show_action_button && (
                     <>
                         <Separator />
-                        <Button variant="default" size="sm" asChild>
-                            <Link href={notification.redirect_url ?? "/user/dashboard/orders"}>
-                                <p>Lihat Pesanan</p>
-                            </Link>
+                        <Button 
+                            variant="default" 
+                            size="sm" 
+                            onClick={() => handler.actionButtonClick({
+                                notification_id: notification.notification_id,
+                                notification_item_id: notification.notification_item_id,
+                                redirect_url: notification.redirect_url ?? "/user/dashboard/orders"
+                            })}
+                        >
+                            Lihat Pesanan
                         </Button>
                     </>
                 )}
@@ -106,7 +115,7 @@ export function NotificationContent({ className }: { className?: string }) {
                     <div className="w-full flex flex-row items-center justify-between">
                         <p className="text-xl font-bold text-primary">Notifikasi</p>
                         <DropdownMenu>
-                            <DropdownMenuTrigger>
+                            <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon">
                                     <MoreVerticalIcon className="w-4 h-4" />
                                 </Button>
@@ -137,10 +146,13 @@ export function NotificationContent({ className }: { className?: string }) {
                             <p className="font-light text-sm">Memuat notifikasi...</p>
                         </div>
                     )}
-                    {!state.loading && data.notification && data.notification.items.length > 0 && data.notification.items.map((notification) => (
-                        <NotificationCard notification={notification} variant={notification.status === "UNREAD" ? "default" : "read"} key={notification.notification_item_id} />
-                    ))}
-                    {data.notification && data.notification.items.length < 1 && (
+                    {!state.loading && data.notification && data.notification.items.length > 0 ? (
+                        <>
+                            {data.notification.items.map((notification) => (
+                                <NotificationCard notification={notification} variant={notification.status === "UNREAD" ? "default" : "read"} key={notification.notification_item_id} />
+                            ))}
+                        </>
+                    ) : (
                         <div className="w-full h-[16rem] grid place-items-center">
                             <p className="font-light text-sm">Untuk saat ini tidak ada notifikasi untuk anda.</p>
                         </div>
