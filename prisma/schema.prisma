@@ -179,6 +179,7 @@ model notification_item {
   description String?
   redirect_url  String?
   show_action_button  Boolean @default(true)
+  notifiedAt DateTime @default(now())
   status NOTIFICATION_STATUS @default(UNREAD)
 
   notification notification @relation(fields: [notification_id], references: [notification_id], onDelete: Cascade)

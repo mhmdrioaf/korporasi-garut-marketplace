@@ -249,6 +249,7 @@ type TNotificationItem = {
   title: string;
   description: string | null;
   redirect_url: string | null;
+  notifiedAt: Date;
   show_action_button: boolean;
   status: NOTIFICATION_STATUS;
 }

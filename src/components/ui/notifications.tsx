@@ -79,7 +79,7 @@ export function NotificationCard({ notification, variant }: { notification: TNot
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>
-                <p className="font-light text-xs">{getDateString(new Date())}</p>
+                <p className="font-light text-xs">{getDateString(notification.notifiedAt)}</p>
                 {notification.show_action_button && (
                     <>
                         <Separator />
