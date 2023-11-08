@@ -11,5 +11,7 @@ type TNotificationContext = {
     }
     handler: {
         toggleOpen: () => void;
+        read: (body: { notification_id: string, notification_item_id: string }) => Promise<void>;
+        actionButtonClick: (body: { notification_id: string, notification_item_id: string, redirect_url: string }) => Promise<void>;
     }
 }
