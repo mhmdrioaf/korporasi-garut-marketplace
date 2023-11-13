@@ -43,7 +43,8 @@ async function handler(request: NextRequest) {
       });
 
       const sendSellerNotification = sendSellerNotificationHandler({
-        seller_id: productOrder.order_item[0].product.seller_id.toString()
+        seller_id: productOrder.order_item[0].product.seller_id.toString(),
+        order_id: orderID,
       });
 
       await Promise.all([updateOrderStatus, sendCustomerNotification, sendSellerNotification]).then(() => redirect(ROUTES.USER.ORDERS));

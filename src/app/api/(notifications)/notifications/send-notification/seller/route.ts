@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface INotificationSendBody {
     seller_id: string;
+    order_id: string;
 };
 
 async function handler (request: NextRequest) {
@@ -17,16 +18,16 @@ async function handler (request: NextRequest) {
                 subscriber_id: parseInt(body.seller_id),
                 items: {
                     create: {
-                        title: "Pesanan baru telah diterima.",
-                        redirect_url: "/seller/dashboard/orders?state=PAID"
+                        title: `Pesanan baru dengan ID ${body.order_id} telah diterima.`,
+                        redirect_url: "/user/dashboard/seller-orders?state=PAID"
                     }
                 }
             },
             update: {
                 items: {
                     create: {
-                        title: "Pesanan baru telah diterima.",
-                        redirect_url: "/seller/dashboard/orders?state=PAID"
+                        title: `Pesanan baru dengan ID ${body.order_id} telah diterima.`,
+                        redirect_url: "/user/dashboard/seller-orders?state=PAID"
                     }
                 }
             },

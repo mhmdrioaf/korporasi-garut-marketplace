@@ -27,11 +27,6 @@ async function handler(request: NextRequest) {
         message: `Pesanan dengan ID ${body.order_id} sedang dikemas.`,
         redirect_url: "/user/dashboard/orders?state=PACKED",
       };
-    } else if (body.order_status === "DELIVERED") {
-      return {
-        message: `Pesanan dengan ID ${body.order_id} telah diterima oleh pelanggan.`,
-        redirect_url: "/seller/dashboard/orders?state=DELIVERED",
-      };
     }
   }
 
@@ -92,17 +87,11 @@ async function handler(request: NextRequest) {
         if (updateOrderStatus) {
           const _notificationDetail = notificationDetail();
           if (_notificationDetail) {
-            const customerNotification = sendNotificationHandler({
+            await sendNotificationHandler({
               notification_redirect_url: _notificationDetail.redirect_url,
               notification_title: _notificationDetail.message,
               subscriber_target: updateOrderStatus.user_id.toString(),
             });
-
-            const sellerNotification = sendSellerNotificationHandler({
-              seller_id: updateOrderStatus.order_item[0].product.seller_id.toString(),
-            });
-
-            await Promise.all([customerNotification, sellerNotification]);
           }
           revalidateTag("seller-orders");
           return NextResponse.json({
