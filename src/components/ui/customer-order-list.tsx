@@ -3,6 +3,7 @@
 import { ORDER_STATUS, TCustomerOrder } from "@/lib/globals";
 import OrderCard from "./order-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
+import { useSearchParams } from "next/navigation";
 
 interface ICustomerOrdersListProps {
   orders: TCustomerOrder[];
@@ -13,6 +14,9 @@ type TOrderShown = "ALL" | ORDER_STATUS;
 export default function CustomerOrderList({
   orders,
 }: ICustomerOrdersListProps) {
+  const searchParams = useSearchParams();
+  const orderState = searchParams.get("state") ?? "ALL";
+  
   const ordersData = {
     ALL: orders,
     PENDING: orders.filter((order) => order.order_status === "PENDING"),
@@ -38,7 +42,7 @@ export default function CustomerOrderList({
     }
   };
   return (
-    <Tabs defaultValue="ALL" className="w-full flex flex-col gap-4 lg:gap-8">
+    <Tabs defaultValue={orderState} className="w-full flex flex-col gap-4 lg:gap-8">
       <TabsList>
         <TabsTrigger value="ALL">{orderShownLabel("ALL")}</TabsTrigger>
         <TabsTrigger value="PENDING">{orderShownLabel("PENDING")}</TabsTrigger>
