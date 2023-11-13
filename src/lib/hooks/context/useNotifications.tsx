@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { TNotificationContext } from "./notificationContext";
 import useSWR from "swr";
 import { fetcher } from "@/lib/helper";
-import { readNotification } from "@/lib/actions/notification";
+import { deleteNotificationHandler, readNotificationHandler } from "@/lib/actions/notification";
 import { useRouter } from "next/navigation";
 import { TNotification } from "@/lib/globals";
 
@@ -38,7 +38,7 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
         }
     ) => {
         try {
-            const updatedNotification = await readNotification(body);
+            const updatedNotification = await readNotificationHandler(body);
             if (updatedNotification) {
                 setNotification(updatedNotification);
                 await mutate("/api/notifications/get");
@@ -63,6 +63,23 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
         toggleOpen();
     }
 
+    const deleteNotification = async (
+        body: {
+            notification_id: string;
+            notification_item_id: string;
+        }
+    ) => {
+        try {
+            const updatedNotification = await deleteNotificationHandler(body);
+            if (updatedNotification) {
+                setNotification(updatedNotification);
+                await mutate("/api/notifications/get");
+            }
+        } catch (error) {
+            console.error(error);          
+        }
+    }
+
     const value: TNotificationContext = {
         data: {
             notification: notification
@@ -75,7 +92,8 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
         handler: {
             toggleOpen: toggleOpen,
             read: readNotifications,
-            actionButtonClick: actionButtonClick
+            actionButtonClick: actionButtonClick,
+            delete: deleteNotification
         }
     }
 
