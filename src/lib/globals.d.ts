@@ -24,6 +24,7 @@ type TProduct = {
   seller: TUser;
   tags: string[];
   status: "APPROVED" | "PENDING" | "REJECTED";
+  sold_count: number;
 };
 
 type TProductVariant = {
