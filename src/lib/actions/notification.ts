@@ -57,7 +57,31 @@ export async function readAllNotificationsHandler(
         notification_id: string
     }
 ) {
-    const res = await fetch("/api/notifications/read-all", {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_READ_ALL!, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            notification_id: body.notification_id
+        })
+    })
+
+    const response = await res.json();
+
+    if (response.ok) {
+        return response.result as TNotification
+    } else {
+        return undefined
+    }
+}
+
+export async function deleteAllNotificationsHandler(
+    body: {
+        notification_id: string
+    }
+) {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_DELETE_ALL!, {
         method: "PATCH",
         headers: {
             "Content-Type": "application/json"
