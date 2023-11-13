@@ -131,6 +131,7 @@ export async function sendNotificationHandler(
 export async function sendSellerNotificationHandler(
     body: {
         seller_id: string;
+        order_id: string;
     }
 ) {
     const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_SEND_SELLER!, {
@@ -140,6 +141,7 @@ export async function sendSellerNotificationHandler(
         },
         body: JSON.stringify({
             seller_id: body.seller_id,
+            order_id: body.order_id
         })
     })
 
