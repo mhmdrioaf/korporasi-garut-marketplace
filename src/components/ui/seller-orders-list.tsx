@@ -4,13 +4,17 @@ import OrderDeliveryReceipt from "./order-delivery-receipt";
 import { useOrderManagement } from "@/lib/hooks/context/useOrderManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import SellerOrderCard from "./seller-order-card";
+import { useSearchParams } from "next/navigation";
 
 export default function SellerOrderList() {
+  const searchParams = useSearchParams();
+  const orderState = searchParams.get("state") ?? "ALL";
+
   const { orders } = useOrderManagement();
 
   return (
     <Tabs
-      defaultValue="ALL"
+      defaultValue={orderState}
       className="w-full flex flex-col gap-4 overflow-hidden"
     >
       <TabsList className="overflow-x-auto">
