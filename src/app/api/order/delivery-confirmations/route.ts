@@ -22,8 +22,10 @@ async function handler(request: NextRequest) {
       include: {
         order_item: {
           select: {
+            order_quantity: true,
             product: {
               select: {
+                id: true,
                 seller_id: true,
               },
             },
@@ -33,6 +35,19 @@ async function handler(request: NextRequest) {
     });
 
     if (updateOrderStatus) {
+      for (const item of updateOrderStatus.order_item) {
+        await db.product.update({
+          where: {
+            id: item.product.id
+          },
+          data: {
+            sold_count: {
+              increment: item.order_quantity
+            }
+          }
+        })
+      };
+      
       await sendNotificationHandler({
         notification_redirect_url: "/user/dashboard/seller-orders?state=DELIVERED",
         notification_title: `Pesanan dengan ID ${body.order_id} telah diterima oleh pelanggan.`,
