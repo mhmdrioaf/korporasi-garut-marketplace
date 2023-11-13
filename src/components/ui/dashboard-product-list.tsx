@@ -77,7 +77,7 @@ export default function DashboardProductList({
           products.map((product) => (
             <div
               key={product.id}
-              className="w-full flex flex-row items-center justify-between gap-1 p-2 rounded-md border border-input"
+              className="w-full grid grid-cols-6 gap-1 p-2 rounded-md border border-input"
             >
               <div className="w-48 h-auto aspect-square rounded-sm overflow-hidden relative">
                 <Image
@@ -89,19 +89,19 @@ export default function DashboardProductList({
                 />
               </div>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 col-span-2 self-center">
                 <p className="text-xl font-bold">{product.title}</p>
                 <p className="text-sm">
                   Stok tersedia: {product.stock} {product.unit}
                 </p>
-                <p className="text-sm">Total produk terjual: 30</p>
+                <p className="text-sm">Total produk terjual: {product.sold_count} {product.unit}</p>
               </div>
 
-              <p className="font-bold text-xl">
+              <p className="font-bold text-xl col-span-2 self-center">
                 {rupiahConverter(product.price)}
               </p>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2 self-center">
                 <Link
                   href={ROUTES.PRODUCT.EDIT(product.id.toString())}
                   className="grid place-items-center bg-secondary text-secondary-foreground text-sm px-4 py-2 rounded-md"
