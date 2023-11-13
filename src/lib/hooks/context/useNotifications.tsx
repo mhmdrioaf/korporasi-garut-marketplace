@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { TNotificationContext } from "./notificationContext";
-import useSWR, { mutate, useSWRConfig } from "swr";
+import useSWR from "swr";
 import { fetcher } from "@/lib/helper";
 import { readNotification } from "@/lib/actions/notification";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ interface INotificationContextProviderProps {
 
 export function NotificationContextProvider({ children, subscriber_id }: INotificationContextProviderProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const [notification, setNotification] = useState<TNotification | null>(null)
 
     const router = useRouter();
 
@@ -36,20 +37,14 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
             notification_item_id: string;
         }
     ) => {
-        let currentNotifications: TNotification = notificationsData.result;
-        let currentNotificationItems = currentNotifications.items;
-        let currentNotificationItem = currentNotificationItems.find(item => item.notification_item_id === body.notification_item_id);
-        currentNotificationItem!.status = "READ";
-
         try {
-            await mutate(readNotification(body), {
-                optimisticData: currentNotifications,
-                rollbackOnError: true,
-                populateCache: true,
-                revalidate: false
-            })
+            const updatedNotification = await readNotification(body);
+            if (updatedNotification) {
+                setNotification(updatedNotification);
+                await mutate("/api/notifications/get");
+            }
         } catch (error) {
-            console.error("Error reading notification", error)
+            console.error(error);          
         }
     }
 
@@ -65,11 +60,12 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
             notification_item_id: body.notification_item_id,
             notification_id: body.notification_id
         })
+        toggleOpen();
     }
 
     const value: TNotificationContext = {
         data: {
-            notification: notificationsData ? notificationsData.result : null
+            notification: notification
         },
         state: {
             loading: notificationsLoading || notificationsValidating,
@@ -82,6 +78,13 @@ export function NotificationContextProvider({ children, subscriber_id }: INotifi
             actionButtonClick: actionButtonClick
         }
     }
+
+    useEffect(() => {
+        if (notificationsData) {
+            setNotification(notificationsData.result)
+        }
+    
+    }, [notificationsData])
 
     return (
         <NotificationContext.Provider value={value}>
