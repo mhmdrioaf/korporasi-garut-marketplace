@@ -74,7 +74,10 @@ export function NotificationCard({ notification, variant }: { notification: TNot
                             </DropdownMenuItem>
                             )}
                             <DropdownMenuItem>
-                                <Button className="w-full items-center justify-start" variant="ghost" size="sm">
+                                <Button className="w-full items-center justify-start" variant="ghost" size="sm" onClick={() => handler.delete({
+                                    notification_id: notification.notification_id,
+                                    notification_item_id: notification.notification_item_id
+                                })}>
                                     <Trash2Icon className="w-4 h-4 mr-2" />
                                     <span>Hapus notifikasi</span>
                                 </Button>
