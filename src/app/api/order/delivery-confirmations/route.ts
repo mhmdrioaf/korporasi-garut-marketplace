@@ -1,3 +1,4 @@
+import { sendNotificationHandler } from "@/lib/actions/notification";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,9 +19,26 @@ async function handler(request: NextRequest) {
         order_status: "DELIVERED",
         order_delivered_date: date,
       },
+      include: {
+        order_item: {
+          select: {
+            product: {
+              select: {
+                seller_id: true,
+              },
+            },
+          }
+        }
+      }
     });
 
     if (updateOrderStatus) {
+      await sendNotificationHandler({
+        notification_redirect_url: "/user/dashboard/seller-orders?state=DELIVERED",
+        notification_title: `Pesanan dengan ID ${body.order_id} telah diterima oleh pelanggan.`,
+        subscriber_target: updateOrderStatus.order_item[0].product.seller_id.toString(),
+      })
+      
       return NextResponse.json({
         ok: true,
         message: "Berhasil mengkonfimasi penerimaan pesanan.",
