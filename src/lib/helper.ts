@@ -419,3 +419,11 @@ export const calculateCartCosts = (
 export const convertStringToBoolean = (value: "true" | "false") => {
   return value === "true";
 };
+
+export const showProductSoldCount = (sold_count: number) => {
+  if (sold_count <= 99) {
+    return sold_count.toString();
+  } else {
+    return "99+"
+  }
+}
