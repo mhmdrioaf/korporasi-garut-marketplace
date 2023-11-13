@@ -51,3 +51,27 @@ export async function deleteNotificationHandler(
         return undefined
     }
 }
+
+export async function readAllNotificationsHandler(
+    body: {
+        notification_id: string
+    }
+) {
+    const res = await fetch("/api/notifications/read-all", {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            notification_id: body.notification_id
+        })
+    })
+
+    const response = await res.json();
+
+    if (response.ok) {
+        return response.result as TNotification
+    } else {
+        return undefined
+    }
+}
