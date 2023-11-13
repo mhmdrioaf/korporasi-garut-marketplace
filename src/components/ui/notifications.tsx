@@ -108,7 +108,7 @@ export function NotificationCard({ notification, variant }: { notification: TNot
 }
 
 export function NotificationContent({ className }: { className?: string }) {
-    const { data, state } = useNotifications();
+    const { data, state, handler } = useNotifications();
 
     return state.isOpen ? (
         <div className={`w-96 min-h-[16rem] max-h-[28rem] rounded-md shadow-lg bg-white border border-input overflow-auto ${className}`}>
@@ -117,7 +117,8 @@ export function NotificationContent({ className }: { className?: string }) {
                 <div className="w-full flex flex-col sticky top-0 left-0 bg-background border-b border-b-input p-4 z-50">
                     <div className="w-full flex flex-row items-center justify-between">
                         <p className="text-xl font-bold text-primary">Notifikasi</p>
-                        <DropdownMenu>
+                        {data.notification && data.notification.items.length > 0 && (
+                            <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="ghost" size="icon">
                                     <MoreVerticalIcon className="w-4 h-4" />
@@ -125,7 +126,7 @@ export function NotificationContent({ className }: { className?: string }) {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
                                 <DropdownMenuItem>
-                                    <Button className="w-full items-center justify-start" variant="ghost" size="sm">
+                                    <Button className="w-full items-center justify-start" variant="ghost" size="sm" onClick={() => handler.readAll({ notification_id: data.notification ? data.notification.notification_id : "" })}>
                                         <MailOpenIcon className="w-4 h-4 mr-2" />
                                         <span>Tandai semua telah dibaca</span>
                                     </Button>
@@ -138,6 +139,7 @@ export function NotificationContent({ className }: { className?: string }) {
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
+                        )}
                     </div>
                     <p className="text-xs text-stone-500">Berikut merupakan notifikasi yang diterima dari SMKs Korporasi Garut Marketplace</p>
                 </div>
