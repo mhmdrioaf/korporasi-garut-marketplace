@@ -1,3 +1,4 @@
+import { sendNotificationHandler, sendSellerNotificationHandler } from "@/lib/actions/notification";
 import { db } from "@/lib/db";
 import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
@@ -14,6 +15,25 @@ interface IUpdateStatusBody {
 async function handler(request: NextRequest) {
   const body: IUpdateStatusBody = await request.json();
   const token = request.headers.get("token");
+
+  const notificationDetail = () => {
+    if (body.order_status === "SHIPPED") {
+      return {
+        message: `Pesanan dengan ID ${body.order_id} telah dikirim.`,
+        redirect_url: "/user/dashboard/orders?state=SHIPPED",
+      };
+    } else if (body.order_status === "PACKED") {
+      return {
+        message: `Pesanan dengan ID ${body.order_id} sedang dikemas.`,
+        redirect_url: "/user/dashboard/orders?state=PACKED",
+      };
+    } else if (body.order_status === "DELIVERED") {
+      return {
+        message: `Pesanan dengan ID ${body.order_id} telah diterima oleh pelanggan.`,
+        redirect_url: "/seller/dashboard/orders?state=DELIVERED",
+      };
+    }
+  }
 
   if (
     token &&
@@ -56,9 +76,34 @@ async function handler(request: NextRequest) {
             order_status: body.order_status,
             delivery_receipt: body.delivery_receipt,
           },
+          include: {
+            order_item: {
+              select: {
+                product: {
+                  select: {
+                    seller_id: true,
+                  },
+                },
+              },
+            }
+          }
         });
 
         if (updateOrderStatus) {
+          const _notificationDetail = notificationDetail();
+          if (_notificationDetail) {
+            const customerNotification = sendNotificationHandler({
+              notification_redirect_url: _notificationDetail.redirect_url,
+              notification_title: _notificationDetail.message,
+              subscriber_target: updateOrderStatus.user_id.toString(),
+            });
+
+            const sellerNotification = sendSellerNotificationHandler({
+              seller_id: updateOrderStatus.order_item[0].product.seller_id.toString(),
+            });
+
+            await Promise.all([customerNotification, sellerNotification]);
+          }
           revalidateTag("seller-orders");
           return NextResponse.json({
             ok: true,

@@ -99,3 +99,55 @@ export async function deleteAllNotificationsHandler(
         return undefined
     }
 }
+
+export async function sendNotificationHandler(
+    body: {
+        subscriber_target: string;
+        notification_title: string;
+        notification_redirect_url: string;
+    }
+) {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_SEND!, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            subscriber_target: body.subscriber_target,
+            notification_title: body.notification_title,
+            notification_redirect_url: body.notification_redirect_url,
+        })
+    })
+
+    const response = await res.json();
+
+    if (response.ok) {
+        return response.result as TNotification
+    } else {
+        return undefined
+    }
+}
+
+export async function sendSellerNotificationHandler(
+    body: {
+        seller_id: string;
+    }
+) {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_SEND_SELLER!, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            seller_id: body.seller_id,
+        })
+    })
+
+    const response = await res.json();
+
+    if (response.ok) {
+        return response.result as TNotification
+    } else {
+        return undefined
+    }
+}
