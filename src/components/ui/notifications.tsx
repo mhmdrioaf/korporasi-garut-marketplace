@@ -132,7 +132,7 @@ export function NotificationContent({ className }: { className?: string }) {
                                     </Button>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem>
-                                    <Button className="w-full items-center justify-start" variant="ghost" size="sm">
+                                    <Button className="w-full items-center justify-start" variant="ghost" size="sm" onClick={() => handler.deleteAll({ notification_id: data.notification ? data.notification.notification_id : "" })}>
                                         <Trash2Icon className="w-4 h-4 mr-2" />
                                         <span>Hapus semua notifikasi</span>
                                     </Button>
