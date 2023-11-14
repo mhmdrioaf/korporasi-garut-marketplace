@@ -135,7 +135,7 @@ export default function DirectPurchaseOrderDetail() {
         <p className="font-bold">Rincian Biaya</p>
         <div className="grid grid-cols-2 gap-2">
           <p className="font-bold">Harga Barang</p>
-          <p>{rupiahConverter(product.price)}</p>
+          <p>{rupiahConverter(variants.variantValue ? variants.variantValue.variant_price : product.price)}</p>
           <p className="font-bold">Jumlah Barang</p>
           <p>
             {quantity.productQuantity} {product.unit}
@@ -145,12 +145,6 @@ export default function DirectPurchaseOrderDetail() {
               <p className="font-bold">Varian Barang</p>
               <div className="flex flex-row items-center gap-1">
                 <p>{variants.variantValue.variant_name}</p>
-                {variants.variantValue.variant_price > 0 && (
-                  <p className="text-green-950">
-                    + {rupiahConverter(variants.variantValue.variant_price)} /{" "}
-                    {product.unit}
-                  </p>
-                )}
               </div>
             </>
           )}
