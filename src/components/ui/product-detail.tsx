@@ -23,6 +23,7 @@ import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import ProductVariants from "./product-variant";
 import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
+import VariantChooser from "./variant-chooser";
 
 export default function ProductDetail() {
   const { product, image, price, variants, cart, quantity, state } =
@@ -197,7 +198,7 @@ export default function ProductDetail() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={cart.handler.onAddToCart}
+                onClick={() => state.isWarning ? variants.handler.showVariantChooser("cart") : cart.handler.onAddToCart()}
                 disabled={cart.loading}
               >
                 Tambahkan ke Keranjang
@@ -227,6 +228,8 @@ export default function ProductDetail() {
           </p>
         </div>
       </div> */}
+
+      <VariantChooser isOpen={state.isVariantChooserOpen} variant={product.variant} />
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">
