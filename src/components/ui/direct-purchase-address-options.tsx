@@ -13,7 +13,12 @@ export default function DirectPurchaseAddressOptions() {
   return order.handler.isModalOpen(1) ? (
     <div className="w-full flex flex-col gap-4">
       <div className="w-full flex flex-col gap-2">
-        <p className="text-2xl font-bold text-primary">Pemilihan Alamat</p>
+        <div className="w-full flex flex-row items-center justify-between">
+          <p className="text-xl font-bold text-primary">Pemilihan Alamat</p>
+          <Button variant="default" asChild>
+            <Link href={ROUTES.USER.ADD_ADDRESS}>Tambah Alamat</Link>
+          </Button>
+        </div>
         <p className="text-sm">
           Silahkan pilih alamat yang akan anda gunakan untuk pengiriman.
         </p>

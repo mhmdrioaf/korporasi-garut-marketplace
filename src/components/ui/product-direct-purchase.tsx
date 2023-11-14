@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 
 export default function ProductDirectPurchase() {
-  const { order, customer, handler } = useDirectPurchase();
+  const { order, customer, handler, state, variants } = useDirectPurchase();
 
   const dotsStyles = "w-4 h-4 rounded-full ";
   return (
@@ -58,7 +58,7 @@ export default function ProductDirectPurchase() {
       )}
       <Button
         variant="default"
-        onClick={order.handler.onOrder}
+        onClick={() => state.isWarning ? variants.handler.showVariantChooser("buy") : order.handler.onOrder()}
         disabled={customer.loading}
         className="w-fit shrink-0"
       >

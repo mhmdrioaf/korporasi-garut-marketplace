@@ -16,6 +16,8 @@ type TDirectPurchaseContext = {
 
     handler: {
       onVariantsChange: (variant: TProductVariantItem) => void;
+      showVariantChooser: (ctx: "cart" | "buy") => void;
+      closeVariantChooser: () => void;
     };
   };
   quantity: {
@@ -85,11 +87,14 @@ type TDirectPurchaseContext = {
     loading: boolean;
 
     handler: {
-      onAddToCart: () => void;
+      onAddToCart: () => Promise<void>;
     };
   };
 
   state: {
     isWarning: boolean;
+    isVariantChooserOpen: boolean;
+    setVariantChooserOpen: (isVariantChooser: boolean) => void;
+    variantChooserContext: "cart" | "buy" | null;
   };
 };

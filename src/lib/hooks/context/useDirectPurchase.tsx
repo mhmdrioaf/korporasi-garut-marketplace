@@ -56,6 +56,8 @@ export function DirectPurchaseProvider({
   const [cartLoading, setCartLoading] = useState(false);
 
   const [isWarning, setIsWarning] = useState(false);
+  const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
+  const [variantChooserContext, setVariantChooserContext] = useState<"cart" | "buy" | null>(null);
 
   const defaultPrice = variantsValue
     ? variantsValue.variant_price * productQuantity
@@ -144,6 +146,18 @@ export function DirectPurchaseProvider({
     }
   };
 
+  const showVariantChooser = (ctx: "cart" | "buy") => {
+    if (product.variant && !variantsValue) {
+      setIsVariantChooserOpen(true);
+      setVariantChooserContext(ctx);
+    }
+  }
+
+  const closeVariantChooser = () => {
+    setIsVariantChooserOpen(false);
+    setVariantChooserContext(null);
+  }
+
   const onAddToCart = async () => {
     setCartLoading(true);
     try {
@@ -179,6 +193,7 @@ export function DirectPurchaseProvider({
             description: response.message,
           });
           mutate("/api/cart-list");
+          setIsVariantChooserOpen(false);
         }
       }
     } catch (error) {
@@ -294,16 +309,6 @@ export function DirectPurchaseProvider({
     const unsub = () => {
       if (product.variant && !variantsValue) {
         setIsWarning(true);
-        const defaultVariant = product.variant.variant_item.find(
-          (variant) => variant.variant_price === product.price
-        );
-        if (defaultVariant) {
-          onVariantsChangeHandler(defaultVariant);
-          setWithVariants(true);
-          setIsWarning(false);
-        } else {
-          setIsWarning(true);
-        }
       }
     };
 
@@ -313,6 +318,8 @@ export function DirectPurchaseProvider({
   useEffect(() => {
     if (product.variant && !variantsValue) {
       setIsWarning(true);
+    } else {
+      setIsWarning(false);
     }
   }, [product.variant, variantsValue]);
 
@@ -358,6 +365,8 @@ export function DirectPurchaseProvider({
 
       handler: {
         onVariantsChange: onVariantsChangeHandler,
+        showVariantChooser: showVariantChooser,
+        closeVariantChooser: closeVariantChooser,
       },
     },
     handler: {
@@ -395,6 +404,9 @@ export function DirectPurchaseProvider({
     },
     state: {
       isWarning: isWarning,
+      isVariantChooserOpen: isVariantChooserOpen,
+      setVariantChooserOpen: setIsVariantChooserOpen,
+      variantChooserContext: variantChooserContext,
     },
   };
 
