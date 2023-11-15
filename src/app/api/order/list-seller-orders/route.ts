@@ -56,6 +56,9 @@ async function handler(request: NextRequest) {
             },
           },
         },
+        orderBy: {
+          order_date: "desc",
+        },
       });
 
       if (sellerOrders) {
