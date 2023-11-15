@@ -1,6 +1,6 @@
 "use client";
 
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
+import { ORDER_STATUS, TOrder, TSellerOrder } from "@/lib/globals";
 import { ReactNode, createContext, useContext, useState } from "react";
 import {
   IOrderDeliveryReceiptInput,
@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader2Icon } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { sortOrders } from "@/lib/helper";
 
 export const OrderManagementContext =
   createContext<TOrderManagementContext | null>(null);
@@ -51,7 +52,7 @@ export function OrderManagementContextProvider({
   });
 
   const orders = {
-    ALL: orders_data,
+    ALL: sortOrders(orders_data) as TSellerOrder[],
     PENDING: orders_data.filter((order) => order.order_status === "PENDING"),
     PAID: orders_data.filter((order) => order.order_status === "PAID"),
     PACKED: orders_data.filter((order) => order.order_status === "PACKED"),
