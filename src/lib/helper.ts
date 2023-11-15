@@ -3,8 +3,8 @@ import {
   TProduct,
   ORDER_STATUS,
   TProductVariantItem,
-  TOrder,
   TCustomerOrder,
+  TSellerOrder,
 } from "./globals";
 import supabase from "./supabase";
 
@@ -430,7 +430,7 @@ export const showProductSoldCount = (sold_count: number) => {
   }
 }
 
-export const sortOrders = (orders: TOrder[] | TCustomerOrder[]) => {
+export const sortOrders = (orders: TSellerOrder[] | TCustomerOrder[]) => {
   const firstOrdersStatus: ORDER_STATUS = "PENDING";
   
   const sortedOrders = orders.sort((a, b) => {
