@@ -1,10 +1,13 @@
 "use client";
 
 import { ORDER_STATUS, TCustomerOrder } from "@/lib/globals";
-import OrderCard from "./order-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import { useSearchParams } from "next/navigation";
 import { sortOrders } from "@/lib/helper";
+import dynamic from "next/dynamic";
+import Loading from "@/app/loading";
+
+const OrderCard = dynamic(() => import("./order-card"), {ssr: false, loading: () => <Loading />})
 
 interface ICustomerOrdersListProps {
   orders: TCustomerOrder[];
