@@ -42,6 +42,9 @@ async function handler(
         },
       },
     },
+    orderBy: {
+      order_date: "desc"
+    }
   });
 
   if (userOrders) {
