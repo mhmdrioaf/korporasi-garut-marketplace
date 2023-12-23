@@ -97,6 +97,18 @@ async function handler(request: NextRequest) {
     });
 
     if (createOrder) {
+      if (body.product_variant) {
+        await db.product_variant_item.update({
+          where: {
+            variant_item_id: body.product_variant.variant_item_id,
+          },
+          data: {
+            pending_order_count: {
+              increment: body.product_quantity,
+            },
+          },
+        });
+      }
       return NextResponse.json({ ok: true });
     } else {
       return NextResponse.json({ ok: false });
