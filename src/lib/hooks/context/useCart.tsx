@@ -12,6 +12,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -54,6 +55,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
   const [chosenCourier, setChosenCourier] = useState<ICourierBySeller>({});
 
   const [isOrdering, setIsOrdering] = useState<boolean>(false);
+  const [isPreOrder, setIsPreOrder] = useState<boolean>(false);
 
   const {
     data: cartData,
@@ -545,6 +547,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
           total_shipping_cost: totalShippingCost,
           customer_id: user_id,
           shipping_address: chosenAddress.address_id,
+          isPreorder: isPreOrder,
         }),
       });
 
@@ -570,6 +573,37 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       console.error("Error terjadi ketika membuat pesanan: ", error);
     }
   };
+
+  useEffect(() => {
+    if (checkedItems) {
+      let _isPreorder: boolean[] = [];
+      for (let sellerId in checkedItems) {
+        const sellerID = parseInt(sellerId);
+        for (let cartItemId in checkedItems[sellerID]) {
+          const cartItem = checkedItems[sellerID][cartItemId];
+          const variant = cartItem.variant;
+          const quantity = cartItem.quantity;
+
+          if (variant) {
+            const pendingOrder = variant.pending_order_count;
+            const stock = variant.variant_stock;
+
+            const preOrder = pendingOrder + quantity > stock || stock === 0;
+
+            _isPreorder.push(preOrder);
+          }
+        }
+      }
+
+      if (_isPreorder.includes(true)) {
+        setIsPreOrder(true);
+      } else {
+        setIsPreOrder(false);
+      }
+    } else {
+      setIsPreOrder(false);
+    }
+  }, [checkedItems]);
 
   const values: TCartContext = {
     cartItems: {
@@ -634,6 +668,9 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
         resetCheckoutState: resetCheckoutState,
         order: onCheckout,
       },
+    },
+    state: {
+      isPreOrder: isPreOrder,
     },
   };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { TAddress, TCustomerCartItem, TShippingCost } from "@/lib/globals";
-import { rupiahConverter } from "@/lib/helper";
+import { rupiahConverter, shippingEstimation } from "@/lib/helper";
 import { useCart } from "@/lib/hooks/context/useCart";
 import { CheckIcon } from "lucide-react";
 import { Button } from "./ui/button";
@@ -24,11 +24,13 @@ export default function CartCheckoutShippingCost({
   const [shippingCost, setShippingCost] = useState<TShippingCost[] | null>(
     null
   );
-  const { checkout } = useCart();
+  const { checkout, state } = useCart();
 
   const isButtonDisabled = (etd: number) => {
     const itemsStoragePeriod = items.map((item) => item.product.storage_period);
-    return itemsStoragePeriod.some((period) => period <= etd);
+    return state.isPreOrder
+      ? itemsStoragePeriod.some((period) => period + 7 <= etd)
+      : itemsStoragePeriod.some((period) => period <= etd);
   };
 
   const shippingCostStyle = "w-full flex flex-row items-center justify-between";
@@ -71,7 +73,12 @@ export default function CartCheckoutShippingCost({
                       <p className="font-bold">Harga</p>
                       <p>{rupiahConverter(cost.value)}</p>
                       <p className="font-bold">Estimasi Pengiriman</p>
-                      <p>{cost.etd} Hari</p>
+                      <p>
+                        {state.isPreOrder
+                          ? shippingEstimation(cost.etd) + 7
+                          : shippingEstimation(cost.etd)}{" "}
+                        Hari
+                      </p>
                     </div>
 
                     {isChosen(cost.value) ? (
@@ -83,11 +90,15 @@ export default function CartCheckoutShippingCost({
                           checkout.handler.changeCourier(sellerID, cost)
                         }
                         disabled={isButtonDisabled(
-                          parseInt(cost.etd.charAt(cost.etd.length - 1))
+                          state.isPreOrder
+                            ? shippingEstimation(cost.etd) + 7
+                            : shippingEstimation(cost.etd)
                         )}
                       >
                         {isButtonDisabled(
-                          parseInt(cost.etd.charAt(cost.etd.length - 1))
+                          state.isPreOrder
+                            ? shippingEstimation(cost.etd) + 7
+                            : shippingEstimation(cost.etd)
                         )
                           ? "Tidak dapat dikirimkan ke alamat ini"
                           : "Pilih Kurir"}

@@ -1,4 +1,7 @@
-import { sendNotificationHandler, sendSellerNotificationHandler } from "@/lib/actions/notification";
+import {
+  sendNotificationHandler,
+  sendSellerNotificationHandler,
+} from "@/lib/actions/notification";
 import { db } from "@/lib/db";
 import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
@@ -28,7 +31,7 @@ async function handler(request: NextRequest) {
         redirect_url: "/user/dashboard/orders?state=PACKED",
       };
     }
-  }
+  };
 
   if (
     token &&
@@ -45,6 +48,9 @@ async function handler(request: NextRequest) {
                 },
                 data: {
                   variant_stock: {
+                    decrement: item.order_quantity,
+                  },
+                  pending_order_count: {
                     decrement: item.order_quantity,
                   },
                 },
@@ -80,8 +86,8 @@ async function handler(request: NextRequest) {
                   },
                 },
               },
-            }
-          }
+            },
+          },
         });
 
         if (updateOrderStatus) {

@@ -3,6 +3,7 @@
 import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import {
   getDateString,
+  getOrderType,
   orderStatusConverter,
   phoneNumberGenerator,
   rupiahConverter,
@@ -57,6 +58,8 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
                     <p>{getDateString(order.order_date)}</p>
                     <p className="font-bold">Dipesan Oleh</p>
                     <p>{order.user.account?.user_name}</p>
+                    <p className="font-bold">Tipe Pesanan</p>
+                    <p>{getOrderType(order.order_type)}</p>
                   </div>
                 </div>
 

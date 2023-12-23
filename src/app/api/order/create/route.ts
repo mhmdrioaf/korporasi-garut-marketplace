@@ -1,9 +1,6 @@
 import { db } from "@/lib/db";
 import { TAddress, TProduct, TProductVariantItem } from "@/lib/globals";
-import {
-  customerOrderIdGenerator,
-  customerOrderItemIdGenerator,
-} from "@/lib/helper";
+import { customerOrderIdGenerator } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IOrderCreateBody {
@@ -14,6 +11,7 @@ interface IOrderCreateBody {
   shipping_address: TAddress;
   shipping_cost: number;
   total_price: number;
+  isPreorder: boolean;
 }
 
 async function handler(request: NextRequest) {
@@ -36,43 +34,6 @@ async function handler(request: NextRequest) {
     );
     const newOrderId = customerOrderIdGenerator(currentMaxId + 1);
 
-    const maxOrderItemID = await db.order_item.aggregate({
-      where: {
-        AND: [
-          {
-            order_id: {
-              equals: newOrderId,
-            },
-          },
-          {
-            product_id: {
-              equals: body.product.id,
-            },
-          },
-          {
-            orders: {
-              user_id: {
-                equals: parseInt(body.user_id),
-              },
-            },
-          },
-        ],
-      },
-      _max: {
-        order_item_id: true,
-      },
-    });
-
-    const orderItemMaxId = maxOrderItemID._max.order_item_id;
-    const currentMaxItemId = Number(
-      orderItemMaxId?.slice(orderItemMaxId.length - 3, orderItemMaxId.length) ??
-        0
-    );
-    const newOrderItemId = customerOrderItemIdGenerator(
-      body.product.title,
-      currentMaxItemId + 1
-    );
-
     const createOrder = await db.orders.create({
       data: {
         order_id: newOrderId,
@@ -80,23 +41,30 @@ async function handler(request: NextRequest) {
         total_price: body.total_price,
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
+        order_type: body.isPreorder ? "PREORDER" : "NORMAL",
         order_item: {
-          connectOrCreate: {
-            where: {
-              order_item_id: newOrderItemId,
-            },
-            create: {
-              order_item_id: newOrderItemId,
-              order_quantity: body.product_quantity,
-              product_id: body.product.id,
-              product_variant_id: body.product_variant?.variant_item_id ?? null,
-            },
+          create: {
+            order_quantity: body.product_quantity,
+            product_id: body.product.id,
+            product_variant_id: body.product_variant?.variant_item_id ?? null,
           },
         },
       },
     });
 
     if (createOrder) {
+      if (body.product_variant) {
+        await db.product_variant_item.update({
+          where: {
+            variant_item_id: body.product_variant.variant_item_id,
+          },
+          data: {
+            pending_order_count: {
+              increment: body.product_quantity,
+            },
+          },
+        });
+      }
       return NextResponse.json({ ok: true });
     } else {
       return NextResponse.json({ ok: false });

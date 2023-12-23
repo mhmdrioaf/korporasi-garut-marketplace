@@ -123,4 +123,8 @@ type TCartContext = {
       order: () => void;
     };
   };
+
+  state: {
+    isPreOrder: boolean;
+  };
 };

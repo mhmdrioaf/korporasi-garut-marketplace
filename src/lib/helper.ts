@@ -349,7 +349,8 @@ export const invoiceMaker = async (
   shipping_address: TAddress,
   shipping_cost: number,
   product_variant: TProductVariantItem | null,
-  total_price: number
+  total_price: number,
+  isPreorder: boolean = false
 ) => {
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
@@ -363,6 +364,7 @@ export const invoiceMaker = async (
         product_variant: product_variant,
         total_price: total_price,
         shipping_cost: shipping_cost,
+        isPreorder: isPreorder,
       }),
     });
 
@@ -426,13 +428,13 @@ export const showProductSoldCount = (sold_count: number) => {
   if (sold_count <= 99) {
     return sold_count.toString();
   } else {
-    return "99+"
+    return "99+";
   }
-}
+};
 
 export const sortOrders = (orders: TSellerOrder[] | TCustomerOrder[]) => {
   const firstOrdersStatus: ORDER_STATUS = "PENDING";
-  
+
   const sortedOrders = orders.sort((a, b) => {
     if (a.order_status === firstOrdersStatus) {
       return -1;
@@ -442,4 +444,23 @@ export const sortOrders = (orders: TSellerOrder[] | TCustomerOrder[]) => {
   });
 
   return sortedOrders;
+};
+
+export const shippingEstimation = (days: string) => {
+  const daysNumber = days.split("-");
+  const dayTo = parseInt(daysNumber[1]);
+
+  return dayTo;
+};
+
+export const getOrderType = (orderType: "NORMAL" | "PREORDER") => {
+  switch (orderType) {
+    case "NORMAL":
+      return "Reguler";
+    case "PREORDER":
+      return "Pre-order";
+
+    default:
+      return "Reguler";
+  }
 };

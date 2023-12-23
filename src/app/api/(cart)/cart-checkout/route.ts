@@ -9,6 +9,7 @@ interface ICartCheckoutBody {
   total_shipping_cost: number;
   customer_id: string;
   shipping_address: string;
+  isPreorder: boolean;
 }
 
 async function handler(request: NextRequest) {
@@ -50,6 +51,7 @@ async function handler(request: NextRequest) {
         },
         user_id: parseInt(body.customer_id),
         shipping_address: body.shipping_address,
+        order_type: body.isPreorder ? "PREORDER" : "NORMAL",
       },
     });
 

@@ -7,13 +7,19 @@ import CartItemDeleteModal from "./modals/cart-item-delete";
 import { Separator } from "./separator";
 import { Checkbox } from "./checkbox";
 import Image from "next/image";
-import { MinusCircleIcon, PlusCircleIcon, Trash2Icon } from "lucide-react";
+import {
+  AlertOctagon,
+  HelpCircleIcon,
+  MinusCircleIcon,
+  PlusCircleIcon,
+  Trash2Icon,
+} from "lucide-react";
 import CartCheckout from "./cart-checkout";
 import CartCheckoutProductsDetail from "./cart-checkout-products-detail";
 import CartCheckoutAddress from "./cart-checkout-address";
 
 export default function UserCartList() {
-  const { cart, cartItems, checkout } = useCart();
+  const { cart, cartItems, checkout, state } = useCart();
 
   function showCartItems() {
     const cartData = cart.items ? Object.keys(cart.items) : null;
@@ -204,6 +210,21 @@ export default function UserCartList() {
       </div>
 
       <div className="w-[calc(25%-4rem)] p-4 flex flex-col gap-2 rounded-md border border-input fixed justify-self-end">
+        {state.isPreOrder && (
+          <div className="w-full rounded-md flex flex-row justify-between items-center bg-blue-500 text-stone-50 px-2 py-2 text-sm">
+            <div className="flex flex-row items-center gap-2">
+              <AlertOctagon className="w-4 h-4" />
+              <p>Pesanan pre-order</p>
+            </div>
+
+            <div
+              className="cursor-pointer"
+              title="Pesanan ini merupakan pesanan pre-order, karena permintaan untuk salah satu produk dalam keranjang anda sedang mengalami peningkatan permintaan."
+            >
+              <HelpCircleIcon className="w-4 h-4 fill-yellow-500 text-stone-950" />
+            </div>
+          </div>
+        )}
         <p className="font-bold">Detail Belanja</p>
         <div className="w-full flex flex-row items-center justify-between text-sm">
           <p>Total Harga ({cartItems.checkedItemsCount} produk)</p>
