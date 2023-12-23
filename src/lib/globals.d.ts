@@ -41,6 +41,7 @@ type TProductVariantItem = {
   variant_name: string;
   variant_stock: number;
   variant_price: number;
+  pending_order_count: number;
 };
 
 type TUser = {
@@ -74,6 +75,7 @@ type TOrder = {
   total_price: number;
   delivery_receipt: string | null;
   payment_proof: string | null;
+  order_type: ORDER_TYPE;
 
   address: TAddress;
   user: TUser;
@@ -90,6 +92,7 @@ type TSellerOrder = {
   total_price: number;
   delivery_receipt: string | null;
   payment_proof: string | null;
+  order_type: ORDER_TYPE;
 
   address: TAddress | null;
   user: {
@@ -142,6 +145,7 @@ type TCustomerOrder = {
   total_price: number;
   delivery_receipt: string | null;
   payment_proof: string | null;
+  order_type: ORDER_TYPE;
 
   address: TAddress;
   user: TUser;
@@ -241,8 +245,8 @@ type TCustomerCartGroupedBySeller = {
 type TNotification = {
   notification_id: string;
   subscriber_id: number;
-  items: TNotificationItem[]
-}
+  items: TNotificationItem[];
+};
 
 type TNotificationItem = {
   notification_item_id: string;
@@ -253,6 +257,8 @@ type TNotificationItem = {
   notifiedAt: Date;
   show_action_button: boolean;
   status: NOTIFICATION_STATUS;
-}
+};
 
-type NOTIFICATION_STATUS = "UNREAD" | "READ"
+type NOTIFICATION_STATUS = "UNREAD" | "READ";
+
+type ORDER_TYPE = "NORMAL" | "PREORDER";
