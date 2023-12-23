@@ -547,6 +547,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
           total_shipping_cost: totalShippingCost,
           customer_id: user_id,
           shipping_address: chosenAddress.address_id,
+          isPreorder: isPreOrder,
         }),
       });
 
