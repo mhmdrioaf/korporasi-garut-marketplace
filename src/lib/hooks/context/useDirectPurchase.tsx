@@ -57,7 +57,11 @@ export function DirectPurchaseProvider({
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
-  const [variantChooserContext, setVariantChooserContext] = useState<"cart" | "buy" | null>(null);
+  const [variantChooserContext, setVariantChooserContext] = useState<
+    "cart" | "buy" | null
+  >(null);
+
+  const [isPreorder, setIsPreorder] = useState<boolean>(false);
 
   const defaultPrice = variantsValue
     ? variantsValue.variant_price * productQuantity
@@ -151,12 +155,12 @@ export function DirectPurchaseProvider({
       setIsVariantChooserOpen(true);
       setVariantChooserContext(ctx);
     }
-  }
+  };
 
   const closeVariantChooser = () => {
     setIsVariantChooserOpen(false);
     setVariantChooserContext(null);
-  }
+  };
 
   const onAddToCart = async () => {
     setCartLoading(true);
@@ -277,7 +281,8 @@ export function DirectPurchaseProvider({
           chosenAddress,
           shippingCost,
           variantsValue,
-          totalPrice
+          totalPrice,
+          isPreorder
         );
         if (!makeOrder.ok) {
           setOrderLoading(false);
@@ -322,6 +327,23 @@ export function DirectPurchaseProvider({
       setIsWarning(false);
     }
   }, [product.variant, variantsValue]);
+
+  useEffect(() => {
+    if (variantsValue) {
+      if (
+        variantsValue.pending_order_count >= variantsValue.variant_stock ||
+        variantsValue.variant_stock < 1 ||
+        productQuantity + variantsValue.pending_order_count >
+          variantsValue.variant_stock
+      ) {
+        setIsPreorder(true);
+      } else {
+        setIsPreorder(false);
+      }
+    } else {
+      setIsPreorder(false);
+    }
+  }, [variantsValue, productQuantity]);
 
   const value: TDirectPurchaseContext = {
     quantity: {
@@ -407,6 +429,7 @@ export function DirectPurchaseProvider({
       isVariantChooserOpen: isVariantChooserOpen,
       setVariantChooserOpen: setIsVariantChooserOpen,
       variantChooserContext: variantChooserContext,
+      isPreorder: isPreorder,
     },
   };
 

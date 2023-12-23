@@ -163,6 +163,16 @@ export default function ProductDetail() {
                 </p>
               </div>
             )}
+
+            {state.isPreorder && (
+              <div className="w-full bg-blue-400 text-stone-50 grid place-items-center px-2 py-2 rounded-sm font-medium">
+                <b>
+                  Pesanan ini merupakan pesanan pre-order, karena saat ini
+                  permintaan untuk produk ini sedang tinggi.
+                </b>
+              </div>
+            )}
+
             <div className="w-fit rounded-md flex flex-row items-center gap-2">
               <Button
                 variant="destructive"
@@ -189,7 +199,11 @@ export default function ProductDetail() {
                 <PlusIcon className="w-4 h-4" />
               </Button>
               <p className="text-sm font-bold">
-                Stok tersedia: {product.stock} {product.unit}
+                Stok tersedia:{" "}
+                {variants.withVariants
+                  ? variants.variantValue?.variant_stock
+                  : product.stock}{" "}
+                {product.unit}
               </p>
             </div>
 
@@ -198,7 +212,11 @@ export default function ProductDetail() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => state.isWarning ? variants.handler.showVariantChooser("cart") : cart.handler.onAddToCart()}
+                onClick={() =>
+                  state.isWarning
+                    ? variants.handler.showVariantChooser("cart")
+                    : cart.handler.onAddToCart()
+                }
                 disabled={cart.loading}
               >
                 Tambahkan ke Keranjang
@@ -229,7 +247,10 @@ export default function ProductDetail() {
         </div>
       </div> */}
 
-      <VariantChooser isOpen={state.isVariantChooserOpen} variant={product.variant} />
+      <VariantChooser
+        isOpen={state.isVariantChooserOpen}
+        variant={product.variant}
+      />
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">

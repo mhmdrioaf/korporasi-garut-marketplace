@@ -1,13 +1,13 @@
 "use client";
 
-import { rupiahConverter } from "@/lib/helper";
+import { rupiahConverter, shippingEstimation } from "@/lib/helper";
 import { Button } from "./button";
 import { Separator } from "./separator";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import { CheckIcon } from "lucide-react";
 
 export default function DirectPurchaseShippingCost() {
-  const { shipping: shippingData } = useDirectPurchase();
+  const { shipping: shippingData, state } = useDirectPurchase();
 
   const shippingCostStyle = "w-full flex flex-row items-center justify-between";
 
@@ -38,7 +38,12 @@ export default function DirectPurchaseShippingCost() {
                       <p className="font-bold">Harga</p>
                       <p>{rupiahConverter(cost.value)}</p>
                       <p className="font-bold">Estimasi Pengiriman</p>
-                      <p>{cost.etd} Hari</p>
+                      <p>
+                        {state.isPreorder
+                          ? shippingEstimation(cost.etd) + 7
+                          : shippingEstimation(cost.etd)}{" "}
+                        Hari
+                      </p>
                     </div>
 
                     {shippingData.chosenCourier &&

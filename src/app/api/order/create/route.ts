@@ -36,43 +36,6 @@ async function handler(request: NextRequest) {
     );
     const newOrderId = customerOrderIdGenerator(currentMaxId + 1);
 
-    const maxOrderItemID = await db.order_item.aggregate({
-      where: {
-        AND: [
-          {
-            order_id: {
-              equals: newOrderId,
-            },
-          },
-          {
-            product_id: {
-              equals: body.product.id,
-            },
-          },
-          {
-            orders: {
-              user_id: {
-                equals: parseInt(body.user_id),
-              },
-            },
-          },
-        ],
-      },
-      _max: {
-        order_item_id: true,
-      },
-    });
-
-    const orderItemMaxId = maxOrderItemID._max.order_item_id;
-    const currentMaxItemId = Number(
-      orderItemMaxId?.slice(orderItemMaxId.length - 3, orderItemMaxId.length) ??
-        0
-    );
-    const newOrderItemId = customerOrderItemIdGenerator(
-      body.product.title,
-      currentMaxItemId + 1
-    );
-
     const createOrder = await db.orders.create({
       data: {
         order_id: newOrderId,
@@ -81,16 +44,10 @@ async function handler(request: NextRequest) {
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
         order_item: {
-          connectOrCreate: {
-            where: {
-              order_item_id: newOrderItemId,
-            },
-            create: {
-              order_item_id: newOrderItemId,
-              order_quantity: body.product_quantity,
-              product_id: body.product.id,
-              product_variant_id: body.product_variant?.variant_item_id ?? null,
-            },
+          create: {
+            order_quantity: body.product_quantity,
+            product_id: body.product.id,
+            product_variant_id: body.product_variant?.variant_item_id ?? null,
           },
         },
       },

@@ -96,5 +96,6 @@ type TDirectPurchaseContext = {
     isVariantChooserOpen: boolean;
     setVariantChooserOpen: (isVariantChooser: boolean) => void;
     variantChooserContext: "cart" | "buy" | null;
+    isPreorder: boolean;
   };
 };
