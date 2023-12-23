@@ -1,9 +1,6 @@
 import { db } from "@/lib/db";
 import { TAddress, TProduct, TProductVariantItem } from "@/lib/globals";
-import {
-  customerOrderIdGenerator,
-  customerOrderItemIdGenerator,
-} from "@/lib/helper";
+import { customerOrderIdGenerator } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IOrderCreateBody {
@@ -14,6 +11,7 @@ interface IOrderCreateBody {
   shipping_address: TAddress;
   shipping_cost: number;
   total_price: number;
+  isPreorder: boolean;
 }
 
 async function handler(request: NextRequest) {
@@ -43,6 +41,7 @@ async function handler(request: NextRequest) {
         total_price: body.total_price,
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
+        order_type: body.isPreorder ? "PREORDER" : "NORMAL",
         order_item: {
           create: {
             order_quantity: body.product_quantity,
