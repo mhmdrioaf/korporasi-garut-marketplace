@@ -72,6 +72,7 @@ model orders {
   shipping_cost        Int
   delivery_receipt     String?
   payment_proof        String?
+  order_type           ORDER_TYPE   @default(NORMAL)
 
   address    address?     @relation(fields: [shipping_address], references: [address_id], onDelete: SetNull)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
@@ -211,4 +212,9 @@ enum PRODUCT_STATUS {
 enum NOTIFICATION_STATUS {
   UNREAD
   READ
+}
+
+enum ORDER_TYPE {
+  NORMAL
+  PREORDER
 }
