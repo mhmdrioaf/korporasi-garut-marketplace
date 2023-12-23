@@ -452,3 +452,15 @@ export const shippingEstimation = (days: string) => {
 
   return dayTo;
 };
+
+export const getOrderType = (orderType: "NORMAL" | "PREORDER") => {
+  switch (orderType) {
+    case "NORMAL":
+      return "Reguler";
+    case "PREORDER":
+      return "Pre-order";
+
+    default:
+      return "Reguler";
+  }
+};

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import {
   getDateString,
+  getOrderType,
   orderStatusConverter,
   rupiahConverter,
 } from "@/lib/helper";
@@ -182,6 +183,8 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                 <p>{order.address.full_address}</p>
                 <p className="font-bold">Ongkos Kirim</p>
                 <p>{rupiahConverter(order.shipping_cost)}</p>
+                <p className="font-bold">Tipe Pesanan</p>
+                <p>{getOrderType(order.order_type)}</p>
               </div>
 
               <div className="flex flex-col gap-2 justify-self-end self-center">
