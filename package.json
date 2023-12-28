@@ -31,7 +31,6 @@
     "autoprefixer": "10.4.16",
     "bcrypt": "^5.1.1",
     "browser-image-compression": "^2.0.2",
-    "chart.js": "^4.4.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
     "create-next-app": "^14.0.4",
