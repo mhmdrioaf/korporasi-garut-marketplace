@@ -464,3 +464,80 @@ export const getOrderType = (orderType: "NORMAL" | "PREORDER") => {
       return "Reguler";
   }
 };
+
+export const getSales = (
+  salesData: TSalesReportData[],
+  start: number,
+  end: number
+) => {
+  const monthStrings = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+  const dates = salesData.map((data) => {
+    const date = new Date(data.order_date);
+    const month = date.getMonth();
+
+    return month;
+  });
+
+  const salesDatasets: { [key: string]: number } = {};
+
+  for (let key = start; key <= end; key++) {
+    salesDatasets[monthStrings[key]] = dates.filter(
+      (value) => value === key
+    ).length;
+  }
+
+  return salesDatasets;
+};
+
+export const getMonthString = (start: number, end: number) => {
+  const monthStrings = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  console.log(monthStrings.slice(start, end));
+
+  return monthStrings.slice(start, end);
+};
+
+export const getTotalProducts = (
+  salesData: TSalesReportData[],
+  start: number,
+  end: number
+) => {
+  const data = salesData.filter((data) => {
+    const date = new Date(data.order_date);
+    const month = date.getMonth();
+
+    return month >= start && month <= end;
+  });
+
+  const items = data.flatMap((data) => data.order_item);
+  const totalProducts = items.map((item) => item.order_quantity);
+  const total = totalProducts.reduce((a, b) => a + b, 0);
+
+  return total;
+};
