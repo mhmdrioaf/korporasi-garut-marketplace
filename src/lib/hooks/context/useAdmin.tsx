@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import useSWR from "swr";
+import { Chart as ChartJS, registerables } from "chart.js";
 
 interface IAdminProviderProps {
   token: string;
@@ -44,17 +45,21 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     mutate,
   } = useSWR("/api/report/getSales", fetcher);
 
-  console.log(salesData);
-
   useEffect(() => {
-    if (startDate && endDate) {
+    if (startDate || endDate) {
       mutate();
     }
   }, [startDate, endDate, mutate]);
 
   useEffect(() => {
-    mutate();
+    if (year) {
+      mutate();
+    }
   }, [year, mutate]);
+
+  useEffect(() => {
+    ChartJS.register(...registerables);
+  }, []);
 
   const value: TAdminContextType = {
     credentials: {
