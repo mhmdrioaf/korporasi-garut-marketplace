@@ -518,8 +518,6 @@ export const getMonthString = (start: number, end: number) => {
     "Desember",
   ];
 
-  console.log(monthStrings.slice(start, end));
-
   return monthStrings.slice(start, end);
 };
 
@@ -540,4 +538,46 @@ export const getTotalProducts = (
   const total = totalProducts.reduce((a, b) => a + b, 0);
 
   return total;
+};
+
+export type TSalesByMonth = {
+  [key: number]: TSalesReportData[];
+};
+
+export const getSalesByMonth = (sales: TSalesReportData[]) => {
+  const groupedSales: TSalesByMonth = {};
+
+  sales.forEach((sale) => {
+    const orderMonth = new Date(sale.order_date).getMonth();
+
+    if (!groupedSales[orderMonth]) {
+      groupedSales[orderMonth] = [];
+    }
+
+    groupedSales[orderMonth].push(sale);
+  });
+
+  const salesMonths = Object.keys(groupedSales).map((key) => parseInt(key));
+
+  return {
+    groupedSales: groupedSales,
+    salesMonths: salesMonths,
+  };
+};
+
+export const getTotalIncome = (sales: TSalesReportData[]) => {
+  let totalIncome = 0;
+
+  sales.forEach((sale) => {
+    const totalItems = sale.order_item.reduce(
+      (a, b) =>
+        a +
+        b.order_quantity *
+          (b.variant ? b.variant.variant_price : b.product.price),
+      0
+    );
+    totalIncome += totalItems;
+  });
+
+  return totalIncome;
 };
