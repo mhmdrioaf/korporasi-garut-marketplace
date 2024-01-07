@@ -85,16 +85,7 @@ export default async function AdminDashboardLayout({
           </Link>
         </div>
 
-        <AdminProvider
-          isAllowed={
-            permissionHelper(
-              session.user.token,
-              process.env.NEXT_PUBLIC_ADMIN_TOKEN!
-            ) && permissionHelper(session.user.role, "ADMIN")
-          }
-        >
-          {children}
-        </AdminProvider>
+        <AdminProvider token={session.user.token}>{children}</AdminProvider>
       </div>
     );
   }
