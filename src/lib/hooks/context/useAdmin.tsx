@@ -21,16 +21,17 @@ export function useAdmin() {
 }
 
 export function AdminProvider({ token, children }: IAdminProviderProps) {
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  const [year, setYear] = useState<"2023" | "2024">("2023");
+  const [startDate, setStartDate] = useState<string>("01");
+  const [endDate, setEndDate] = useState<string>("12");
 
   const fetcher = (url: string) =>
     fetch(url, {
       method: "POST",
       body: JSON.stringify({
         token: token,
-        startDate: startDate ? startDate : "2023-01-01",
-        endDate: endDate ? endDate : "2023-12-31",
+        startDate: startDate ? `${year}-${startDate}-01` : `${year}-01-01`,
+        endDate: endDate ? `${year}-${endDate}-31` : `${year}-12-31`,
       }),
     })
       .then((res) => res.json())
@@ -43,11 +44,17 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     mutate,
   } = useSWR("/api/report/getSales", fetcher);
 
+  console.log(salesData);
+
   useEffect(() => {
     if (startDate && endDate) {
       mutate();
     }
   }, [startDate, endDate, mutate]);
+
+  useEffect(() => {
+    mutate();
+  }, [year, mutate]);
 
   const value: TAdminContextType = {
     credentials: {
@@ -58,6 +65,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
         data: salesData,
         startDate: startDate,
         endDate: endDate,
+        year: year,
 
         state: {
           loading: salesReportLoading,
@@ -67,6 +75,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
         handler: {
           changeStartDate: setStartDate,
           changeEndDate: setEndDate,
+          changeYear: setYear,
         },
       },
     },
