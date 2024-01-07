@@ -2,7 +2,6 @@
 
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import { Loader2Icon } from "lucide-react";
-import { Chart as ChartJS, registerables } from "chart.js";
 import { Separator } from "./separator";
 import ReportsDatePicker from "./reports-date-picker";
 import ReportsChart from "./reports-chart";
@@ -24,10 +23,6 @@ export default function AdminReportsComponents() {
   const endDate = reports.sales.endDate
     ? new Date(reports.sales.endDate).getMonth()
     : 11;
-
-  useEffect(() => {
-    ChartJS.register(...registerables);
-  }, []);
 
   return (
     <div className="w-full flex flex-col gap-4">
