@@ -63,6 +63,7 @@ export const ROUTES = {
       REJECTED: "/admin/product-management/rejected",
     },
     PRODUCT_DETAIL: (id: string) => `/admin/product/${id}`,
+    REPORTS: "/admin/reports",
   },
 };
 

@@ -464,3 +464,120 @@ export const getOrderType = (orderType: "NORMAL" | "PREORDER") => {
       return "Reguler";
   }
 };
+
+export const getSales = (
+  salesData: TSalesReportData[],
+  start: number,
+  end: number
+) => {
+  const monthStrings = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+  const dates = salesData.map((data) => {
+    const date = new Date(data.order_date);
+    const month = date.getMonth();
+
+    return month;
+  });
+
+  const salesDatasets: { [key: string]: number } = {};
+
+  for (let key = start; key <= end; key++) {
+    salesDatasets[monthStrings[key]] = dates.filter(
+      (value) => value === key
+    ).length;
+  }
+
+  return salesDatasets;
+};
+
+export const getMonthString = (start: number, end: number) => {
+  const monthStrings = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
+  return monthStrings.slice(start, end);
+};
+
+export const getTotalProducts = (
+  salesData: TSalesReportData[],
+  start: number,
+  end: number
+) => {
+  const data = salesData.filter((data) => {
+    const date = new Date(data.order_date);
+    const month = date.getMonth();
+
+    return month >= start && month <= end;
+  });
+
+  const items = data.flatMap((data) => data.order_item);
+  const totalProducts = items.map((item) => item.order_quantity);
+  const total = totalProducts.reduce((a, b) => a + b, 0);
+
+  return total;
+};
+
+export type TSalesByMonth = {
+  [key: number]: TSalesReportData[];
+};
+
+export const getSalesByMonth = (sales: TSalesReportData[]) => {
+  const groupedSales: TSalesByMonth = {};
+
+  sales.forEach((sale) => {
+    const orderMonth = new Date(sale.order_date).getMonth();
+
+    if (!groupedSales[orderMonth]) {
+      groupedSales[orderMonth] = [];
+    }
+
+    groupedSales[orderMonth].push(sale);
+  });
+
+  const salesMonths = Object.keys(groupedSales).map((key) => parseInt(key));
+
+  return {
+    groupedSales: groupedSales,
+    salesMonths: salesMonths,
+  };
+};
+
+export const getTotalIncome = (sales: TSalesReportData[]) => {
+  let totalIncome = 0;
+
+  sales.forEach((sale) => {
+    const totalItems = sale.order_item.reduce(
+      (a, b) =>
+        a +
+        b.order_quantity *
+          (b.variant ? b.variant.variant_price : b.product.price),
+      0
+    );
+    totalIncome += totalItems;
+  });
+
+  return totalIncome;
+};
