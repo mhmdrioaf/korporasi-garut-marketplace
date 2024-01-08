@@ -9,6 +9,7 @@ import {
 } from "react";
 import useSWR from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
+import { fetcher } from "@/lib/helper";
 
 interface IAdminProviderProps {
   token: string;
@@ -25,8 +26,9 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
   const [year, setYear] = useState<"2023" | "2024">("2023");
   const [startDate, setStartDate] = useState<string>("01");
   const [endDate, setEndDate] = useState<string>("12");
+  const [tab, setTab] = useState<TAdminReportTabs>("sales");
 
-  const fetcher = (url: string) =>
+  const customFetcher = (url: string) =>
     fetch(url, {
       method: "POST",
       body: JSON.stringify({
@@ -43,7 +45,16 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     isLoading: salesReportLoading,
     error: salesReportError,
     mutate,
-  } = useSWR("/api/report/getSales", fetcher);
+  } = useSWR("/api/report/getSales", customFetcher);
+
+  const { data: productsData, isLoading: productsDataLoading } = useSWR(
+    "/api/product/list",
+    fetcher
+  );
+
+  function changeTab(tab: TAdminReportTabs) {
+    setTab(tab);
+  }
 
   useEffect(() => {
     if (startDate || endDate) {
@@ -75,14 +86,21 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
         state: {
           loading: salesReportLoading,
           error: salesReportError,
+          tabs: tab,
         },
 
         handler: {
           changeStartDate: setStartDate,
           changeEndDate: setEndDate,
           changeYear: setYear,
+          changeTab: changeTab,
         },
       },
+    },
+
+    products: {
+      loading: productsDataLoading,
+      data: productsData ? productsData.result.products : null,
     },
   };
 
