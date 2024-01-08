@@ -14,7 +14,7 @@ import { Separator } from "./separator";
 export default function ReportsProducts() {
   const { reports } = useAdmin();
 
-  if (reports.sales.data) {
+  if (reports.sales.data && reports.sales.data.length > 0) {
     const salesData = getSalesByMonth(reports.sales.data);
     return (
       <div className="w-full flex flex-col gap-4">
@@ -110,6 +110,10 @@ export default function ReportsProducts() {
       </div>
     );
   } else {
-    return null;
+    return (
+      <p className="w-full text-center text-sm italic">
+        Belum ada penjualan pada periode yang dipilih.
+      </p>
+    );
   }
 }

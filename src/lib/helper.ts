@@ -581,3 +581,170 @@ export const getTotalIncome = (sales: TSalesReportData[]) => {
 
   return totalIncome;
 };
+
+export type TReportsProductsIdentifications = {
+  [key: string]: {
+    name: string;
+    quantity: number;
+    price: number;
+    images: string[];
+    seller?: string;
+  };
+};
+
+export const identifyProducts = (sales: TSalesReportData[]) => {
+  const items = sales.map((sale) => sale.order_item).flat();
+  const products: TReportsProductsIdentifications = {};
+  items.forEach((item) => {
+    const id = item.variant
+      ? item.variant.variant_item_id
+      : item.product.id.toString();
+    const name = item.variant
+      ? `${item.product.title} - ${item.variant.variant_name}`
+      : item.product.title;
+    const price = item.variant
+      ? item.variant.variant_price
+      : item.product.price;
+
+    const images = item.product.images;
+    const seller = item.product.seller.account?.user_name;
+
+    if (!products[id]) {
+      products[id] = {
+        name: name,
+        quantity: item.order_quantity,
+        price: price,
+        images: images,
+        seller: seller,
+      };
+    } else {
+      products[id].quantity += item.order_quantity;
+    }
+  });
+
+  const sortedProducts = Object.entries(products)
+    .sort(([, a], [, b]) => b.quantity - a.quantity)
+    .map(([key, value]) => ({ [key]: value }));
+
+  const productsIds = sortedProducts
+    .map((product) => Object.keys(product))
+    .flat();
+
+  return {
+    ids: productsIds,
+    products: products ? sortedProducts : null,
+    highestSelling:
+      sortedProducts.length > 0 ? sortedProducts[0][productsIds[0]] : null,
+    lowestSelling:
+      sortedProducts.length > 0
+        ? sortedProducts[sortedProducts.length - 1][
+            productsIds[productsIds.length - 1]
+          ]
+        : null,
+  };
+};
+
+export const lowestSellingProducts = (products: TProduct[]) => {
+  const lowestSelling = products.filter((product) => product.sold_count < 1);
+
+  return lowestSelling;
+};
+
+export type TSellerIncomes = {
+  [key: string]: {
+    name: string;
+    income: number;
+    products: TSalesReportOrderItem[];
+  };
+};
+
+export type TReportIncomes = {
+  [key: string]: {
+    product_development: number;
+    student_savings: number;
+    seller_income: number;
+  };
+};
+
+export type TReportIncomesTotal = {
+  rawIncomes: number;
+  product_sold: number;
+  product_development: number;
+  student_savings: number;
+  seller_income: number;
+};
+
+export const getSellerIncomes = (sales: TSalesReportData[]) => {
+  const sellerIncomes: TSellerIncomes = {};
+
+  const items = sales.map((sale) => sale.order_item).flat();
+
+  items.forEach((item) => {
+    const sellerId = item.product.seller.user_id;
+    const sellerName = item.product.seller.account?.user_name;
+    const sellerIncome =
+      item.order_quantity *
+      (item.variant ? item.variant.variant_price : item.product.price);
+
+    if (!sellerIncomes[sellerId]) {
+      sellerIncomes[sellerId] = {
+        name: sellerName!,
+        income: sellerIncome,
+        products: [item],
+      };
+    } else {
+      sellerIncomes[sellerId].income += sellerIncome;
+      sellerIncomes[sellerId].products.push(item);
+    }
+  });
+
+  const sellerIds = Object.keys(sellerIncomes);
+
+  const incomesDetail: TReportIncomes = {};
+
+  sellerIds.forEach((id) => {
+    const _sellerIncomes = sellerIncomes[id];
+    const productDevelopment = _sellerIncomes.income * 0.5;
+    const student_savings = _sellerIncomes.income * 0.2;
+    const seller_income = _sellerIncomes.income * 0.3;
+
+    if (!incomesDetail[id]) {
+      incomesDetail[id] = {
+        product_development: productDevelopment,
+        student_savings: student_savings,
+        seller_income: seller_income,
+      };
+    } else {
+      incomesDetail[id].product_development += productDevelopment;
+      incomesDetail[id].student_savings += student_savings;
+      incomesDetail[id].seller_income += seller_income;
+    }
+  });
+
+  const productSoldTotal = items.reduce((a, b) => a + b.order_quantity, 0);
+  const rawIncomeTotal = items.reduce(
+    (a, b) =>
+      a +
+      b.order_quantity *
+        (b.variant ? b.variant.variant_price : b.product.price),
+    0
+  );
+  const totalProductDevelopment = rawIncomeTotal * 0.5;
+  const totalStudentSavings = rawIncomeTotal * 0.2;
+  const totalSellerIncome = rawIncomeTotal * 0.3;
+
+  const totalIncomes: TReportIncomesTotal = {
+    rawIncomes: rawIncomeTotal,
+    product_sold: productSoldTotal,
+    product_development: totalProductDevelopment,
+    student_savings: totalStudentSavings,
+    seller_income: totalSellerIncome,
+  };
+
+  return {
+    incomes: sellerIncomes,
+    sellerIds: sellerIds,
+    detailedIncomes: incomesDetail,
+    totalIncomes: totalIncomes,
+  };
+};

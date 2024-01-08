@@ -11,18 +11,13 @@ import {
   getTotalProducts,
   rupiahConverter,
 } from "@/lib/helper";
-import { useEffect } from "react";
 import ReportsProducts from "./reports-products";
+import AdminProductsIdentifications from "./admin-products-identifications";
+import { Button } from "./button";
+import ReportTabs from "@/lib/renderer/report-tabs";
 
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
-
-  const startDate = reports.sales.startDate
-    ? new Date(reports.sales.startDate).getMonth()
-    : 0;
-  const endDate = reports.sales.endDate
-    ? new Date(reports.sales.endDate).getMonth()
-    : 11;
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -35,40 +30,35 @@ export default function AdminReportsComponents() {
         <ReportsChart />
       )}
 
-      {reports.sales.data && (
-        <div className="w-full flex flex-col gap-2">
-          <div className="w-full flex flex-row items-center justify-between">
-            <p className="font-bold">
-              Total Penjualan: {reports.sales.data.length}
-            </p>
-
-            <p className="font-bold">
-              Total produk terjual:{" "}
-              {getTotalProducts(reports.sales.data, startDate, endDate)} produk
-            </p>
-          </div>
-        </div>
-      )}
-
       <Separator />
 
       <ReportsDatePicker />
 
       <Separator />
-      <ReportsProducts />
 
-      <Separator />
-      <div className="w-full grid grid-cols-2">
-        <p className="font-bold">
-          Total pendapatan {getMonthString(startDate, startDate + 1)} -{" "}
-          {getMonthString(endDate, endDate + 1)} tahun {reports.sales.year}
-        </p>
-        <p className="font-bold self-center justify-self-end">
-          {reports.sales.data
-            ? rupiahConverter(getTotalIncome(reports.sales.data))
-            : rupiahConverter(0)}
-        </p>
+      <div className="w-full grid grid-cols-3 gap-2 items-center">
+        <Button
+          variant={reports.sales.state.tabs === "sales" ? "default" : "ghost"}
+          onClick={() => reports.sales.handler.changeTab("sales")}
+        >
+          Penjualan
+        </Button>
+        <Button
+          variant={
+            reports.sales.state.tabs === "products" ? "default" : "ghost"
+          }
+          onClick={() => reports.sales.handler.changeTab("products")}
+        >
+          Identifikasi Produk
+        </Button>
+        <Button
+          variant={reports.sales.state.tabs === "incomes" ? "default" : "ghost"}
+          onClick={() => reports.sales.handler.changeTab("incomes")}
+        >
+          Pendapatan
+        </Button>
       </div>
+      <ReportTabs tab={reports.sales.state.tabs} />
     </div>
   );
 }

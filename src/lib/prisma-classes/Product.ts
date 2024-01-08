@@ -126,6 +126,11 @@ export default class Product {
                 city: true,
               },
             },
+            account: {
+              select: {
+                user_name: true,
+              },
+            },
           },
         },
         category: {
