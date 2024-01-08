@@ -21,6 +21,11 @@ type TSalesReportVariant = {
   variant_item_id: string;
   variant_name: string;
   variant_price: number;
+  variant: {
+    product: {
+      seller_id: number;
+    } | null;
+  };
 };
 
 type TSalesReportOrderItem = {
