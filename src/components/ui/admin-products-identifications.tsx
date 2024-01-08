@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  highestProductsSellingWeekly,
   identifyProducts,
   lowestSellingProducts,
   remoteImageSource,
@@ -14,6 +15,9 @@ export default function AdminProductsIdentifications() {
   const { reports, products } = useAdmin();
   if (reports.sales.data) {
     const productsData = identifyProducts(reports.sales.data);
+    const highestSellingWeekly = highestProductsSellingWeekly(
+      reports.sales.data
+    );
     return (
       <div className="w-full flex flex-col gap-4">
         {productsData.ids.length > 0 && (
@@ -97,6 +101,45 @@ export default function AdminProductsIdentifications() {
                     {rupiahConverter(
                       productsData.highestSelling.quantity *
                         productsData.highestSelling.price
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {highestSellingWeekly && (
+          <>
+            <Separator />
+            <div className="w-full flex flex-col gap-2 bg-primary text-white rounded-md overflow-hidden p-2">
+              <p className="font-bold">
+                Produk dengan penjualan tertinggi minggu ini
+              </p>
+              <div className="w-full grid grid-cols-2">
+                <div className="flex flex-row gap-2 items-center">
+                  <div className="w-20 h-auto aspect-square relative rounded-md overflow-hidden">
+                    <Image
+                      src={remoteImageSource(highestSellingWeekly.images[0])}
+                      fill
+                      className="object-cover"
+                      alt="Foto produk"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <p className="font-bold text-xl">
+                      {highestSellingWeekly.name}
+                    </p>
+                    <p className="text-xs">{highestSellingWeekly.seller}</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 justify-self-end self-center">
+                  <p className="font-bold">Total terjual:</p>
+                  <p>{highestSellingWeekly.quantity}</p>
+                  <p className="font-bold">Total pendapatan:</p>
+                  <p>
+                    {rupiahConverter(
+                      highestSellingWeekly.quantity * highestSellingWeekly.price
                     )}
                   </p>
                 </div>
