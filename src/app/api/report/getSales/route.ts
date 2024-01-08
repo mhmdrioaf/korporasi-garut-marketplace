@@ -57,6 +57,15 @@ async function handler(request: NextRequest) {
                   variant_item_id: true,
                   variant_name: true,
                   variant_price: true,
+                  variant: {
+                    select: {
+                      product: {
+                        select: {
+                          seller_id: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
