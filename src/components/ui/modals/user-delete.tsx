@@ -1,3 +1,5 @@
+"use client";
+
 import { useForm } from "react-hook-form";
 import Modal from "../modal";
 import { Input } from "../input";
