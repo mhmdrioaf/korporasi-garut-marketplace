@@ -748,3 +748,17 @@ export const getSellerIncomes = (sales: TSalesReportData[]) => {
     totalIncomes: totalIncomes,
   };
 };
+
+export const highestProductsSellingWeekly = (sales: TSalesReportData[]) => {
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const salesWeekly = sales.filter(
+    (sale) => new Date(sale.order_date) > sevenDaysAgo
+  );
+
+  const products = identifyProducts(salesWeekly);
+  const highestSellingProducts = products.highestSelling
+    ? products.highestSelling
+    : null;
+
+  return highestSellingProducts;
+};
