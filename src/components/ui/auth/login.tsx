@@ -1,10 +1,16 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { ROUTES } from "@/lib/constants";
 import { authSchema } from "@/lib/resolver/authResolver";
-import { signIn } from "next-auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "../button";
 import {
   Form,
   FormControl,
@@ -14,20 +20,16 @@ import {
   FormMessage,
 } from "../form";
 import { Input } from "../input";
-import { useState } from "react";
-import { Button } from "../button";
-import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { Separator } from "../separator";
 import { useToast } from "../use-toast";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "@/lib/constants";
 
 type TLoginOptions = "username" | "email";
 
 export default function AuthLogin() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const { data: session } = useSession();
 
   const [loginOptions, setLoginOptions] = useState<TLoginOptions>("username");
 
@@ -80,9 +82,6 @@ export default function AuthLogin() {
             description: "Selamat datang kembali.",
             variant: "success",
           });
-          form.reset();
-          router.refresh();
-          router.push(ROUTES.USER.DASHBOARD);
         }
         setLoading(false);
       })
@@ -96,7 +95,51 @@ export default function AuthLogin() {
         });
         console.error(err);
       });
+
+    // return await signIn("credentials", {
+    //   redirect: false,
+    //   username: username ? username : email,
+    //   password: password,
+    // })
+    //   .then((res) => {
+    //     if (res?.error) {
+    //       toast({
+    //         title: "Proses masuk gagal",
+    //         description:
+    //           "Username/email atau password yang anda masukkan salah.",
+    //         variant: "destructive",
+    //       });
+    //     } else {
+    //       toast({
+    //         title: "Berhasil masuk.",
+    //         description: "Selamat datang kembali.",
+    //         variant: "success",
+    //       });
+    //       form.reset();
+    //       router.refresh();
+    //       router.push(ROUTES.LANDING_PAGE);
+    //     }
+    //     setLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     setLoading(false);
+    //     toast({
+    //       title: "Terjadi kesalahan...",
+    //       description:
+    //         "Telah terjadi kesalahan ketika melakukan proses login, silahkan coba lagi nanti.",
+    //       variant: "destructive",
+    //     });
+    //     console.error(err);
+    //   });
   }
+
+  useEffect(() => {
+    if (session) {
+      form.reset();
+      router.replace(ROUTES.LANDING_PAGE);
+      router.refresh();
+    }
+  }, [session, form, router]);
 
   return (
     <Form {...form}>
