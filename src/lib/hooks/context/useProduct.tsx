@@ -5,12 +5,17 @@ import { Session } from "next-auth";
 import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import { IProductInput, TProductContext } from "./productContextType";
+import {
+  IProductInput,
+  TProductContext,
+  TProductInput,
+} from "./productContextType";
 import { fetcher, uploadImage } from "@/lib/helper";
 import imageCompression from "browser-image-compression";
 import useSWR from "swr";
@@ -107,29 +112,32 @@ export function ProductProvider({
         })
       : [];
 
-  const onWithVariantsChangeHandler = (value: "true" | "false") => {
-    setWithVariants(value === "true");
-    if (value === "true") {
-      if (product && product.variant) {
-        setDeletedVariant(null);
+  const onWithVariantsChangeHandler = useCallback(
+    (value: "true" | "false") => {
+      setWithVariants(value === "true");
+      if (value === "true") {
+        if (product && product.variant) {
+          setDeletedVariant(null);
+        } else {
+          variantItems.append({
+            variant_item_id: "",
+            variant_item_name: "",
+            variant_item_price: 0,
+            variant_item_stock: 0,
+          });
+        }
       } else {
-        variantItems.append({
-          variant_item_id: "",
-          variant_item_name: "",
-          variant_item_price: 0,
-          variant_item_stock: 0,
-        });
+        if (product && product.variant) {
+          setDeletedVariant(product.variant.variant_id);
+          setWithVariants(false);
+        } else {
+          variantItems.remove();
+          form.setValue("variant", null);
+        }
       }
-    } else {
-      if (product && product.variant) {
-        setDeletedVariant(product.variant.variant_id);
-        setWithVariants(false);
-      } else {
-        variantItems.remove();
-        form.setValue("variant", null);
-      }
-    }
-  };
+    },
+    [product, variantItems, form]
+  );
 
   const onAddVariantItemsHandler = () => {
     variantItems.append({
@@ -158,7 +166,7 @@ export function ProductProvider({
 
   const onRemoveCurrentVariantHandler = (id: string) => {
     setDeletedVariant(id);
-    form.setValue("variant", null);
+    onWithVariantsChangeHandler("false");
   };
 
   const onRemoveCurrentVariantItemHandler = (id: string) => {
@@ -215,13 +223,13 @@ export function ProductProvider({
   const onSubmit: SubmitHandler<IProductInput> = async (data) => {
     setUploading(true);
 
-    const { stock, seller_id, images, ...productData } = data.product;
+    const { stock, seller_id, images, price, ...productData } = data.product;
 
     const productsId = product
       ? product.id
       : productsList
-      ? productsList.result.maxId + 1
-      : 1;
+        ? productsList.result.maxId + 1
+        : 1;
 
     try {
       const imagesURL = await uploadImages(productsId);
@@ -234,6 +242,9 @@ export function ProductProvider({
         body: JSON.stringify({
           product: {
             ...productData,
+            price: data.variant
+              ? data.variant.variant_item[0].variant_item_price
+              : price,
             seller_id: session.user.id,
             stock:
               controlledVariantItems.length > 0
@@ -281,7 +292,7 @@ export function ProductProvider({
       setUploading(false);
       console.error("Produk tidak ditemukan");
     } else {
-      const { stock, seller_id, images, ...productData } = data.product;
+      const { stock, seller_id, images, price, ...productData } = data.product;
 
       try {
         const imagesURL = await uploadImages(product.id);
@@ -294,6 +305,9 @@ export function ProductProvider({
           body: JSON.stringify({
             product: {
               ...productData,
+              price: data.variant
+                ? data.variant.variant_item[0].variant_item_price
+                : price,
               seller_id: session.user.id,
               stock:
                 controlledVariantItems.length > 0
@@ -304,7 +318,7 @@ export function ProductProvider({
                   : stock,
               images: imagesURL,
             },
-            variant: data.variant,
+            variant: data.variant ? data.variant : null,
             tags: productTags,
             id: product.id,
             deletedVariant: deletedVariant,
@@ -349,6 +363,14 @@ export function ProductProvider({
     }
   }, [product]);
 
+  useEffect(() => {
+    if (isEdit) {
+      if (product && product.variant && !deletedVariant) {
+        onWithVariantsChangeHandler("true");
+      }
+    }
+  }, [isEdit, product, onWithVariantsChangeHandler, deletedVariant]);
+
   const value: TProductContext = {
     form: {
       productForm: form,
@@ -387,6 +409,7 @@ export function ProductProvider({
       uploading: uploading,
       isEdit: isEdit,
     },
+    currentProduct: product ? product : null,
   };
 
   return (
