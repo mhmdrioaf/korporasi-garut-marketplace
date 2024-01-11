@@ -15,10 +15,24 @@ async function handler(request: NextRequest) {
     try {
       const ordersData: TSalesReportData[] = await db.orders.findMany({
         where: {
-          order_date: {
-            gte: new Date(body.startDate),
-            lte: new Date(body.endDate),
-          },
+          AND: [
+            {
+              order_date: {
+                gte: new Date(body.startDate),
+                lte: new Date(body.endDate),
+              },
+            },
+            {
+              OR: [
+                {
+                  order_status: "FINISHED",
+                },
+                {
+                  order_status: "DELIVERED",
+                },
+              ],
+            },
+          ],
         },
         include: {
           user: {
