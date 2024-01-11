@@ -147,7 +147,7 @@ type TCustomerOrder = {
   payment_proof: string | null;
   order_type: ORDER_TYPE;
 
-  address: TAddress;
+  address: TAddress | null;
   user: TUser;
   order_item: TOrderItem[];
 };

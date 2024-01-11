@@ -180,7 +180,11 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                 <p className="font-bold">Tanggal Pesanan</p>
                 <p>{getDateString(order.order_date)}</p>
                 <p className="font-bold">Alamat Pengiriman</p>
-                <p>{order.address.full_address}</p>
+                <p>
+                  {order.address
+                    ? order.address.full_address
+                    : "Alamat telah dihapus."}
+                </p>
                 <p className="font-bold">Ongkos Kirim</p>
                 <p>{rupiahConverter(order.shipping_cost)}</p>
                 <p className="font-bold">Tipe Pesanan</p>
