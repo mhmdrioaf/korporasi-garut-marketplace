@@ -124,9 +124,8 @@ export default function AddressForm({
           title: "Berhasil menambahkan alamat.",
         });
         setIsLoading(false);
-        router.back();
         router.refresh();
-        router.push(ROUTES.USER.ADDRESSES);
+        router.back();
       }
     } catch (error) {
       setIsLoading(false);
