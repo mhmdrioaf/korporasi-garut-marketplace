@@ -19,6 +19,7 @@ async function getSellerOrders(seller_id: string, seller_token: string) {
     next: {
       tags: ["seller-orders"],
     },
+    cache: "no-store",
   });
 
   const response = await res.json();
