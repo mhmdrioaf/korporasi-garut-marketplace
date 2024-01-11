@@ -40,6 +40,7 @@ async function handler(request: NextRequest) {
                   images: true,
                   price: true,
                   title: true,
+                  unit: true,
                   seller: {
                     select: {
                       user_id: true,

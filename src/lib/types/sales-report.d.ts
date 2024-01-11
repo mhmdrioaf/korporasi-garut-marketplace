@@ -13,6 +13,7 @@ type TSalesReportProduct = {
   id: number;
   images: string[];
   price: number;
+  unit: string;
   title: string;
   seller: TSalesReportSeller;
 };
