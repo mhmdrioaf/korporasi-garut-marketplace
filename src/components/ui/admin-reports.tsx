@@ -5,19 +5,18 @@ import { Loader2Icon } from "lucide-react";
 import { Separator } from "./separator";
 import ReportsDatePicker from "./reports-date-picker";
 import ReportsChart from "./reports-chart";
-import {
-  getMonthString,
-  getTotalIncome,
-  getTotalProducts,
-  rupiahConverter,
-} from "@/lib/helper";
-import ReportsProducts from "./reports-products";
-import AdminProductsIdentifications from "./admin-products-identifications";
 import { Button } from "./button";
 import ReportTabs from "@/lib/renderer/report-tabs";
+import AdminReportExportPDF from "./admin-report-export-pdf";
+import { getPeriodTime } from "@/lib/helper";
 
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
+
+  const periodMonths = getPeriodTime(
+    parseInt(reports.sales.startDate) - 1,
+    parseInt(reports.sales.endDate)
+  );
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -59,6 +58,15 @@ export default function AdminReportsComponents() {
         </Button>
       </div>
       <ReportTabs tab={reports.sales.state.tabs} />
+      {reports.sales.data && (
+        <AdminReportExportPDF
+          reportsData={reports.sales.data}
+          period={{
+            month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
+            year: parseInt(reports.sales.year),
+          }}
+        />
+      )}
     </div>
   );
 }
