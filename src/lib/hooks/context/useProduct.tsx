@@ -1,7 +1,12 @@
 "use client";
 
+import { useToast } from "@/components/ui/use-toast";
+import { ROUTES } from "@/lib/constants";
 import { TProduct } from "@/lib/globals";
+import { fetcher, uploadImage } from "@/lib/helper";
+import imageCompression from "browser-image-compression";
 import { Session } from "next-auth";
+import { useRouter } from "next/navigation";
 import {
   ReactNode,
   createContext,
@@ -11,17 +16,8 @@ import {
   useState,
 } from "react";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
-import {
-  IProductInput,
-  TProductContext,
-  TProductInput,
-} from "./productContextType";
-import { fetcher, uploadImage } from "@/lib/helper";
-import imageCompression from "browser-image-compression";
 import useSWR from "swr";
-import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
-import { ROUTES } from "@/lib/constants";
+import { IProductInput, TProductContext } from "./productContextType";
 
 interface IProductProviderProps {
   children: ReactNode;

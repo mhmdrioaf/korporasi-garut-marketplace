@@ -1,16 +1,9 @@
 "use client";
 
 import { useProduct } from "@/lib/hooks/context/useProduct";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
-import { Input } from "./input";
-import { Button } from "./button";
 import { Trash2Icon, XIcon } from "lucide-react";
+import { Button } from "./button";
+import { Input } from "./input";
 import {
   Table,
   TableBody,

@@ -1,7 +1,4 @@
-import {
-  sendNotificationHandler,
-  sendSellerNotificationHandler,
-} from "@/lib/actions/notification";
+import { sendNotificationHandler } from "@/lib/actions/notification";
 import { db } from "@/lib/db";
 import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
