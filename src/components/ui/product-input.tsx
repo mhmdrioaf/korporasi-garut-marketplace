@@ -14,7 +14,6 @@ import {
   SelectValue,
 } from "./select";
 import ProductVariantInput from "./product-variant-input";
-import { useEffect } from "react";
 import { Loader2Icon } from "lucide-react";
 import { Button } from "./button";
 import { convertStringToBoolean } from "@/lib/helper";
@@ -24,17 +23,6 @@ export default function ProductInput() {
   const defaultRadio = form.productForm.getValues(
     "product.capable_out_of_town"
   );
-
-  useEffect(() => {
-    if (form.variant.items.length < 1 && !state.isEdit) {
-      form.variant.handler.add("false");
-    }
-  }, [
-    form.variant.items,
-    form.variant.handler.add,
-    form.variant.handler,
-    state.isEdit,
-  ]);
 
   return (
     <form
@@ -64,6 +52,7 @@ export default function ProductInput() {
                 type="text"
                 placeholder="Nama produk..."
                 {...form.productForm.register("product.title")}
+                required
               />
             </div>
           </div>
@@ -75,6 +64,7 @@ export default function ProductInput() {
                 type="text"
                 placeholder="Unit produk..."
                 {...form.productForm.register("product.unit")}
+                required
               />
             </div>
           </div>
@@ -86,6 +76,7 @@ export default function ProductInput() {
                 rows={16}
                 placeholder="Deskripsi produk..."
                 {...form.productForm.register("product.description")}
+                required
               />
             </div>
           </div>
@@ -111,6 +102,7 @@ export default function ProductInput() {
                 {...form.productForm.register("product.expire_date", {
                   setValueAs: (value) => new Date(value),
                 })}
+                required
               />
             </div>
           </div>
@@ -126,6 +118,7 @@ export default function ProductInput() {
                     setValueAs: (value) => parseInt(value),
                   })}
                   className="col-span-3"
+                  required
                 />
                 <p className="place-self-center">Hari</p>
               </div>
@@ -143,6 +136,7 @@ export default function ProductInput() {
                     setValueAs: (value) => parseInt(value),
                   })}
                   className="col-span-3"
+                  required
                 />
                 <p className="place-self-center">Gram</p>
               </div>
@@ -207,6 +201,7 @@ export default function ProductInput() {
                   setValueAs: (value) => parseInt(value),
                 })}
                 className="col-span-3"
+                required={form.variant.withVariants ? false : true}
               />
             </div>
           </div>
@@ -240,6 +235,7 @@ export default function ProductInput() {
                     setValueAs: (value) => parseInt(value),
                   })}
                   className="col-span-3"
+                  required={form.variant.withVariants ? false : true}
                 />
               </div>
             </div>

@@ -294,6 +294,11 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       );
       currentCart.cart_items = updatedItems;
 
+      let _checkedItems = checkedItems;
+      delete _checkedItems[itemToDelete.product.seller.user_id];
+
+      setCheckedItems(_checkedItems);
+
       try {
         await mutate(cartItemDeleteHandler(itemToDelete), {
           optimisticData: currentCart,
@@ -567,6 +572,21 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
           description: response.message,
         });
         onCheckoutStepChanges(3);
+
+        try {
+          items.forEach(async (item) => {
+            let _checkedItems = checkedItems;
+            delete _checkedItems[item.product.seller.user_id];
+            await mutate(cartItemDeleteHandler(item), {
+              optimisticData: cartData,
+              populateCache: true,
+              rollbackOnError: true,
+              revalidate: false,
+            });
+          });
+        } catch (error) {
+          console.error("An error occurred while deleting cart item: ", error);
+        }
       }
     } catch (error) {
       setIsOrdering(false);

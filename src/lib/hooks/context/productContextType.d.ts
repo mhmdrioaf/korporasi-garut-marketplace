@@ -1,3 +1,4 @@
+import { TProduct } from "@/lib/globals";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TProductContext = {
@@ -19,6 +20,8 @@ type TProductContext = {
       updateProduct: SubmitHandler<IProductInput>;
     };
   };
+
+  currentProduct: TProduct | null;
 
   images: {
     images: File[];

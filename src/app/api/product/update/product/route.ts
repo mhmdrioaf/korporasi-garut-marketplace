@@ -26,7 +26,7 @@ async function handler(request: NextRequest) {
       );
       const updateProduct = await products.updateProduct(productData);
 
-      if (body.variant) {
+      if (body.variant && body.variant.variant_item.length > 0) {
         await products.productVariantUpdate(productData);
       }
 

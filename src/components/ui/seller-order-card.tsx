@@ -82,15 +82,21 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
               <div className="grid grid-cols-3 mb-2">
                 <div className="col-span-2 grid grid-cols-2">
                   <p className="font-bold">Nama Penerima</p>
-                  <p>{order.address?.recipient_name}</p>
+                  <p>
+                    {order.address?.recipient_name ?? "Detail alamat di hapus"}
+                  </p>
                   <p className="font-bold">Nomor Telpon Penerima</p>
                   <p>
-                    {phoneNumberGenerator(
-                      order.address?.recipient_phone_number ?? ""
-                    )}
+                    {order.address
+                      ? phoneNumberGenerator(
+                          order.address.recipient_phone_number
+                        )
+                      : "Detail alamat di hapus"}
                   </p>
                   <p className="font-bold">Alamat Lengkap Pengiriman</p>
-                  <p>{order.address?.full_address}</p>
+                  <p>
+                    {order.address?.full_address ?? "Detail alamat di hapus"}
+                  </p>
                   <p className="font-bold">Ongkos Kirim</p>
                   <p>{rupiahConverter(order.shipping_cost)}</p>
                 </div>

@@ -7,7 +7,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { fetcher } from "@/lib/helper";
 
@@ -23,7 +23,7 @@ export function useAdmin() {
 }
 
 export function AdminProvider({ token, children }: IAdminProviderProps) {
-  const [year, setYear] = useState<"2023" | "2024">("2023");
+  const [year, setYear] = useState<string>("2023");
   const [startDate, setStartDate] = useState<string>("01");
   const [endDate, setEndDate] = useState<string>("12");
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
@@ -44,8 +44,9 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     data: salesData,
     isLoading: salesReportLoading,
     error: salesReportError,
-    mutate,
   } = useSWR("/api/report/getSales", customFetcher);
+
+  const { mutate } = useSWRConfig();
 
   const { data: productsData, isLoading: productsDataLoading } = useSWR(
     "/api/product/list",
@@ -58,13 +59,13 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
 
   useEffect(() => {
     if (startDate || endDate) {
-      mutate();
+      mutate("/api/report/getSales");
     }
   }, [startDate, endDate, mutate]);
 
   useEffect(() => {
     if (year) {
-      mutate();
+      mutate("/api/report/getSales");
     }
   }, [year, mutate]);
 

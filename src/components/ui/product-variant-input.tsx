@@ -1,16 +1,9 @@
 "use client";
 
 import { useProduct } from "@/lib/hooks/context/useProduct";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
-import { Input } from "./input";
+import { Trash2Icon, XIcon } from "lucide-react";
 import { Button } from "./button";
-import { XIcon } from "lucide-react";
+import { Input } from "./input";
 import {
   Table,
   TableBody,
@@ -22,7 +15,7 @@ import {
 } from "./table";
 
 export default function ProductVariantInput() {
-  const { form, state } = useProduct();
+  const { form, state, currentProduct } = useProduct();
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -31,12 +24,29 @@ export default function ProductVariantInput() {
         <div className="col-span-2 flex flex-col gap-2">
           <div className="grid grid-cols-3">
             <p>Nama Varian</p>
-            <div className="col-span-2">
+            <div className="col-span-2 flex flex-row items-center gap-2">
               <Input
                 type="text"
                 {...form.productForm.register("variant.variant_title")}
                 required
               />
+              <Button
+                type="button"
+                variant="destructive"
+                className="flex flex-row gap-2 items-center"
+                onClick={() =>
+                  currentProduct
+                    ? currentProduct.variant
+                      ? form.variant.handler.removeCurrent(
+                          currentProduct.variant.variant_id
+                        )
+                      : form.variant.handler.add("false")
+                    : form.variant.handler.add("false")
+                }
+              >
+                <Trash2Icon className="w-4 h-4" />
+                <p>Hapus</p>
+              </Button>
             </div>
           </div>
 
