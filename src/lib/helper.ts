@@ -589,6 +589,7 @@ export type TReportsProductsIdentifications = {
     price: number;
     images: string[];
     seller?: string;
+    unit: string;
   };
 };
 
@@ -605,6 +606,7 @@ export const identifyProducts = (sales: TSalesReportData[]) => {
     const price = item.variant
       ? item.variant.variant_price
       : item.product.price;
+    const unit = item.product.unit;
 
     const images = item.product.images;
     const seller = item.product.seller.account?.user_name;
@@ -616,6 +618,7 @@ export const identifyProducts = (sales: TSalesReportData[]) => {
         price: price,
         images: images,
         seller: seller,
+        unit: unit,
       };
     } else {
       products[id].quantity += item.order_quantity;
@@ -761,4 +764,75 @@ export const highestProductsSellingWeekly = (sales: TSalesReportData[]) => {
     : null;
 
   return highestSellingProducts;
+};
+
+export const getDateWithoutTime = (date: any) => {
+  const _date = new Date(date);
+  const year = _date.getFullYear();
+  const month = _date.getMonth();
+  const monthString = getMonthString(month, month + 1);
+  const day = _date.getDate();
+
+  return `${decimalDate(day)} ${monthString} ${year}`;
+};
+
+export const sortReportsData = (data: TSalesReportData[]) => {
+  const sortedData = data.sort((a, b) => {
+    const dateA = new Date(a.order_date);
+    const dateB = new Date(b.order_date);
+
+    return dateA.getMonth() - dateB.getMonth();
+  });
+
+  return sortedData;
+};
+
+export const getPeriodTime = (start: number, end: number) => {
+  const months = getMonthString(start, end);
+  const startMonth = months[0];
+  const endMonth = months[months.length - 1];
+
+  return {
+    start: startMonth,
+    end: endMonth,
+  };
+};
+
+export const reportMessage = (sales: TSalesReportData[]) => {
+  const totalIncomes = sales.reduce(
+    (a, b) =>
+      a +
+      b.order_item.reduce(
+        (c, d) =>
+          c +
+          d.order_quantity *
+            (d.variant ? d.variant.variant_price : d.product.price),
+        0
+      ),
+    0
+  );
+
+  const totalSales = sales.length;
+  const productSold = sales.reduce(
+    (a, b) => a + b.order_item.reduce((c, d) => c + d.order_quantity, 0),
+    0
+  );
+  const highestSelling = identifyProducts(sales).highestSelling;
+
+  const breakLine = "\n";
+  const message = `Pada periode ini, terdapat ${totalSales} penjualan yang terjadi, dengan total produk yang terjual sebanyak ${productSold} produk, dan total pendapatan adalah sebesar ${rupiahConverter(
+    totalIncomes
+  )}.`;
+
+  const highestSellingMessage = highestSelling
+    ? `Produk terlaris pada periode ini adalah ${
+        highestSelling.name
+      } dengan total produk terjual sebanyak ${highestSelling.quantity} ${
+        highestSelling.unit
+      }, dan total pendapatan sebesar ${rupiahConverter(
+        highestSelling.quantity * highestSelling.price
+      )}.`
+    : "";
+
+  return highestSelling ? message + breakLine + highestSellingMessage : message;
 };
