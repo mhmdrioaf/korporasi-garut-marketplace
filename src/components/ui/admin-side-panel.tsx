@@ -29,7 +29,7 @@ export default function AdminSidePanel() {
       className="w-full bg-background z-40 lg:w-fit h-fit lg:h-screen fixed bottom-0 lg:top-[5.25rem] left-0 border-t border-r-0 border-t-input lg:border-t-0 lg:border-r lg:border-r-input flex flex-row lg:flex-col gap-2 divide-x divide-y-0 lg:divide-y lg:divide-x-0 justify-stretch lg:justify-normal"
     >
       <Link
-        className="w-full grid place-items-center p-2"
+        className="w-full grid place-items-center p-2 lg:flex lg:flex-row lg:gap-2 lg:items-center"
         href={ROUTES.ADMIN.DASHBOARD}
         title="Dashboard"
       >
@@ -38,7 +38,7 @@ export default function AdminSidePanel() {
       </Link>
 
       <Link
-        className="w-full grid place-items-center p-2"
+        className="w-full grid place-items-center p-2 lg:flex lg:flex-row lg:gap-2 lg:items-center"
         href={ROUTES.ADMIN.USER_MANAGEMENT.MAIN}
         title="Kelola Pengguna"
       >
@@ -47,7 +47,7 @@ export default function AdminSidePanel() {
       </Link>
 
       <Link
-        className="w-full grid place-items-center p-2"
+        className="w-full grid place-items-center p-2 lg:flex lg:flex-row lg:gap-2 lg:items-center"
         href={ROUTES.ADMIN.USER_MANAGEMENT.ADD_SELLER}
         title="Tambahkan Penjual"
       >
@@ -56,7 +56,7 @@ export default function AdminSidePanel() {
       </Link>
 
       <Link
-        className="w-full grid place-items-center p-2"
+        className="w-full grid place-items-center p-2 lg:flex lg:flex-row lg:gap-2 lg:items-center"
         href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
         title="Kelola Produk"
       >
@@ -65,7 +65,7 @@ export default function AdminSidePanel() {
       </Link>
 
       <Link
-        className="w-full grid place-items-center p-2"
+        className="w-full grid place-items-center p-2 lg:flex lg:flex-row lg:gap-2 lg:items-center"
         href={ROUTES.ADMIN.REPORTS}
         title="Laporan Penjualan"
       >
