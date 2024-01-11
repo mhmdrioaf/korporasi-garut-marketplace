@@ -10,7 +10,7 @@ type TAdminContextType = {
       data: TSalesReportData[] | null | undefined;
       startDate: string;
       endDate: string;
-      year: "2023" | "2024";
+      year: string;
 
       state: {
         loading: boolean;
@@ -21,7 +21,7 @@ type TAdminContextType = {
       handler: {
         changeStartDate: React.Dispatch<React.SetStateAction<string>>;
         changeEndDate: React.Dispatch<React.SetStateAction<string>>;
-        changeYear: (year: "2023" | "2024") => void;
+        changeYear: (year: string) => void;
         changeTab: (tab: TAdminReportTabs) => void;
       };
     };
