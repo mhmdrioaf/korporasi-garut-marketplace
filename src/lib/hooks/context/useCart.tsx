@@ -294,6 +294,11 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       );
       currentCart.cart_items = updatedItems;
 
+      let _checkedItems = checkedItems;
+      delete _checkedItems[itemToDelete.product.seller.user_id];
+
+      setCheckedItems(_checkedItems);
+
       try {
         await mutate(cartItemDeleteHandler(itemToDelete), {
           optimisticData: currentCart,
