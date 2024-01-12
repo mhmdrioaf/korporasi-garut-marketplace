@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "./button";
 import { Loader2Icon } from "lucide-react";
+import ShippingTracking from "./modals/shipping-tracking";
 
 interface IOrderCardProps {
   ordersData: TCustomerOrder[];
@@ -23,6 +24,7 @@ interface IOrderCardProps {
 
 export default function OrderCard({ ordersData }: IOrderCardProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
+  const [deliveryReceipt, setDeliveryReceipt] = useState<string | null>(null);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -165,6 +167,15 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
       return null;
     }
   };
+
+  const showShippingTrackingModal = (receipt: string | null) => {
+    setDeliveryReceipt(receipt);
+  };
+
+  const onShippingTrackingModalCloses = () => {
+    setDeliveryReceipt(null);
+  };
+
   return (
     <div className="flex flex-col gap-8">
       {ordersData.length > 0 ? (
@@ -203,6 +214,9 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                   status={order.order_status}
                   onPaymentClick={() => onPaymentClick(order)}
                   disabled={buttonLoading || order.payment_proof !== null}
+                  onShippingTrackingClick={() =>
+                    showShippingTrackingModal(order.delivery_receipt)
+                  }
                 />
                 {showPaymentProof(order.order_status, order.payment_proof)}
                 {order.order_delivered_date &&
@@ -281,6 +295,14 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
         <div className="w-full text-center">
           Tidak ada pesanan dalam status ini.
         </div>
+      )}
+
+      {deliveryReceipt && (
+        <ShippingTracking
+          delivery_receipt={deliveryReceipt}
+          open={deliveryReceipt !== null}
+          onClose={onShippingTrackingModalCloses}
+        />
       )}
     </div>
   );
