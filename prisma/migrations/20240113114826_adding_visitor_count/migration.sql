@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "product" ADD COLUMN     "cart_count" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "visitor" INTEGER NOT NULL DEFAULT 0;
