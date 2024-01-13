@@ -6,12 +6,14 @@ import { ORDER_STATUS } from "../globals";
 interface IOrderButtonProps {
   status: ORDER_STATUS;
   onPaymentClick: () => void;
+  onShippingTrackingClick: () => void;
   disabled: boolean;
 }
 
 export default function ShowOrderButton({
   status,
   onPaymentClick,
+  onShippingTrackingClick,
   disabled,
 }: IOrderButtonProps) {
   switch (status) {
@@ -28,7 +30,11 @@ export default function ShowOrderButton({
         </Button>
       );
     case "SHIPPED":
-      return <Button variant="outline">Lacak Pesanan</Button>;
+      return (
+        <Button variant="outline" onClick={onShippingTrackingClick}>
+          Lacak Pesanan
+        </Button>
+      );
     case "DELIVERED":
       return null;
     case "FINISHED":
