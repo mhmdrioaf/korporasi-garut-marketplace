@@ -14,6 +14,16 @@ async function handler(
   const product = await products.getProductDetail(params.id);
 
   if (product) {
+    await db.product.update({
+      where: {
+        id: parseInt(params.id),
+      },
+      data: {
+        visitor: {
+          increment: 1,
+        },
+      },
+    });
     return NextResponse.json({ ok: true, result: product });
   } else {
     return NextResponse.json({ ok: false, result: null });
