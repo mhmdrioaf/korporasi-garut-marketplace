@@ -26,7 +26,7 @@ interface IAdminReportExportPDFProps {
   reportsData: TSalesReportData[];
   period?: {
     month: string;
-    year: number;
+    year: string;
   };
 }
 

@@ -8,14 +8,14 @@ import ReportsChart from "./reports-chart";
 import { Button } from "./button";
 import ReportTabs from "@/lib/renderer/report-tabs";
 import AdminReportExportPDF from "./admin-report-export-pdf";
-import { getPeriodTime } from "@/lib/helper";
+import { getPeriodTime, getSalesYears } from "@/lib/helper";
 
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
 
   const periodMonths = getPeriodTime(
-    parseInt(reports.sales.startDate) - 1,
-    parseInt(reports.sales.endDate)
+    parseInt(reports.sales.startDate ?? "1") - 1,
+    parseInt(reports.sales.endDate ?? "12")
   );
 
   return (
@@ -63,7 +63,10 @@ export default function AdminReportsComponents() {
           reportsData={reports.sales.data}
           period={{
             month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
-            year: parseInt(reports.sales.year),
+            year:
+              reports.sales.year ?? reports.sales.data
+                ? getSalesYears(reports.sales.data).join(" & ")
+                : new Date().getFullYear().toString(),
           }}
         />
       )}
