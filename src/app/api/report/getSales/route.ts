@@ -43,6 +43,9 @@ async function handler(request: NextRequest) {
                   price: true,
                   title: true,
                   unit: true,
+                  visitor: true,
+                  cart_count: true,
+                  search_count: true,
                   seller: {
                     select: {
                       user_id: true,

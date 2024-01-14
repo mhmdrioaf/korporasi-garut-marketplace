@@ -27,6 +27,7 @@ type TProduct = {
   sold_count: number;
   visitor: number;
   cart_count: number;
+  search_count: number;
 };
 
 type TProductVariant = {

@@ -16,6 +16,9 @@ type TSalesReportProduct = {
   unit: string;
   title: string;
   seller: TSalesReportSeller;
+  visitor: number;
+  cart_count: number;
+  search_count: number;
 };
 
 type TSalesReportVariant = {
