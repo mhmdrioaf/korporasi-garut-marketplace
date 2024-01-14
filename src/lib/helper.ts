@@ -515,15 +515,6 @@ export const getSales = (
     }
   });
 
-  // for (let key = start; key <= end; key++) {
-
-  //   // salesDatasets[monthStrings[key]] = dates.filter(
-  //   //   (value) => value === key
-  //   // ).length;
-  // }
-
-  console.log(salesDatasets);
-
   return salesDatasets;
 };
 
