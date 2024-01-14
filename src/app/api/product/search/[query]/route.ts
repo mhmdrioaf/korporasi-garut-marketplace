@@ -14,6 +14,18 @@ async function handler(
   const productsResult = await products.searchProducts(params.query);
 
   if (productsResult) {
+    await db.product.updateMany({
+      where: {
+        id: {
+          in: productsResult.map((product) => product.id),
+        },
+      },
+      data: {
+        search_count: {
+          increment: 1,
+        },
+      },
+    });
     return NextResponse.json({ ok: true, result: productsResult });
   } else {
     return NextResponse.json({ ok: false, result: null });
