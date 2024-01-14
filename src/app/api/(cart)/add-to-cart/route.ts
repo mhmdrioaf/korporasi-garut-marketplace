@@ -17,7 +17,25 @@ async function handler(request: NextRequest) {
     const carts = new Carts(db.customer_cart, db.customer_cart_item);
     const addNewCart = await carts.initializeCart(body);
 
-    return NextResponse.json(addNewCart);
+    const updateProductCartCount = await db.product.update({
+      where: {
+        id: body.product.id,
+      },
+      data: {
+        cart_count: {
+          increment: body.product_quantity,
+        },
+      },
+    });
+
+    if (updateProductCartCount) {
+      return NextResponse.json(addNewCart);
+    } else {
+      return NextResponse.json({
+        ok: false,
+        message: "Gagal menambahkan item ke keranjang",
+      });
+    }
   } catch (error) {
     console.error("An error occurred while adding items to the cart: ", error);
     return NextResponse.json({

@@ -3,13 +3,14 @@
 import {
   ReactNode,
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
 } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
-import { fetcher } from "@/lib/helper";
+import { fetcher, filterSalesByDate } from "@/lib/helper";
 
 interface IAdminProviderProps {
   token: string;
@@ -23,30 +24,34 @@ export function useAdmin() {
 }
 
 export function AdminProvider({ token, children }: IAdminProviderProps) {
-  const [year, setYear] = useState<string>("2023");
-  const [startDate, setStartDate] = useState<string>("01");
-  const [endDate, setEndDate] = useState<string>("12");
+  const [year, setYear] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
 
-  const customFetcher = (url: string) =>
-    fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        token: token,
-        startDate: startDate ? `${year}-${startDate}-01` : `${year}-01-01`,
-        endDate: endDate ? `${year}-${endDate}-31` : `${year}-12-31`,
-      }),
-    })
-      .then((res) => res.json())
-      .then((response) => response.data as TSalesReportData[] | null);
+  const customFetcher = useCallback(async () => {
+    async function fetchData(url: string) {
+      const res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          token: token,
+        }),
+      });
+
+      const response = await res.json();
+      return response.data as TSalesReportData[] | null;
+    }
+
+    const data = await fetchData("/api/report/getSales");
+
+    return data;
+  }, [token]);
 
   const {
     data: salesData,
     isLoading: salesReportLoading,
     error: salesReportError,
   } = useSWR("/api/report/getSales", customFetcher);
-
-  const { mutate } = useSWRConfig();
 
   const { data: productsData, isLoading: productsDataLoading } = useSWR(
     "/api/product/list",
@@ -57,17 +62,19 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     setTab(tab);
   }
 
-  useEffect(() => {
-    if (startDate || endDate) {
-      mutate("/api/report/getSales");
+  function getSalesData() {
+    if (salesData) {
+      if (year) {
+        return filterSalesByDate(year, "01", "12", salesData);
+      } else if (startDate && endDate && year) {
+        return filterSalesByDate(year, startDate, endDate, salesData);
+      } else {
+        return salesData;
+      }
+    } else {
+      return [];
     }
-  }, [startDate, endDate, mutate]);
-
-  useEffect(() => {
-    if (year) {
-      mutate("/api/report/getSales");
-    }
-  }, [year, mutate]);
+  }
 
   useEffect(() => {
     ChartJS.register(...registerables);
@@ -79,7 +86,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     },
     reports: {
       sales: {
-        data: salesData,
+        data: getSalesData(),
         startDate: startDate,
         endDate: endDate,
         year: year,

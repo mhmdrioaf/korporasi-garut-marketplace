@@ -108,6 +108,9 @@ model product {
   tags                String[]
   status              PRODUCT_STATUS @default(PENDING)
   sold_count          Int            @default(0)
+  visitor             Int            @default(0)
+  cart_count          Int            @default(0)
+  search_count        Int            @default(0)
 
   category    product_category?    @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user                 @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)

@@ -487,17 +487,33 @@ export const getSales = (
   const dates = salesData.map((data) => {
     const date = new Date(data.order_date);
     const month = date.getMonth();
+    const year = date.getFullYear();
 
-    return month;
+    return {
+      month: month,
+      year: year,
+    };
   });
 
-  const salesDatasets: { [key: string]: number } = {};
+  const salesDatasets: {
+    [key: string]: {
+      [key: string]: number;
+    };
+  } = {};
 
-  for (let key = start; key <= end; key++) {
-    salesDatasets[monthStrings[key]] = dates.filter(
-      (value) => value === key
-    ).length;
-  }
+  dates.forEach((date) => {
+    const year = date.year;
+
+    for (let key = start; key <= end; key++) {
+      if (!salesDatasets[year]) {
+        salesDatasets[year] = {};
+      }
+
+      salesDatasets[year][monthStrings[key]] = dates.filter(
+        (value) => value.month === key && value.year === year
+      ).length;
+    }
+  });
 
   return salesDatasets;
 };
@@ -648,7 +664,9 @@ export const identifyProducts = (sales: TSalesReportData[]) => {
 };
 
 export const lowestSellingProducts = (products: TProduct[]) => {
-  const lowestSelling = products.filter((product) => product.sold_count < 1);
+  const lowestSelling = products.filter(
+    (product) => product.status === "APPROVED" && product.sold_count < 1
+  );
 
   return lowestSelling;
 };
@@ -835,4 +853,44 @@ export const reportMessage = (sales: TSalesReportData[]) => {
     : "";
 
   return highestSelling ? message + breakLine + highestSellingMessage : message;
+};
+
+export const getSalesYears = (sales: TSalesReportData[]) => {
+  let years: string[] = [];
+  const dates = sales.map((sale) => new Date(sale.order_date));
+  const orderYears = dates.map((date) => date.getFullYear());
+
+  orderYears.forEach((year) => {
+    if (!years.includes(year.toString())) {
+      years.push(year.toString());
+    }
+  });
+
+  return years;
+};
+
+export const filterSalesByDate = (
+  year: string,
+  startMonth: string,
+  endMonth: string,
+  sales: TSalesReportData[]
+) => {
+  const isOddDate = () => {
+    const month = parseInt(endMonth);
+    return month % 2 === 0;
+  };
+
+  const startDate = new Date(`${year}-${startMonth}-01`);
+  const endDate = new Date(
+    `${year}-${endMonth}-${
+      isOddDate() ? "30" : isOddDate() && endMonth === "02" ? "28" : "31"
+    }`
+  );
+
+  const salesData = sales.filter((sale) => {
+    const orderDate = new Date(sale.order_date);
+    return orderDate >= startDate && orderDate <= endDate;
+  });
+
+  return salesData;
 };

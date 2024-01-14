@@ -1,6 +1,11 @@
 "use client";
 
-import { getMonthString, getSales, getTotalProducts } from "@/lib/helper";
+import {
+  getMonthString,
+  getSales,
+  getSalesYears,
+  getTotalProducts,
+} from "@/lib/helper";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 
 import { Chart } from "react-chartjs-2";
@@ -21,15 +26,10 @@ export default function ReportsChart() {
         type="line"
         data={{
           labels: getMonthString(startDate, endDate),
-          datasets: [
-            {
-              data: reports.sales.data
-                ? getSales(reports.sales.data, startDate, endDate)
-                : [],
-              borderWidth: 1,
-              label: "Penjualan",
-            },
-          ],
+          datasets: getSalesYears(reports.sales.data ?? []).map((year) => ({
+            data: getSales(reports.sales.data ?? [], startDate, endDate)[year],
+            label: year,
+          })),
         }}
         options={{
           scales: {
