@@ -4,8 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 interface IGetSalesRequest {
   token: string;
-  startDate: string;
-  endDate: string;
 }
 
 async function handler(request: NextRequest) {
@@ -15,22 +13,12 @@ async function handler(request: NextRequest) {
     try {
       const ordersData: TSalesReportData[] = await db.orders.findMany({
         where: {
-          AND: [
+          OR: [
             {
-              order_date: {
-                gte: new Date(body.startDate),
-                lte: new Date(body.endDate),
-              },
+              order_status: "FINISHED",
             },
             {
-              OR: [
-                {
-                  order_status: "FINISHED",
-                },
-                {
-                  order_status: "DELIVERED",
-                },
-              ],
+              order_status: "DELIVERED",
             },
           ],
         },
