@@ -1,14 +1,13 @@
 "use client";
 
 import { TProduct } from "@/lib/globals";
-import { remoteImageSource, rupiahConverter } from "@/lib/helper";
-import Image from "next/image";
-import { Button } from "./button";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import { useEffect, useState } from "react";
 import ProductDelete from "./modals/product-delete";
 import { useToast } from "./use-toast";
+import SellerProductCard from "./seller-product-card";
+import ProductDetailModal from "./product-detail-modal";
 
 export type TDeleteResponse = {
   status: "success" | "destructive";
@@ -24,6 +23,10 @@ export default function DashboardProductList({
 }: IDashboardProductListComponentProps) {
   const [isDelete, setIsDelete] = useState<boolean>(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [productDetail, setProductDetail] = useState<{
+    product: TProduct | null;
+    open: boolean;
+  }>({ product: null, open: false });
   const [deleteResponse, setDeleteResponse] = useState<TDeleteResponse | null>(
     null
   );
@@ -40,6 +43,20 @@ export default function DashboardProductList({
     setProductToDelete(null);
   };
 
+  const onProductDetailOpen = (product: TProduct) => {
+    setProductDetail({
+      product: product,
+      open: true,
+    });
+  };
+
+  const onProductDetailCloses = () => {
+    setProductDetail({
+      product: null,
+      open: false,
+    });
+  };
+
   useEffect(() => {
     if (deleteResponse !== null) {
       toast({
@@ -51,6 +68,13 @@ export default function DashboardProductList({
 
   return (
     <>
+      {productDetail.product && productDetail.open && (
+        <ProductDetailModal
+          product={productDetail.product}
+          open={productDetail.open}
+          onClose={onProductDetailCloses}
+        />
+      )}
       <ProductDelete
         open={isDelete}
         product_id={productToDelete ?? ""}
@@ -73,56 +97,18 @@ export default function DashboardProductList({
             di unggah pada halaman marketplace.
           </p>
         </div>
-        {products.length > 0 &&
-          products.map((product) => (
-            <div
-              key={product.id}
-              className="w-full grid grid-cols-6 gap-1 p-2 rounded-md border border-input"
-            >
-              <div className="w-48 h-auto aspect-square rounded-sm overflow-hidden relative">
-                <Image
-                  src={remoteImageSource(product.images[0])}
-                  fill
-                  alt={product.title}
-                  className="object-cover"
-                  sizes="100vw"
-                />
-              </div>
 
-              <div className="flex flex-col gap-2 col-span-2 self-center">
-                <p className="text-xl font-bold">{product.title}</p>
-                <p className="text-sm">
-                  Stok tersedia: {product.stock} {product.unit}
-                </p>
-                <p className="text-sm">Total produk terjual: {product.sold_count} {product.unit}</p>
-              </div>
-
-              <p className="font-bold text-xl col-span-2 self-center">
-                {rupiahConverter(product.price)}
-              </p>
-
-              <div className="flex flex-col gap-2 self-center">
-                <Link
-                  href={ROUTES.PRODUCT.EDIT(product.id.toString())}
-                  className="grid place-items-center bg-secondary text-secondary-foreground text-sm px-4 py-2 rounded-md"
-                >
-                  Edit produk
-                </Link>
-                <Link
-                  href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
-                  className="grid place-items-center bg-primary text-primary-foreground text-sm px-4 py-2 rounded-md"
-                >
-                  Detail produk
-                </Link>
-                <Button
-                  variant="destructive"
-                  onClick={() => openDeleteModal(product.id.toString())}
-                >
-                  Hapus produk
-                </Button>
-              </div>
-            </div>
-          ))}
+        <div className="w-full grid grid-cols-4 gap-4">
+          {products.length > 0 &&
+            products.map((product) => (
+              <SellerProductCard
+                key={product.id}
+                product={product}
+                onDelete={openDeleteModal}
+                onProductDetail={onProductDetailOpen}
+              />
+            ))}
+        </div>
 
         {products.length < 1 && (
           <>
