@@ -6,7 +6,6 @@ import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "./button";
-import { Separator } from "./separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,57 +101,4 @@ export default function SellerProductCard({
       </Button>
     </div>
   );
-}
-
-{
-  /* <div className="w-full grid grid-cols-6 gap-1">
-        <div className="w-40 h-auto aspect-square rounded-sm overflow-hidden relative">
-          <Image
-            src={remoteImageSource(product.images[0])}
-            fill
-            alt={product.title}
-            className="object-cover"
-            sizes="100vw"
-          />
-        </div>
-
-        <div className="flex flex-col gap-2 col-span-2 self-center">
-          <p className="text-xl font-bold">{product.title}</p>
-        </div>
-
-        <p className="font-bold text-xl col-span-2 self-center">
-          {rupiahConverter(product.price)}
-        </p>
-
-        <div className="flex flex-col gap-2 self-center">
-          <Link
-            href={ROUTES.PRODUCT.EDIT(product.id.toString())}
-            className="grid place-items-center bg-secondary text-secondary-foreground text-sm px-4 py-2 rounded-md"
-          >
-            Edit produk
-          </Link>
-          <Link
-            href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
-            className="grid place-items-center bg-primary text-primary-foreground text-sm px-4 py-2 rounded-md"
-          >
-            Detail produk
-          </Link>
-          <Button
-            variant="destructive"
-            onClick={() => onDelete(product.id.toString())}
-          >
-            Hapus produk
-          </Button>
-        </div>
-      </div>
-
-      <Separator />
-      <div className="w-fit flex flex-col gap-2">
-        {productIdentificationsData.map((data, index) => (
-          <div className="grid grid-cols-2 gap-2" key={index}>
-            <p className="text-sm font-bold">{data.title}</p>
-            <p className="text-sm">{data.value}</p>
-          </div>
-        ))}
-      </div> */
 }
