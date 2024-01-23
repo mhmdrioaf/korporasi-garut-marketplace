@@ -48,33 +48,35 @@ export default class Product {
   ) {}
 
   async addProduct(data: IProductData) {
-    const variantItems = data.variant
-      ? data.variant.variant_item.map((item) => ({
-          variant_item_id: variantItemsIdGenerator(
-            data.product.title,
-            data.variant?.variant_title ?? "",
-            item.variant_item_name
-          ),
-          variant_name: properizeWords(item.variant_item_name),
-          variant_price: item.variant_item_price,
-          variant_stock: item.variant_item_stock,
-        }))
-      : [];
+    const variantItems =
+      data.variant && data.variant.variant_item.length > 0
+        ? data.variant.variant_item.map((item) => ({
+            variant_item_id: variantItemsIdGenerator(
+              data.product.title,
+              data.variant?.variant_title ?? "",
+              item.variant_item_name
+            ),
+            variant_name: properizeWords(item.variant_item_name),
+            variant_price: item.variant_item_price,
+            variant_stock: item.variant_item_stock,
+          }))
+        : [];
 
-    const variant = data.variant
-      ? {
-          variant_id: variantIdGenerator(
-            data.product.title,
-            data.variant.variant_title
-          ),
-          variant_title: data.variant.variant_title,
-          variant_item: {
-            createMany: {
-              data: variantItems,
+    const variant =
+      data.variant && data.variant.variant_item.length > 0
+        ? {
+            variant_id: variantIdGenerator(
+              data.product.title,
+              data.variant.variant_title
+            ),
+            variant_title: data.variant.variant_title,
+            variant_item: {
+              createMany: {
+                data: variantItems,
+              },
             },
-          },
-        }
-      : {};
+          }
+        : {};
 
     return await this.prismaProduct.create({
       data: {
@@ -87,19 +89,20 @@ export default class Product {
         weight: data.product.weight,
         images: data.product.images,
         stock: data.product.stock,
-        variant: data.variant
-          ? {
-              create: {
-                variant_id: variant.variant_id ?? "",
-                variant_title: variant.variant_title ?? "",
-                variant_item: {
-                  createMany: {
-                    data: variantItems,
+        variant:
+          data.variant && data.variant.variant_item.length > 0
+            ? {
+                create: {
+                  variant_id: variant.variant_id ?? "",
+                  variant_title: variant.variant_title ?? "",
+                  variant_item: {
+                    createMany: {
+                      data: variantItems,
+                    },
                   },
                 },
-              },
-            }
-          : undefined,
+              }
+            : undefined,
         category_id: data.product.category_id ?? null,
         tags: data.tags,
         capable_out_of_town: convertStringToBoolean(

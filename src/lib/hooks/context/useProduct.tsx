@@ -230,6 +230,13 @@ export function ProductProvider({
     try {
       const imagesURL = await uploadImages(productsId);
 
+      console.log(data.variant);
+
+      const productPrice =
+        withVariants && data.variant
+          ? data.variant.variant_item[0].variant_item_price
+          : price;
+
       const res = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_CREATE!, {
         method: "PUT",
         headers: {
@@ -238,9 +245,7 @@ export function ProductProvider({
         body: JSON.stringify({
           product: {
             ...productData,
-            price: data.variant
-              ? data.variant.variant_item[0].variant_item_price
-              : price,
+            price: productPrice,
             seller_id: session.user.id,
             stock:
               controlledVariantItems.length > 0
