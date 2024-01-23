@@ -914,3 +914,17 @@ export const advancedProductIdentifications = (products: TProduct[]) => {
     cart: mostCarted[0],
   };
 };
+
+export const fullAddressGenerator = (
+  province: string,
+  city: string,
+  district: string,
+  village: string,
+  fullAddress: string
+) => {
+  const districtName = district !== "NO_DATA" ? district : "";
+  const villageName = village !== "NO_DATA" ? village : "";
+  const value = `${fullAddress}, ${properizeWords(villageName)}, ${properizeWords(districtName)}, ${city}, ${province}, Indonesia`;
+
+  return value;
+};
