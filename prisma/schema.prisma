@@ -40,6 +40,8 @@ model address {
   address_id             String @id
   city_id                String
   user_id                Int
+  district               String
+  village                String
   full_address           String
   label                  String
   recipient_name         String

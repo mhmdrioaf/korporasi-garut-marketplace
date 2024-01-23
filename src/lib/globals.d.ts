@@ -184,6 +184,13 @@ type TAddress = {
   user_id: number;
   recipient_name: string;
   recipient_phone_number: string;
+  village: string;
+  district: string;
+};
+
+type TDistrict = {
+  code: string;
+  name: string;
 };
 
 type TProvince = {
