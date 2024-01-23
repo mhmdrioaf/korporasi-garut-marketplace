@@ -1,6 +1,6 @@
 "use client";
 
-import { TAddress, TCity, TDistrict, TProvince } from "@/lib/globals";
+import { TAddress, TCity, TDistrict, TProvince, TVillage } from "@/lib/globals";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR, { useSWRConfig } from "swr";
@@ -50,6 +50,7 @@ export default function AddressForm({
     option: "district",
     open: false,
   });
+  const [districtCode, setDistrictCode] = useState<string | null>(null);
 
   const form = useForm<TAddressInput>({
     defaultValues: {
@@ -84,6 +85,25 @@ export default function AddressForm({
 
     const response = await res.json();
     return response.result as TDistrict[];
+  };
+
+  const villagesFetcher = async () => {
+    if (districtCode) {
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API_LOCATIONS_GET_VILLAGES!,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            district_code: districtCode,
+          }),
+        }
+      );
+
+      const response = await res.json();
+      return response.result as TVillage[];
+    } else {
+      return [] as TVillage[];
+    }
   };
 
   const { data: provinces, isLoading: provincesLoading } = useSWR(
@@ -132,8 +152,27 @@ export default function AddressForm({
     districtFetcher
   );
 
+  const { data: villagesData, isLoading: villagesLoading } = useSWR(
+    "/api/shipping/get-villages",
+    villagesFetcher
+  );
+
   const onDistrictChangeHandler = (district: string) => {
     form.setValue("district", district);
+
+    const districtCode = districtsData?.find(
+      (_district) => _district.name === district
+    )?.code;
+    setDistrictCode(districtCode ?? null);
+
+    mutate("/api/shipping/get-villages", villagesFetcher, {
+      revalidate: true,
+      rollbackOnError: false,
+    });
+  };
+
+  const onVillageChangeHandler = (village: string) => {
+    form.setValue("village", village);
   };
 
   const onHelpModalOpen = (option: "district" | "village") => {
@@ -374,19 +413,94 @@ export default function AddressForm({
             <SelectContent className="overflow-y-auto max-h-[45vh]">
               {districtLoading ? (
                 <SelectItem value="loading" disabled>
-                  Memuat kota/kabupaten...
+                  Memuat kecamatan...
                 </SelectItem>
               ) : districtsData && districtsData.length > 0 ? (
-                districtsData.map((district) => (
-                  <SelectItem key={district.code} value={district.name}>
-                    {properizeWords(district.name)}
-                  </SelectItem>
-                ))
+                districtsData
+                  .sort((a, b) => {
+                    if (a.name < b.name) {
+                      return -1;
+                    }
+                    if (a.name > b.name) {
+                      return 0;
+                    }
+                    return 0;
+                  })
+                  .map((district) => (
+                    <SelectItem key={district.code} value={district.name}>
+                      {properizeWords(district.name)}
+                    </SelectItem>
+                  ))
               ) : (
                 districtsData &&
                 districtsData.length < 1 && (
                   <SelectItem value="NO_DATA" disabled>
                     Tidak ada data kecamatan
+                  </SelectItem>
+                )
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="w-full flex flex-col gap-2">
+          <div className="flex flex-row items-center gap-2">
+            <Label htmlFor="city">Desa</Label>
+            <Button
+              variant="ghost"
+              size="icon"
+              type="button"
+              onClick={() => onHelpModalOpen("village")}
+            >
+              <HelpCircleIcon className="w-4 h-4" />
+            </Button>
+          </div>
+          <Select
+            onValueChange={(value) => onVillageChangeHandler(value)}
+            disabled={
+              !form.watch("district") ||
+              !districtCode ||
+              villagesLoading ||
+              (villagesData && villagesData.length < 1)
+            }
+            defaultValue={form.watch("village")}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue
+                placeholder={
+                  villagesData && villagesData.length < 1
+                    ? "Tidak ada data desa"
+                    : "Pilih Desa"
+                }
+              />
+            </SelectTrigger>
+
+            <SelectContent className="overflow-y-auto max-h-[45vh]">
+              {villagesLoading ? (
+                <SelectItem value="loading" disabled>
+                  Memuat data desa...
+                </SelectItem>
+              ) : villagesData && villagesData.length > 0 ? (
+                villagesData
+                  .sort((a, b) => {
+                    if (a.name < b.name) {
+                      return -1;
+                    }
+                    if (a.name > b.name) {
+                      return 0;
+                    }
+                    return 0;
+                  })
+                  .map((village) => (
+                    <SelectItem key={village.code} value={village.name}>
+                      {properizeWords(village.name)}
+                    </SelectItem>
+                  ))
+              ) : (
+                villagesData &&
+                villagesData.length < 1 && (
+                  <SelectItem value="NO_DATA" disabled>
+                    Tidak ada data desa
                   </SelectItem>
                 )
               )}
@@ -408,7 +522,7 @@ export default function AddressForm({
           <Label htmlFor="fullAddress">Alamat Lengkap</Label>
           <Textarea
             id="fullAddress"
-            placeholder="Kecamatan, Kelurahan, RT/RW, Kode Pos, Nomor Rumah"
+            placeholder="Nama Jalan/Patokan/Nomor Rumah"
             rows={5}
             {...form.register("fullAddress")}
           />
