@@ -13,6 +13,8 @@ type TAddAddress = {
   recipientName: string;
   recipientPhoneNumber: string;
   label: string;
+  district: string;
+  village: string;
 };
 
 export default class Address {
@@ -56,6 +58,8 @@ export default class Address {
                 maxValue ? maxValue + 1 : 1,
                 data.user_id
               ),
+              district: data.district,
+              village: data.village,
               full_address: data.fullAddress,
               recipient_name: properizeWords(data.recipientName),
               recipient_phone_number: phoneNumberGenerator(
