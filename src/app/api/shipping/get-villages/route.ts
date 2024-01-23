@@ -14,7 +14,7 @@ async function handler(request: NextRequest) {
     const res = await fetch(apiURL, {
       method: "GET",
       headers: {
-        key: process.env.NEXT_PUBLIC_LOCATIONS_SECRET!,
+        key: process.env.NEXT_LOCATIONS_SECRET!,
       },
     });
 
