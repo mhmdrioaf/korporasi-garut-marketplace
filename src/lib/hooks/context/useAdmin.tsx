@@ -8,9 +8,10 @@ import {
   useEffect,
   useState,
 } from "react";
-import useSWR, { useSWRConfig } from "swr";
+import useSWR from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { fetcher, filterSalesByDate } from "@/lib/helper";
+import { TProduct } from "@/lib/globals";
 
 interface IAdminProviderProps {
   token: string;
@@ -28,6 +29,13 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
+  const [productDetail, setProductDetail] = useState<{
+    product: TProduct | null;
+    open: boolean;
+  }>({
+    product: null,
+    open: false,
+  });
 
   const customFetcher = useCallback(async () => {
     async function fetchData(url: string) {
@@ -76,6 +84,20 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     }
   }
 
+  function onProductDetailModalOpen(product: TProduct) {
+    setProductDetail({
+      product: product,
+      open: true,
+    });
+  }
+
+  function onProductDetailClose() {
+    setProductDetail({
+      product: null,
+      open: false,
+    });
+  }
+
   useEffect(() => {
     ChartJS.register(...registerables);
   }, []);
@@ -109,6 +131,15 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     products: {
       loading: productsDataLoading,
       data: productsData ? productsData.result.products : null,
+    },
+
+    state: {
+      product_detail: {
+        product: productDetail.product,
+        isOpen: productDetail.open,
+        onOpen: onProductDetailModalOpen,
+        onClose: onProductDetailClose,
+      },
     },
   };
 
