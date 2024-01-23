@@ -79,16 +79,19 @@ export function ProductProvider({
         weight: product?.weight,
         images: product?.images,
       },
-      variant: {
-        variant_id: product?.variant?.variant_id,
-        variant_item: product?.variant?.variant_item.map((item) => ({
-          variant_item_id: item.variant_item_id,
-          variant_item_name: item.variant_name,
-          variant_item_price: item.variant_price,
-          variant_item_stock: item.variant_stock,
-        })),
-        variant_title: product?.variant?.variant_title,
-      },
+      variant:
+        product && product.variant
+          ? {
+              variant_id: product.variant.variant_id,
+              variant_title: product.variant.variant_title,
+              variant_item: product.variant.variant_item.map((item) => ({
+                variant_item_id: item.variant_item_id,
+                variant_item_name: item.variant_name,
+                variant_item_price: item.variant_price,
+                variant_item_stock: item.variant_stock,
+              })),
+            }
+          : null,
     },
   });
 
