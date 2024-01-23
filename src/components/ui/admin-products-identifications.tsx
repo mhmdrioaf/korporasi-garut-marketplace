@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  advancedProductIdentifications,
   highestProductsSellingWeekly,
   identifyProducts,
   lowestSellingProducts,
@@ -13,6 +14,18 @@ import { Separator } from "./separator";
 
 export default function AdminProductsIdentifications() {
   const { reports, products } = useAdmin();
+
+  const identifyAdvancedProductsData = () => {
+    if (products.data) {
+      const productsData = advancedProductIdentifications(products.data);
+      return productsData;
+    } else {
+      return null;
+    }
+  };
+
+  const advancedProductsData = identifyAdvancedProductsData();
+
   if (reports.sales.data) {
     const productsData = identifyProducts(reports.sales.data);
     const highestSellingWeekly = highestProductsSellingWeekly(
@@ -176,6 +189,121 @@ export default function AdminProductsIdentifications() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        <Separator />
+        {advancedProductsData && (
+          <div className="w-full flex flex-col gap-4">
+            {advancedProductsData.search && (
+              <div className="w-full flex flex-col gap-2 p-2 rounded-md border border-input">
+                <p className="font-bold">Produk yang paling banyak di cari</p>
+
+                <div className="w-full grid grid-cols-2">
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="w-20 h-auto aspect-square relative rounded-md overflow-hidden">
+                      <Image
+                        src={remoteImageSource(
+                          advancedProductsData.search.images[0]
+                        )}
+                        fill
+                        className="object-cover"
+                        alt="Foto produk"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <b>{advancedProductsData.search.title}</b>
+                      <p className="text-xs">
+                        {advancedProductsData.search.seller.account.user_name}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2 justify-self-end self-center">
+                    <p className="font-bold">Total pencarian:</p>
+                    <p>{advancedProductsData.search.search_count} kali</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Separator />
+
+            {advancedProductsData.view && (
+              <div className="w-full flex flex-col gap-2 p-2 rounded-md border border-input">
+                <p className="font-bold">Produk yang paling banyak di lihat</p>
+
+                <div className="w-full grid grid-cols-2">
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="w-20 h-auto aspect-square relative rounded-md overflow-hidden">
+                      <Image
+                        src={remoteImageSource(
+                          advancedProductsData.view.images[0]
+                        )}
+                        fill
+                        className="object-cover"
+                        alt="Foto produk"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <b>{advancedProductsData.view.title}</b>
+                      <p className="text-xs">
+                        {advancedProductsData.view.seller.account.user_name}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2 justify-self-end self-center">
+                    <p className="font-bold">Total dilihat:</p>
+                    <p>{advancedProductsData.view.visitor} kali</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <Separator />
+
+            {advancedProductsData.cart && (
+              <div className="w-full flex flex-col gap-2 p-2 rounded-md border border-input">
+                <p className="font-bold">
+                  Produk yang paling banyak di tambahkan kedalam keranjang
+                </p>
+
+                <div className="w-full grid grid-cols-2">
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="w-20 h-auto aspect-square relative rounded-md overflow-hidden">
+                      <Image
+                        src={remoteImageSource(
+                          advancedProductsData.cart.images[0]
+                        )}
+                        fill
+                        className="object-cover"
+                        alt="Foto produk"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <b>{advancedProductsData.cart.title}</b>
+                      <p className="text-xs">
+                        {advancedProductsData.cart.seller.account.user_name}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2 justify-self-end self-center">
+                    <p className="font-bold">
+                      Total produk dalam keranjang konsumen:
+                    </p>
+                    <p>
+                      {advancedProductsData.cart.cart_count}{" "}
+                      {advancedProductsData.cart.unit}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

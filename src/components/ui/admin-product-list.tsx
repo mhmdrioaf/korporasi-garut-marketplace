@@ -1,14 +1,14 @@
 "use client";
 
-import { ROUTES } from "@/lib/constants";
 import { TProduct } from "@/lib/globals";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
-import Link from "next/link";
 import { Button } from "./button";
 import { useEffect, useState } from "react";
 import ProductStatusChangeModal from "./modals/product-status-change";
 import { useToast } from "./use-toast";
+import { useAdmin } from "@/lib/hooks/context/useAdmin";
+import AdminProductDetailModal from "./modals/admin-product-detail";
 
 interface IAdminProductListComponentProps {
   products: TProduct[];
@@ -47,6 +47,8 @@ export default function AdminProductList({
     setProductToUpdate(null);
   };
 
+  const { state } = useAdmin();
+
   useEffect(() => {
     if (productStatusUpdateResponse !== null) {
       toast({
@@ -66,6 +68,14 @@ export default function AdminProductList({
         setStatusUpdateResponse={setProductStatusUpdateResponse}
         token={token}
       />
+
+      <AdminProductDetailModal
+        onClose={state.product_detail.onClose}
+        open={state.product_detail.isOpen}
+        product={state.product_detail.product}
+        onStatusChange={openProductStatusChangeModal}
+      />
+
       <div className="w-full flex flex-col gap-4">
         {products.length > 0 &&
           products.map((product) => (
@@ -96,12 +106,12 @@ export default function AdminProductList({
               </p>
 
               <div className="flex flex-col gap-2">
-                <Link
-                  href={ROUTES.ADMIN.PRODUCT_DETAIL(product.id.toString())}
-                  className="grid place-items-center bg-secondary text-secondary-foreground text-sm px-4 py-2 rounded-md"
+                <Button
+                  variant="secondary"
+                  onClick={() => state.product_detail.onOpen(product)}
                 >
-                  Detail produk
-                </Link>
+                  Detail Produk
+                </Button>
 
                 {product.status !== "APPROVED" && (
                   <Button
@@ -133,11 +143,11 @@ export default function AdminProductList({
 
                 <p className="text-sm">
                   Status produk saat ini:{" "}
-                  {product.status === "APPROVED"
-                    ? "Disetujui"
-                    : "REJECTED"
-                    ? "Ditolak"
-                    : "Menunggu Persetujuan"}
+                  {product.status === "PENDING"
+                    ? "Menunggu Persetujuan"
+                    : product.status === "APPROVED"
+                      ? "Disetujui"
+                      : "Ditolak"}
                 </p>
               </div>
             </div>

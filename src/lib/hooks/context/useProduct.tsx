@@ -79,16 +79,19 @@ export function ProductProvider({
         weight: product?.weight,
         images: product?.images,
       },
-      variant: {
-        variant_id: product?.variant?.variant_id,
-        variant_item: product?.variant?.variant_item.map((item) => ({
-          variant_item_id: item.variant_item_id,
-          variant_item_name: item.variant_name,
-          variant_item_price: item.variant_price,
-          variant_item_stock: item.variant_stock,
-        })),
-        variant_title: product?.variant?.variant_title,
-      },
+      variant:
+        product && product.variant
+          ? {
+              variant_id: product.variant.variant_id,
+              variant_title: product.variant.variant_title,
+              variant_item: product.variant.variant_item.map((item) => ({
+                variant_item_id: item.variant_item_id,
+                variant_item_name: item.variant_name,
+                variant_item_price: item.variant_price,
+                variant_item_stock: item.variant_stock,
+              })),
+            }
+          : null,
     },
   });
 
@@ -230,6 +233,13 @@ export function ProductProvider({
     try {
       const imagesURL = await uploadImages(productsId);
 
+      console.log(data.variant);
+
+      const productPrice =
+        withVariants && data.variant
+          ? data.variant.variant_item[0].variant_item_price
+          : price;
+
       const res = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_CREATE!, {
         method: "PUT",
         headers: {
@@ -238,9 +248,7 @@ export function ProductProvider({
         body: JSON.stringify({
           product: {
             ...productData,
-            price: data.variant
-              ? data.variant.variant_item[0].variant_item_price
-              : price,
+            price: productPrice,
             seller_id: session.user.id,
             stock:
               controlledVariantItems.length > 0

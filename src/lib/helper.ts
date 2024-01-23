@@ -894,3 +894,23 @@ export const filterSalesByDate = (
 
   return salesData;
 };
+
+export const advancedProductIdentifications = (products: TProduct[]) => {
+  const mostSearched = products
+    .filter((product) => product.search_count > 0)
+    .sort((a, b) => b.search_count - a.search_count);
+
+  const mostViewed = products
+    .filter((product) => product.visitor > 0)
+    .sort((a, b) => b.visitor - a.visitor);
+
+  const mostCarted = products
+    .filter((product) => product.cart_count > 0)
+    .sort((a, b) => b.cart_count - a.cart_count);
+
+  return {
+    search: mostSearched[0],
+    view: mostViewed[0],
+    cart: mostCarted[0],
+  };
+};

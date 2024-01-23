@@ -28,7 +28,7 @@ export default function ProductVariantInput() {
               <Input
                 type="text"
                 {...form.productForm.register("variant.variant_title")}
-                required
+                required={form.variant.withVariants}
               />
               <Button
                 type="button"
@@ -65,7 +65,7 @@ export default function ProductVariantInput() {
                     {...form.productForm.register(
                       `variant.variant_item.${index}.variant_item_name` as const
                     )}
-                    required
+                    required={form.variant.withVariants}
                   />
                   <Button
                     variant="destructive"
@@ -118,7 +118,7 @@ export default function ProductVariantInput() {
                             setValueAs: (value) => parseInt(value),
                           }
                         )}
-                        required
+                        required={form.variant.withVariants}
                       />
                     </TableCell>
                     <TableCell>
@@ -130,7 +130,7 @@ export default function ProductVariantInput() {
                             setValueAs: (value) => parseInt(value),
                           }
                         )}
-                        required
+                        required={form.variant.withVariants}
                       />
                     </TableCell>
                   </TableRow>

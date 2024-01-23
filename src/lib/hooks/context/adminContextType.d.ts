@@ -31,4 +31,13 @@ type TAdminContextType = {
     loading: boolean;
     data: TProduct[] | null;
   };
+
+  state: {
+    product_detail: {
+      product: TProduct | null;
+      isOpen: boolean;
+      onClose: () => void;
+      onOpen: (product: TProduct) => void;
+    };
+  };
 };
