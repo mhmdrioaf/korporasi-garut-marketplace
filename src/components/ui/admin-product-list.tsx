@@ -145,7 +145,7 @@ export default function AdminProductList({
                   Status produk saat ini:{" "}
                   {product.status === "PENDING"
                     ? "Menunggu Persetujuan"
-                    : "APPROVED"
+                    : product.status === "APPROVED"
                       ? "Disetujui"
                       : "Ditolak"}
                 </p>
