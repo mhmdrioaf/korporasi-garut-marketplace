@@ -193,6 +193,11 @@ type TDistrict = {
   name: string;
 };
 
+type TVillage = {
+  code: string;
+  name: string;
+};
+
 type TProvince = {
   province_id: string;
   province: string;
