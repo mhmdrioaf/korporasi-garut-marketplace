@@ -50,7 +50,6 @@ export default function AddressForm({
     option: "district",
     open: false,
   });
-  const [districtCode, setDistrictCode] = useState<string | null>(null);
 
   const form = useForm<TAddressInput>({
     defaultValues: {
@@ -152,6 +151,14 @@ export default function AddressForm({
     districtFetcher
   );
 
+  const [districtCode, setDistrictCode] = useState<string | null>(
+    defaultAddress
+      ? districtsData?.find(
+          (district) => district.name === defaultAddress.district
+        )?.code ?? null
+      : null
+  );
+
   const { data: villagesData, isLoading: villagesLoading } = useSWR(
     "/api/shipping/get-villages",
     villagesFetcher
@@ -248,6 +255,8 @@ export default function AddressForm({
             label: data.label,
             recipientName: data.recipient_name,
             recipientPhoneNumber: data.recipient_phone,
+            district: data.district ? data.district : "NO_DATA",
+            village: data.village ? data.village : "NO_DATA",
           }),
         }
       );

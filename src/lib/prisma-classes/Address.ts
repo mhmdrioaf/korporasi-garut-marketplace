@@ -157,6 +157,8 @@ export default class Address {
         label: properizeWords(data.label),
         recipient_name: properizeWords(data.recipientName),
         recipient_phone_number: phoneNumberGenerator(data.recipientPhoneNumber),
+        district: data.district,
+        village: data.village,
       },
     });
   }

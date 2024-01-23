@@ -10,6 +10,8 @@ interface IUpdateAddressBody {
   recipientName: string;
   recipientPhoneNumber: string;
   label: string;
+  district: string;
+  village: string;
 }
 
 async function handler(request: NextRequest) {
@@ -35,6 +37,8 @@ async function handler(request: NextRequest) {
       recipientName: body.recipientName,
       recipientPhoneNumber: body.recipientPhoneNumber,
       user_id: body.user_id,
+      district: body.district,
+      village: body.village,
     });
 
     if (updateAddress) {
