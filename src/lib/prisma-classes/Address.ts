@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import {
   addressIdGenerator,
+  fullAddressGenerator,
   phoneNumberGenerator,
   properizeWords,
 } from "../helper";
@@ -13,6 +14,8 @@ type TAddAddress = {
   recipientName: string;
   recipientPhoneNumber: string;
   label: string;
+  district: string;
+  village: string;
 };
 
 export default class Address {
@@ -56,7 +59,15 @@ export default class Address {
                 maxValue ? maxValue + 1 : 1,
                 data.user_id
               ),
-              full_address: data.fullAddress,
+              district: data.district,
+              village: data.village,
+              full_address: fullAddressGenerator(
+                data.city.province,
+                data.city.city_name,
+                data.district,
+                data.village,
+                data.fullAddress
+              ),
               recipient_name: properizeWords(data.recipientName),
               recipient_phone_number: phoneNumberGenerator(
                 data.recipientPhoneNumber
@@ -146,6 +157,8 @@ export default class Address {
         label: properizeWords(data.label),
         recipient_name: properizeWords(data.recipientName),
         recipient_phone_number: phoneNumberGenerator(data.recipientPhoneNumber),
+        district: data.district,
+        village: data.village,
       },
     });
   }

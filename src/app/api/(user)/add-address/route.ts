@@ -9,6 +9,8 @@ interface IAddressBody {
   recipient_name: string;
   recipient_phone: string;
   label: string;
+  district: string;
+  village: string;
 }
 
 async function handler(request: NextRequest) {
@@ -33,6 +35,8 @@ async function handler(request: NextRequest) {
         recipientName: body.recipient_name,
         recipientPhoneNumber: body.recipient_phone,
         user_id: body.user_id,
+        district: body.district,
+        village: body.village,
       });
 
       if (newAddress) {
