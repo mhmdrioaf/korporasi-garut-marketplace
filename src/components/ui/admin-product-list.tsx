@@ -133,11 +133,11 @@ export default function AdminProductList({
 
                 <p className="text-sm">
                   Status produk saat ini:{" "}
-                  {product.status === "APPROVED"
-                    ? "Disetujui"
-                    : "REJECTED"
-                    ? "Ditolak"
-                    : "Menunggu Persetujuan"}
+                  {product.status === "PENDING"
+                    ? "Menunggu Persetujuan"
+                    : "APPROVED"
+                      ? "Disetujui"
+                      : "Ditolak"}
                 </p>
               </div>
             </div>
