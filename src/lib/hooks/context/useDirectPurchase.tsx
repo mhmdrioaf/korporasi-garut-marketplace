@@ -122,25 +122,30 @@ export function DirectPurchaseProvider({
     const value = parseInt(e.target.value);
 
     if (!isNaN(value)) {
-      if (value > product.stock) {
-        setProductQuantity(product.stock);
-        setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price * product.stock
-            : product.price * product.stock
-        );
-      } else if (value < 1) {
-        setProductQuantity(1);
-        setTotalPrice(
-          variantsValue ? variantsValue.variant_price : product.price
-        );
+      if (!variantsValue) {
+        if (value > product.stock) {
+          setProductQuantity(product.stock);
+          setTotalPrice(product.price * product.stock);
+        } else if (value < 1) {
+          setProductQuantity(1);
+          setTotalPrice(product.price);
+        } else {
+          setProductQuantity(value);
+          setTotalPrice(product.price * value);
+        }
       } else {
-        setProductQuantity(value);
-        setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price * value
-            : product.price * value
-        );
+        if (value > variantsValue.variant_stock) {
+          setProductQuantity(variantsValue.variant_stock);
+          setTotalPrice(
+            variantsValue.variant_price * variantsValue.variant_stock
+          );
+        } else if (value < 1) {
+          setProductQuantity(1);
+          setTotalPrice(variantsValue.variant_price);
+        } else {
+          setProductQuantity(value);
+          setTotalPrice(variantsValue.variant_price * value);
+        }
       }
     } else {
       setProductQuantity(1);
@@ -336,20 +341,13 @@ export function DirectPurchaseProvider({
 
   useEffect(() => {
     if (variantsValue) {
-      if (
-        variantsValue.pending_order_count >= variantsValue.variant_stock ||
-        variantsValue.variant_stock < 1 ||
-        productQuantity + variantsValue.pending_order_count >
-          variantsValue.variant_stock
-      ) {
-        setIsPreorder(true);
-      } else {
-        setIsPreorder(false);
-      }
+      const status = variantsValue.variant_stock < 1;
+      setIsPreorder(status);
     } else {
-      setIsPreorder(false);
+      const status = product.stock < 1;
+      setIsPreorder(status);
     }
-  }, [variantsValue, productQuantity]);
+  }, [variantsValue, productQuantity, product]);
 
   useEffect(() => {
     if (!product.capable_out_of_town) {
