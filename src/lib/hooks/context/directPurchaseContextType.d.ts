@@ -71,6 +71,7 @@ type TDirectPurchaseContext = {
   handler: {
     resetPrice: () => void;
     resetAll: () => void;
+    onSamedayModalClose: () => void;
   };
   order: {
     step: number | null;
@@ -97,5 +98,7 @@ type TDirectPurchaseContext = {
     setVariantChooserOpen: (isVariantChooser: boolean) => void;
     variantChooserContext: "cart" | "buy" | null;
     isPreorder: boolean;
+    isSameDay: boolean;
+    sameDayModalOpen: boolean;
   };
 };

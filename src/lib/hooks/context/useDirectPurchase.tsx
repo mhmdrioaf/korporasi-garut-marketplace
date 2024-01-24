@@ -54,6 +54,8 @@ export function DirectPurchaseProvider({
   const [orderStep, setOrderStep] = useState<number | null>(null);
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [cartLoading, setCartLoading] = useState(false);
+  const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
+  const [isSameDay, setIsSameDay] = useState<boolean>(false);
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
@@ -310,6 +312,10 @@ export function DirectPurchaseProvider({
     setChosenAddress(null);
   };
 
+  const onSamedayModalClose = () => {
+    setSameDayModalOpen(false);
+  };
+
   useEffect(() => {
     const unsub = () => {
       if (product.variant && !variantsValue) {
@@ -344,6 +350,13 @@ export function DirectPurchaseProvider({
       setIsPreorder(false);
     }
   }, [variantsValue, productQuantity]);
+
+  useEffect(() => {
+    if (!product.capable_out_of_town) {
+      setIsSameDay(true);
+      setSameDayModalOpen(true);
+    }
+  }, [product.capable_out_of_town]);
 
   const value: TDirectPurchaseContext = {
     quantity: {
@@ -394,6 +407,7 @@ export function DirectPurchaseProvider({
     handler: {
       resetPrice: resetPrice,
       resetAll: onResetAll,
+      onSamedayModalClose: onSamedayModalClose,
     },
     customer: {
       user: user ? user.result : null,
@@ -430,6 +444,8 @@ export function DirectPurchaseProvider({
       setVariantChooserOpen: setIsVariantChooserOpen,
       variantChooserContext: variantChooserContext,
       isPreorder: isPreorder,
+      isSameDay: isSameDay,
+      sameDayModalOpen: sameDayModalOpen,
     },
   };
 

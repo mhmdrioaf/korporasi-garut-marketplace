@@ -24,6 +24,7 @@ import ProductVariants from "./product-variant";
 import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import VariantChooser from "./variant-chooser";
+import SameDayProductAlert from "./modals/same-day-product-alert";
 
 export default function ProductDetail() {
   const { product, image, price, variants, cart, quantity, state } =
@@ -251,6 +252,8 @@ export default function ProductDetail() {
         isOpen={state.isVariantChooserOpen}
         variant={product.variant}
       />
+
+      <SameDayProductAlert />
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">
