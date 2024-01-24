@@ -1,4 +1,7 @@
-import { sendNotificationHandler, sendSellerNotificationHandler } from "@/lib/actions/notification";
+import {
+  sendNotificationHandler,
+  sendSellerNotificationHandler,
+} from "@/lib/actions/notification";
 import { ROUTES } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -16,30 +19,33 @@ async function handler(request: NextRequest) {
       include: {
         order_item: {
           select: {
+            order_quantity: true,
             product: {
               select: {
-                seller_id: true
-              }
-            }
-          }
-        }
-      }
+                seller_id: true,
+                id: true,
+              },
+            },
+            variant: true,
+          },
+        },
+      },
     });
 
-    if (productOrder) {
+    if (productOrder && productOrder.order_status === "PENDING") {
       const updateOrderStatus = db.orders.update({
         where: {
-          order_id: orderID
+          order_id: orderID,
         },
         data: {
-          order_status: "PAID"
-        }
+          order_status: "PAID",
+        },
       });
 
       const sendCustomerNotification = sendNotificationHandler({
         subscriber_target: productOrder.user_id.toString(),
         notification_title: `Pesanan dengan ID ${orderID} berhasil dibayar dan sedang menunggu pengiriman.`,
-        notification_redirect_url: "/user/dashboard/orders?state=PAID"
+        notification_redirect_url: "/user/dashboard/orders?state=PAID",
       });
 
       const sendSellerNotification = sendSellerNotificationHandler({
@@ -47,7 +53,41 @@ async function handler(request: NextRequest) {
         order_id: orderID,
       });
 
-      await Promise.all([updateOrderStatus, sendCustomerNotification, sendSellerNotification]).then(() => redirect(ROUTES.USER.ORDERS));
+      for (const item of productOrder.order_item) {
+        if (item.variant) {
+          await db.product_variant_item.update({
+            where: {
+              variant_item_id: item.variant.variant_item_id,
+            },
+            data: {
+              variant_stock: {
+                decrement: item.order_quantity,
+              },
+              pending_order_count: {
+                decrement: item.order_quantity,
+              },
+            },
+          });
+        }
+        await db.product.update({
+          where: {
+            id: item.product.id,
+          },
+          data: {
+            stock: {
+              decrement: item.order_quantity,
+            },
+          },
+        });
+      }
+
+      await Promise.all([
+        updateOrderStatus,
+        sendCustomerNotification,
+        sendSellerNotification,
+      ]).then(() => redirect(ROUTES.USER.ORDERS));
+    } else {
+      return redirect(ROUTES.USER.ORDERS);
     }
   }
 }
