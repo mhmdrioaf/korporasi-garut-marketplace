@@ -126,5 +126,18 @@ type TCartContext = {
 
   state: {
     isPreOrder: boolean;
+    orderable: boolean;
+    sameDay: boolean;
+    sameDayData: {
+      price: number;
+      eta: number;
+    };
+    sameDayCourier: {
+      [sellerID: number]: number;
+    };
+  };
+
+  handler: {
+    sameDayCourier: (sellerID: number, price: number) => void;
   };
 };

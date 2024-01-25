@@ -4,6 +4,7 @@ import {
   TAddress,
   TCustomerCart,
   TCustomerCartItem,
+  TSameDayShippingResult,
   TShippingCost,
   TShippingCostServiceCost,
 } from "@/lib/globals";
@@ -23,7 +24,7 @@ import {
   TCartContext,
 } from "./cartContextType";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { fetcher } from "@/lib/helper";
+import { fetcher, getSameDayShippingDetail } from "@/lib/helper";
 import useSWR from "swr";
 import {
   cartItemDeleteHandler,
@@ -56,6 +57,17 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
 
   const [isOrdering, setIsOrdering] = useState<boolean>(false);
   const [isPreOrder, setIsPreOrder] = useState<boolean>(false);
+  const [orderable, setOrderable] = useState(true);
+  const [sameDay, setSameDay] = useState(false);
+
+  const [sameDayData, setSameDayData] = useState<{
+    price: number;
+    eta: number;
+  }>({ price: 0, eta: 0 });
+
+  const [sameDayCourier, setSameDayCourier] = useState<{
+    [sellerId: number]: number;
+  }>({});
 
   const {
     data: cartData,
@@ -380,12 +392,17 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       );
 
       const courier = chosenCourier && chosenCourier[parseInt(sellerID)];
+      const sameDayCourierData =
+        sameDayCourier && sameDayCourier[parseInt(sellerID)];
+
       const sellerShippingCourier = courier
         ? Object.keys(chosenCourier[parseInt(sellerID)])
         : null;
       const shippingPrice = sellerShippingCourier
         ? parseInt(sellerShippingCourier[0])
-        : 0;
+        : sameDayCourierData
+          ? sameDayCourierData
+          : 0;
 
       const totalPrice = itemsPrice + shippingPrice;
 
@@ -393,7 +410,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     });
 
     return total;
-  }, [chosenCourier, checkoutItems]);
+  }, [chosenCourier, checkoutItems, sameDayCourier]);
 
   const checkedItemsSellers = Object.keys(checkoutItems());
 
@@ -499,10 +516,12 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
   const totalChosenCourier = useCallback(() => {
     if (chosenCourier) {
       return Object.keys(chosenCourier).length;
+    } else if (sameDayCourier) {
+      return Object.keys(sameDayCourier).length;
     } else {
       return 0;
     }
-  }, [chosenCourier]);
+  }, [chosenCourier, sameDayCourier]);
 
   const totalCheckedSeller = useCallback(() => {
     const items = checkoutItems();
@@ -512,6 +531,13 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       return 0;
     }
   }, [checkoutItems]);
+
+  const onSamedayCourierChange = (sellerId: number, price: number) => {
+    setSameDayCourier((prev) => ({
+      ...prev,
+      [sellerId]: price,
+    }));
+  };
 
   const onCheckout = async () => {
     setIsOrdering(true);
@@ -625,6 +651,116 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     }
   }, [checkedItems]);
 
+  useEffect(() => {
+    if (checkedItems) {
+      const sellers = Object.keys(checkedItems);
+      let isOrderable = [true];
+      let isSameDay = [false];
+
+      sellers.forEach((seller) => {
+        const sellerItems = checkedItems[parseInt(seller)];
+        const items = Object.keys(sellerItems);
+
+        items.forEach((item) => {
+          const cartItem = sellerItems[parseInt(item)];
+          const product = cartItem.product;
+
+          const sellerPrimaryAddressID = product.seller.primary_address_id;
+          const sellerPrimaryAddress = product.seller.address.find(
+            (address) => address.address_id === sellerPrimaryAddressID
+          );
+
+          if (chosenAddress && sellerPrimaryAddress) {
+            if (
+              chosenAddress.city.city_id !== sellerPrimaryAddress.city.city_id
+            ) {
+              isOrderable.push(false);
+            }
+
+            if (product.stock === 0) {
+              isOrderable.push(false);
+            }
+          }
+
+          if (!product.capable_out_of_town) {
+            isSameDay.push(true);
+          }
+        });
+      });
+
+      if (isOrderable.includes(false)) {
+        setOrderable(false);
+      } else {
+        setOrderable(true);
+      }
+
+      if (isSameDay.includes(true)) {
+        setSameDay(true);
+      } else {
+        setSameDay(false);
+      }
+    }
+  }, [checkedItems, chosenAddress]);
+
+  useEffect(() => {
+    if (checkedItems) {
+      setSameDayData({ price: 0, eta: 0 });
+      const sellers = Object.keys(checkedItems);
+
+      sellers.forEach((seller) => {
+        const sellerItems = checkedItems[parseInt(seller)];
+        const items = Object.keys(sellerItems);
+
+        items.forEach((item) => {
+          const cartItem = sellerItems[parseInt(item)];
+          const product = cartItem.product;
+
+          const sellerPrimaryAddressID = product.seller.primary_address_id;
+          const sellerPrimaryAddress = product.seller.address.find(
+            (address) => address.address_id === sellerPrimaryAddressID
+          );
+
+          if (chosenAddress && sellerPrimaryAddress) {
+            if (
+              chosenAddress.city.city_id === sellerPrimaryAddress.city.city_id
+            ) {
+              const getSamedayShippingData = async () => {
+                const res = await fetch(
+                  process.env.NEXT_PUBLIC_API_SAMEDAY_SHIPPING_COST!,
+                  {
+                    method: "POST",
+                    body: JSON.stringify({
+                      origin: {
+                        lat: sellerPrimaryAddress.latidude,
+                        long: sellerPrimaryAddress.longitude,
+                      },
+                      currentLocation: {
+                        lat: chosenAddress.latidude,
+                        long: chosenAddress.longitude,
+                      },
+                    }),
+                  }
+                );
+
+                const response = await res.json();
+                const result = response.result as TSameDayShippingResult;
+
+                const _sameDayData = getSameDayShippingDetail(result);
+
+                setSameDayData((prev) => ({
+                  price: prev.price + _sameDayData.price,
+                  eta: prev.eta + _sameDayData.eta,
+                }));
+              };
+
+              getSamedayShippingData();
+            }
+          }
+        });
+      });
+    }
+  }, [checkedItems, chosenAddress]);
+
   const values: TCartContext = {
     cartItems: {
       checkbox: itemRef,
@@ -691,6 +827,13 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
     },
     state: {
       isPreOrder: isPreOrder,
+      orderable: orderable,
+      sameDay: sameDay,
+      sameDayData: sameDayData,
+      sameDayCourier: sameDayCourier,
+    },
+    handler: {
+      sameDayCourier: onSamedayCourierChange,
     },
   };
 

@@ -193,6 +193,8 @@ export default class Carts {
                       select: {
                         city: true,
                         address_id: true,
+                        latidude: true,
+                        longitude: true,
                       },
                     },
                     account: {
