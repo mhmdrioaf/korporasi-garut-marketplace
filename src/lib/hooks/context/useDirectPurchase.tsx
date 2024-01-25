@@ -56,6 +56,7 @@ export function DirectPurchaseProvider({
   const [cartLoading, setCartLoading] = useState(false);
   const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
   const [isSameDay, setIsSameDay] = useState<boolean>(false);
+  const [orderable, setOrderable] = useState<boolean>(true);
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
@@ -356,6 +357,20 @@ export function DirectPurchaseProvider({
     }
   }, [product.capable_out_of_town]);
 
+  useEffect(() => {
+    if (chosenAddress && sellerAddress) {
+      if (isSameDay) {
+        if (chosenAddress.city.city_id !== sellerAddress.city.city_id) {
+          setOrderable(false);
+        } else {
+          setOrderable(true);
+        }
+      } else {
+        setOrderable(true);
+      }
+    }
+  }, [chosenAddress, sellerAddress, isSameDay]);
+
   const value: TDirectPurchaseContext = {
     quantity: {
       productQuantity: productQuantity,
@@ -444,6 +459,7 @@ export function DirectPurchaseProvider({
       isPreorder: isPreorder,
       isSameDay: isSameDay,
       sameDayModalOpen: sameDayModalOpen,
+      orderable: orderable,
     },
   };
 

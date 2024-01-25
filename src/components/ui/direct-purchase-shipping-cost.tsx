@@ -7,7 +7,7 @@ import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import { CheckIcon } from "lucide-react";
 
 export default function DirectPurchaseShippingCost() {
-  const { shipping: shippingData, state } = useDirectPurchase();
+  const { shipping: shippingData, state, product } = useDirectPurchase();
 
   const shippingCostStyle = "w-full flex flex-row items-center justify-between";
 
@@ -55,8 +55,15 @@ export default function DirectPurchaseShippingCost() {
                         onClick={() =>
                           shippingData.handler.onCourierChange(cost)
                         }
+                        disabled={
+                          !state.orderable ||
+                          shippingEstimation(cost.etd) >= product.storage_period
+                        }
                       >
-                        Pilih Kurir
+                        {state.orderable &&
+                        shippingEstimation(cost.etd) <= product.storage_period
+                          ? "Pilih Kurir"
+                          : "Pengiriman tidak didukung"}
                       </Button>
                     )}
                   </div>

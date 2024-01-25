@@ -100,5 +100,6 @@ type TDirectPurchaseContext = {
     isPreorder: boolean;
     isSameDay: boolean;
     sameDayModalOpen: boolean;
+    orderable: boolean;
   };
 };
