@@ -46,6 +46,8 @@ model address {
   label                  String
   recipient_name         String
   recipient_phone_number String
+  latidude               Float
+  longitude              Float
 
   user   user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   city   city     @relation(fields: [city_id], references: [city_id])

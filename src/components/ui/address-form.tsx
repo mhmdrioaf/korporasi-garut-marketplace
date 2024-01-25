@@ -1,7 +1,7 @@
 "use client";
 
 import { TAddress, TCity, TDistrict, TProvince, TVillage } from "@/lib/globals";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR, { useSWRConfig } from "swr";
 import { Label } from "./label";
@@ -20,6 +20,7 @@ import { Button } from "./button";
 import { HelpCircleIcon, Loader2Icon } from "lucide-react";
 import { properizeWords } from "@/lib/helper";
 import AddressHelpModal from "./modals/address-help-modal";
+import Alert from "./modals/alert";
 
 interface IAddressFormProps {
   userId: string;
@@ -43,6 +44,11 @@ export default function AddressForm({
   onUpdated,
 }: IAddressFormProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [currentLocation, setCurrentLocation] = useState<{
+    lat: number;
+    long: number;
+  } | null>(null);
+  const [isAlert, setIsAlert] = useState<boolean>(false);
   const [help, setHelp] = useState<{
     option: "district" | "village";
     open: boolean;
@@ -207,6 +213,7 @@ export default function AddressForm({
             label: data.label,
             district: data.district ? data.district : "NO_DATA",
             village: data.village ? data.village : "NO_DATA",
+            currentLocation: currentLocation,
           }),
         }
       );
@@ -292,6 +299,25 @@ export default function AddressForm({
     }
   };
 
+  useEffect(() => {
+    if (navigator) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setCurrentLocation({
+          lat: position.coords.latitude,
+          long: position.coords.longitude,
+        });
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!currentLocation) {
+      setIsAlert(true);
+    } else {
+      setIsAlert(false);
+    }
+  }, [currentLocation]);
+
   return (
     <>
       <form
@@ -325,10 +351,22 @@ export default function AddressForm({
         </div>
 
         <div className="w-full flex flex-col gap-2">
+          <Label htmlFor="fullAddress">Alamat Lengkap</Label>
+          <Textarea
+            id="fullAddress"
+            placeholder="Nama Jalan/Patokan/Nomor Rumah"
+            rows={5}
+            required
+            {...form.register("fullAddress")}
+          />
+        </div>
+
+        <div className="w-full flex flex-col gap-2">
           <Label htmlFor="province">Provinsi</Label>
           <Select
             onValueChange={(value) => onProvinceChangeHandler(value)}
             defaultValue={form.watch("city.province_id")}
+            required
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Pilih provinsi" />
@@ -363,6 +401,7 @@ export default function AddressForm({
             onValueChange={(value) => onCityChangeHandler(value)}
             disabled={!form.watch("city.province_id")}
             defaultValue={form.watch("city.city_id")}
+            required
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Pilih kota/kabupaten" />
@@ -527,16 +566,6 @@ export default function AddressForm({
           />
         </div>
 
-        <div className="w-full flex flex-col gap-2">
-          <Label htmlFor="fullAddress">Alamat Lengkap</Label>
-          <Textarea
-            id="fullAddress"
-            placeholder="Nama Jalan/Patokan/Nomor Rumah"
-            rows={5}
-            {...form.register("fullAddress")}
-          />
-        </div>
-
         <Button variant="default" type="submit" disabled={isLoading}>
           {isLoading ? (
             <>
@@ -553,6 +582,13 @@ export default function AddressForm({
         open={help.open}
         onClose={onHelpModalClose}
         option={help.option}
+      />
+
+      <Alert
+        isOpen={isAlert}
+        title="GPS Belum Aktif"
+        message="Mohon aktifkan lokasi anda untuk mempermudah pengisian alamat."
+        onConfirm={() => setIsAlert(false)}
       />
     </>
   );

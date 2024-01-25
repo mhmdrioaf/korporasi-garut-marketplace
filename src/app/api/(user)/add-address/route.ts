@@ -11,6 +11,10 @@ interface IAddressBody {
   label: string;
   district: string;
   village: string;
+  currentLocation: {
+    lat: number;
+    long: number;
+  } | null;
 }
 
 async function handler(request: NextRequest) {
@@ -37,6 +41,7 @@ async function handler(request: NextRequest) {
         user_id: body.user_id,
         district: body.district,
         village: body.village,
+        currentLocation: body.currentLocation,
       });
 
       if (newAddress) {

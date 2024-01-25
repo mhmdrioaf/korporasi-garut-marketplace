@@ -16,6 +16,10 @@ type TAddAddress = {
   label: string;
   district: string;
   village: string;
+  currentLocation: {
+    lat: number;
+    long: number;
+  } | null;
 };
 
 export default class Address {
@@ -88,6 +92,8 @@ export default class Address {
                   },
                 },
               },
+              latidude: data?.currentLocation?.lat ?? 0,
+              longitude: data?.currentLocation?.long ?? 0,
             },
           },
         },
