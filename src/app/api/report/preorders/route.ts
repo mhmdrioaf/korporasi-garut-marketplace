@@ -15,7 +15,14 @@ async function handler(request: NextRequest) {
         where: {
           AND: [
             {
-              order_status: "PENDING",
+              OR: [
+                {
+                  order_status: "PENDING",
+                },
+                {
+                  order_status: "PAID",
+                },
+              ],
             },
             {
               order_type: "PREORDER",
@@ -78,8 +85,6 @@ async function handler(request: NextRequest) {
           },
         },
       });
-
-      console.log(ordersData);
 
       if (ordersData) {
         return NextResponse.json({ ok: true, data: ordersData });
