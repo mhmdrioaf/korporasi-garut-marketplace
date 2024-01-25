@@ -13,11 +13,6 @@ import { getPeriodTime, getSalesYears } from "@/lib/helper";
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
 
-  const periodMonths = getPeriodTime(
-    parseInt(reports.sales.startDate ?? "1") - 1,
-    parseInt(reports.sales.endDate ?? "12")
-  );
-
   return (
     <div className="w-full flex flex-col gap-4">
       {reports.sales.state.loading ? (
@@ -35,7 +30,7 @@ export default function AdminReportsComponents() {
 
       <Separator />
 
-      <div className="w-full grid grid-cols-3 gap-2 items-center">
+      <div className="w-full grid grid-cols-4 gap-2 items-center">
         <Button
           variant={reports.sales.state.tabs === "sales" ? "default" : "ghost"}
           onClick={() => reports.sales.handler.changeTab("sales")}
@@ -51,6 +46,14 @@ export default function AdminReportsComponents() {
           Identifikasi Produk
         </Button>
         <Button
+          variant={
+            reports.sales.state.tabs === "preorder" ? "default" : "ghost"
+          }
+          onClick={() => reports.sales.handler.changeTab("preorder")}
+        >
+          Pesanan Preorder
+        </Button>
+        <Button
           variant={reports.sales.state.tabs === "incomes" ? "default" : "ghost"}
           onClick={() => reports.sales.handler.changeTab("incomes")}
         >
@@ -58,18 +61,6 @@ export default function AdminReportsComponents() {
         </Button>
       </div>
       <ReportTabs tab={reports.sales.state.tabs} />
-      {reports.sales.data && (
-        <AdminReportExportPDF
-          reportsData={reports.sales.data}
-          period={{
-            month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
-            year:
-              reports.sales.year ?? reports.sales.data
-                ? getSalesYears(reports.sales.data).join(" & ")
-                : new Date().getFullYear().toString(),
-          }}
-        />
-      )}
     </div>
   );
 }

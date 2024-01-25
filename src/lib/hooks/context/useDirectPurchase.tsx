@@ -14,12 +14,13 @@ import {
   TAddress,
   TProduct,
   TProductVariantItem,
+  TSameDayShippingResult,
   TShippingCost,
   TShippingCostServiceCost,
 } from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR, { useSWRConfig } from "swr";
-import { fetcher, invoiceMaker } from "@/lib/helper";
+import { fetcher, getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 
@@ -54,6 +55,20 @@ export function DirectPurchaseProvider({
   const [orderStep, setOrderStep] = useState<number | null>(null);
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [cartLoading, setCartLoading] = useState(false);
+  const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
+  const [orderable, setOrderable] = useState<boolean>(true);
+
+  const [samedayData, setSamedayData] = useState<{
+    isSameDay: boolean;
+    sameDayCost: number;
+    sameDayETA: number;
+    courierSelected: boolean;
+  }>({
+    isSameDay: false,
+    sameDayCost: 0,
+    sameDayETA: 0,
+    courierSelected: false,
+  });
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
@@ -96,6 +111,30 @@ export function DirectPurchaseProvider({
     (address) => address.address_id === product.seller.primary_address_id
   );
 
+  const {
+    data: sameDayShippingData,
+    isLoading: sameDayShippingLoading,
+    mutate: sameDayShippingMutate,
+  } = useSWR(
+    chosenAddress && sellerAddress ? "/api/shipping/same-day-shipping" : null,
+    (url) =>
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          currentLocation: {
+            lat: chosenAddress?.latidude,
+            long: chosenAddress?.longitude,
+          },
+          origin: {
+            lat: sellerAddress?.latidude,
+            long: sellerAddress?.longitude,
+          },
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => res.result as TSameDayShippingResult)
+  );
+
   const router = useRouter();
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
@@ -120,25 +159,30 @@ export function DirectPurchaseProvider({
     const value = parseInt(e.target.value);
 
     if (!isNaN(value)) {
-      if (value > product.stock) {
-        setProductQuantity(product.stock);
-        setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price * product.stock
-            : product.price * product.stock
-        );
-      } else if (value < 1) {
-        setProductQuantity(1);
-        setTotalPrice(
-          variantsValue ? variantsValue.variant_price : product.price
-        );
+      if (!variantsValue) {
+        if (value > product.stock) {
+          setProductQuantity(product.stock);
+          setTotalPrice(product.price * product.stock);
+        } else if (value < 1) {
+          setProductQuantity(1);
+          setTotalPrice(product.price);
+        } else {
+          setProductQuantity(value);
+          setTotalPrice(product.price * value);
+        }
       } else {
-        setProductQuantity(value);
-        setTotalPrice(
-          variantsValue
-            ? variantsValue.variant_price * value
-            : product.price * value
-        );
+        if (value > variantsValue.variant_stock) {
+          setProductQuantity(variantsValue.variant_stock);
+          setTotalPrice(
+            variantsValue.variant_price * variantsValue.variant_stock
+          );
+        } else if (value < 1) {
+          setProductQuantity(1);
+          setTotalPrice(variantsValue.variant_price);
+        } else {
+          setProductQuantity(value);
+          setTotalPrice(variantsValue.variant_price * value);
+        }
       }
     } else {
       setProductQuantity(1);
@@ -240,10 +284,23 @@ export function DirectPurchaseProvider({
     setShippingCost(courier.value);
   };
 
+  const onSamedayCourierChangeHandler = () => {
+    if (sameDayShippingData) {
+      const sameDayDetail = getSameDayShippingDetail(sameDayShippingData);
+      setTotalPrice(defaultPrice + sameDayDetail.price);
+      setShippingCost(sameDayDetail.price);
+      setSamedayData((prev) => ({
+        ...prev,
+        courierSelected: true,
+      }));
+    }
+  };
+
   const onAddressChoose = (chosenAddress: TAddress) => {
     setChosenAddress(chosenAddress);
     setOrderStep(2);
     shippingCostMutate();
+    sameDayShippingMutate();
   };
 
   const onOrder = () => {
@@ -274,6 +331,10 @@ export function DirectPurchaseProvider({
           title: "Anda belum memilih alamat pengiriman.",
         });
       } else {
+        const estimatedTimeArrival =
+          !samedayData.isSameDay && chosenCourier
+            ? parseInt(chosenCourier.etd)
+            : samedayData.sameDayETA;
         const makeOrder = await invoiceMaker(
           user_id,
           product,
@@ -282,7 +343,9 @@ export function DirectPurchaseProvider({
           shippingCost,
           variantsValue,
           totalPrice,
-          isPreorder
+          isPreorder,
+          estimatedTimeArrival,
+          samedayData.isSameDay
         );
         if (!makeOrder.ok) {
           setOrderLoading(false);
@@ -301,6 +364,10 @@ export function DirectPurchaseProvider({
 
   const resetPrice = () => {
     setTotalPrice(defaultPrice);
+    setSamedayData((prev) => ({
+      ...prev,
+      courierSelected: false,
+    }));
   };
 
   const onResetAll = () => {
@@ -308,6 +375,10 @@ export function DirectPurchaseProvider({
     setOrderStep(null);
     setChosenCourier(null);
     setChosenAddress(null);
+  };
+
+  const onSamedayModalClose = () => {
+    setSameDayModalOpen(false);
   };
 
   useEffect(() => {
@@ -330,20 +401,59 @@ export function DirectPurchaseProvider({
 
   useEffect(() => {
     if (variantsValue) {
-      if (
-        variantsValue.pending_order_count >= variantsValue.variant_stock ||
-        variantsValue.variant_stock < 1 ||
-        productQuantity + variantsValue.pending_order_count >
-          variantsValue.variant_stock
-      ) {
-        setIsPreorder(true);
-      } else {
-        setIsPreorder(false);
-      }
+      const status = variantsValue.variant_stock < 1;
+      setIsPreorder(status);
     } else {
-      setIsPreorder(false);
+      const status = product.stock < 1;
+      setIsPreorder(status);
     }
-  }, [variantsValue, productQuantity]);
+  }, [variantsValue, productQuantity, product]);
+
+  useEffect(() => {
+    if (!product.capable_out_of_town) {
+      setSamedayData((prev) => ({
+        ...prev,
+        isSameDay: true,
+      }));
+      setSameDayModalOpen(true);
+    }
+  }, [product.capable_out_of_town]);
+
+  useEffect(() => {
+    if (chosenAddress && sellerAddress) {
+      if (samedayData.isSameDay) {
+        if (chosenAddress.city.city_id !== sellerAddress.city.city_id) {
+          setOrderable(false);
+        } else {
+          setOrderable(true);
+        }
+      } else {
+        setOrderable(true);
+      }
+    }
+  }, [chosenAddress, sellerAddress, samedayData]);
+
+  useEffect(() => {
+    if (samedayData.isSameDay) {
+      if (chosenAddress && sellerAddress) {
+        if (chosenAddress.city.city_id === sellerAddress.city.city_id) {
+          if (sameDayShippingData) {
+            const sameDayDetail = getSameDayShippingDetail(sameDayShippingData);
+            setSamedayData((prev) => ({
+              ...prev,
+              sameDayCost: sameDayDetail.price,
+              sameDayETA: sameDayDetail.eta,
+            }));
+          }
+        }
+      }
+    }
+  }, [
+    chosenAddress,
+    sellerAddress,
+    samedayData.isSameDay,
+    sameDayShippingData,
+  ]);
 
   const value: TDirectPurchaseContext = {
     quantity: {
@@ -373,9 +483,11 @@ export function DirectPurchaseProvider({
         validating: shippingCostValidating,
         data: shippingCosts,
       },
+      sameDay: samedayData,
 
       handler: {
         onCourierChange: onCourierChangeHandler,
+        onSamedayCourierChange: onSamedayCourierChangeHandler,
       },
     },
     user_id: user_id,
@@ -394,6 +506,7 @@ export function DirectPurchaseProvider({
     handler: {
       resetPrice: resetPrice,
       resetAll: onResetAll,
+      onSamedayModalClose: onSamedayModalClose,
     },
     customer: {
       user: user ? user.result : null,
@@ -430,6 +543,8 @@ export function DirectPurchaseProvider({
       setVariantChooserOpen: setIsVariantChooserOpen,
       variantChooserContext: variantChooserContext,
       isPreorder: isPreorder,
+      sameDayModalOpen: sameDayModalOpen,
+      orderable: orderable,
     },
   };
 

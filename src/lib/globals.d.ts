@@ -79,6 +79,8 @@ type TOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
+  isSameday: boolean;
 
   address: TAddress;
   user: TUser;
@@ -96,6 +98,8 @@ type TSellerOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
+  isSameday: boolean;
 
   address: TAddress | null;
   user: {
@@ -149,6 +153,8 @@ type TCustomerOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
+  isSameday: boolean;
 
   address: TAddress | null;
   user: TUser;
@@ -186,6 +192,8 @@ type TAddress = {
   recipient_phone_number: string;
   village: string;
   district: string;
+  latidude: number;
+  longitude: number;
 };
 
 type TDistrict = {
@@ -272,6 +280,11 @@ type TNotificationItem = {
   notifiedAt: Date;
   show_action_button: boolean;
   status: NOTIFICATION_STATUS;
+};
+
+type TSameDayShippingResult = {
+  travelDistance: number;
+  travelDuration: number;
 };
 
 type NOTIFICATION_STATUS = "UNREAD" | "READ";

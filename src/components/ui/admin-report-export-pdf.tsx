@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getCurrentDateString,
   getDateWithoutTime,
   getSellerIncomes,
   reportMessage,
@@ -148,10 +149,12 @@ export default function AdminReportExportPDF({
     });
   };
 
-  const sellerIncomes = getSellerIncomes(reports);
-
   return (
     <>
+      <Button variant="outline" onClick={exportPDF}>
+        Unduh Laporan
+      </Button>
+
       <div className="w-[1054px] hidden flex-col gap-4" ref={tableRef}>
         <div className="w-full flex flex-row gap-4 items-center px-4 py-2 text-primary">
           <div className="w-24 h-24 relative overflow-hidden">
@@ -179,7 +182,7 @@ export default function AdminReportExportPDF({
           <p>{reportMessage(reports)}</p>
         </div>
 
-        <Table className="w-full table table-auto">
+        <Table>
           <TableCaption></TableCaption>
           <TableHeader>
             <TableRow>
@@ -240,88 +243,19 @@ export default function AdminReportExportPDF({
           </TableFooter>
         </Table>
 
-        <p>
-          Berikut ini merupakan detail pendapatan penjualan pada periode{" "}
-          {period?.month} tahun {period?.year} :
-        </p>
+        <div className="w-52 flex flex-col justify-end items-end gap-16 self-end">
+          <div className="w-full flex flex-col gap-2">
+            <p>Garut, {getCurrentDateString()}</p>
+            <p>Mengetahui,</p>
+          </div>
 
-        {sellerIncomes.sellerIds.length > 0 && (
-          <Table>
-            <TableCaption></TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>No.</TableHead>
-                <TableHead>Nama Penjual</TableHead>
-                <TableHead>Produk Terjual</TableHead>
-                <TableHead>Pendapatan</TableHead>
-                <TableHead>Pengembangan Produk {"(50%)"}</TableHead>
-                <TableHead>Tabungan Siswa {"(20%)"}</TableHead>
-                <TableHead>Pendapatan Bersih {"(30%)"}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sellerIncomes.sellerIds.map((sellerId, idx) => (
-                <TableRow key={sellerId}>
-                  <TableCell>{idx + 1}.</TableCell>
-                  <TableCell>{sellerIncomes.incomes[sellerId].name}</TableCell>
-                  <TableCell>
-                    {sellerIncomes.incomes[sellerId].products.length} Produk
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(sellerIncomes.incomes[sellerId].income)}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId]
-                        .product_development
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].student_savings
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].seller_income
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
-
-              <TableCell className="bg-primary text-white font-bold" />
-              <TableCell className="bg-primary text-white font-bold">
-                Total
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {sellerIncomes.totalIncomes.product_sold} Produk
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.rawIncomes)}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(
-                  sellerIncomes.totalIncomes.product_development
-                )}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.student_savings)}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.seller_income)}
-              </TableCell>
-            </TableBody>
-          </Table>
-        )}
+          <div className="w-full flex flex-row items-center">
+            <p>{"("}</p>
+            <div className="w-full h-1 border-b border-dashed border-black self-end justify-self-end" />
+            <p>{")"}</p>
+          </div>
+        </div>
       </div>
-
-      <Button
-        variant="default"
-        onClick={exportPDF}
-        className="fixed bottom-4 right-4"
-      >
-        Unduh Laporan
-      </Button>
     </>
   );
 }

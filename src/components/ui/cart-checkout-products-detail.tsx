@@ -12,10 +12,12 @@ import CartCheckoutShippingCost from "../cart-checkout-shipping-cost";
 import { Loader2Icon } from "lucide-react";
 
 export default function CartCheckoutProductsDetail() {
-  const { cart, checkout } = useCart();
+  const { cart, checkout, state } = useCart();
 
-  const isCheckoutButtonDisabled =
-    checkout.totalChosenCourier !== checkout.totalProductSellers;
+  const isCheckoutButtonDisabled = state.sameDay
+    ? Object.keys(state.sameDayCourier).length !== checkout._sellers.length
+    : Object.keys(checkout.totalChosenCourier).length !==
+      checkout._sellers.length;
 
   return checkout.step === 2 ? (
     <div className="w-full flex flex-col gap-2 text-sm">

@@ -5,6 +5,7 @@ import {
   TProductVariantItem,
   TCustomerOrder,
   TSellerOrder,
+  TSameDayShippingResult,
 } from "./globals";
 import supabase from "./supabase";
 
@@ -350,7 +351,9 @@ export const invoiceMaker = async (
   shipping_cost: number,
   product_variant: TProductVariantItem | null,
   total_price: number,
-  isPreorder: boolean = false
+  isPreorder: boolean = false,
+  eta: number,
+  isSameday: boolean
 ) => {
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
@@ -365,6 +368,8 @@ export const invoiceMaker = async (
         total_price: total_price,
         shipping_cost: shipping_cost,
         isPreorder: isPreorder,
+        eta: eta,
+        isSameday: isSameday,
       }),
     });
 
@@ -852,7 +857,7 @@ export const reportMessage = (sales: TSalesReportData[]) => {
       )}.`
     : "";
 
-  return highestSelling ? message + breakLine + highestSellingMessage : message;
+  return message;
 };
 
 export const getSalesYears = (sales: TSalesReportData[]) => {
@@ -927,4 +932,69 @@ export const fullAddressGenerator = (
   const value = `${fullAddress}, ${properizeWords(villageName)}, ${properizeWords(districtName)}, ${city}, ${province}, Indonesia`;
 
   return value;
+};
+
+export const roundThousands = (value: number): number => {
+  let thousandDigit = Math.floor(value / 1000);
+  const hundredsDigit = Math.floor((value % 1000) / 10);
+
+  console.log(hundredsDigit);
+
+  if (hundredsDigit > 50) {
+    thousandDigit += 1;
+  }
+
+  const hundredsDigitBulat =
+    hundredsDigit > 50 ? 0 : hundredsDigit === 50 ? 5 : 0;
+
+  const roundedTensDigit = 0;
+  const roundedNumberDigit = 0;
+
+  const rounded =
+    thousandDigit * 1000 +
+    hundredsDigitBulat * 100 +
+    roundedTensDigit * 10 +
+    roundedNumberDigit;
+
+  return rounded;
+};
+
+export const getSameDayShippingDetail = (result: TSameDayShippingResult) => {
+  const meters = result.travelDistance * 1000;
+  const cost = 1000;
+
+  const price = (meters / 200) * cost;
+  const eta = result.travelDuration.toFixed(1);
+
+  return {
+    price: roundThousands(price),
+    eta: parseInt(eta),
+  };
+};
+
+export const estimatedTimeArrivalGenerator = (eta: number) => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  const _date = new Date(year, month, day + eta);
+  const _day = _date.getDate();
+  const _month = _date.getMonth();
+  const _year = _date.getFullYear();
+
+  const monthString = getMonthString(_month, _month + 1);
+
+  return `${decimalDate(_day)} ${monthString} ${_year}`;
+};
+
+export const getCurrentDateString = () => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  const monthString = getMonthString(month, month + 1);
+
+  return `${decimalDate(day)} ${monthString} ${year}`;
 };

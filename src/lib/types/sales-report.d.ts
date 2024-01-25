@@ -50,6 +50,7 @@ type TSalesReportData = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
 
   user: TSalesReportUser;
   order_item: TSalesReportOrderItem[];

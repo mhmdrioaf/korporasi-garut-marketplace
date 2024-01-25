@@ -3,21 +3,43 @@
 import {
   getDateString,
   getMonthString,
+  getPeriodTime,
   getSalesByMonth,
+  getSalesYears,
   remoteImageSource,
   rupiahConverter,
 } from "@/lib/helper";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import Image from "next/image";
 import { Separator } from "./separator";
+import AdminReportExportPDF from "./admin-report-export-pdf";
 
 export default function ReportsProducts() {
   const { reports } = useAdmin();
+
+  const periodMonths = getPeriodTime(
+    parseInt(reports.sales.startDate ?? "1") - 1,
+    parseInt(reports.sales.endDate ?? "12")
+  );
 
   if (reports.sales.data && reports.sales.data.length > 0) {
     const salesData = getSalesByMonth(reports.sales.data);
     return (
       <div className="w-full flex flex-col gap-4">
+        <div className="w-full flex flex-row items-center justify-between">
+          <p className="font-bold text-lg">Penjualan</p>
+          <AdminReportExportPDF
+            reportsData={reports.sales.data}
+            period={{
+              month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
+              year:
+                reports.sales.year ?? reports.sales.data
+                  ? getSalesYears(reports.sales.data).join(" & ")
+                  : new Date().getFullYear().toString(),
+            }}
+          />
+        </div>
+
         {salesData.salesMonths.map((month) => (
           <div className="w-full flex flex-col gap-2" key={month}>
             <p className="font-bold text-lg">

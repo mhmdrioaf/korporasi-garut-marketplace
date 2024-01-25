@@ -1,4 +1,4 @@
-type TAdminReportTabs = "sales" | "incomes" | "products";
+type TAdminReportTabs = "sales" | "incomes" | "products" | "preorder";
 
 type TAdminContextType = {
   credentials: {
@@ -23,6 +23,15 @@ type TAdminContextType = {
         changeEndDate: (endDate: string | null) => void;
         changeYear: (year: string | null) => void;
         changeTab: (tab: TAdminReportTabs) => void;
+      };
+    };
+
+    preorders: {
+      data: TSalesReportData[];
+
+      state: {
+        loading: boolean;
+        error: any;
       };
     };
   };

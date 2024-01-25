@@ -28,6 +28,7 @@ export default function DirectPurchaseOrderDetail() {
     price,
     shipping,
     handler,
+    state,
   } = useDirectPurchase();
 
   const onChangeAddressClick = () => {
@@ -135,7 +136,13 @@ export default function DirectPurchaseOrderDetail() {
         <p className="font-bold">Rincian Biaya</p>
         <div className="grid grid-cols-2 gap-2">
           <p className="font-bold">Harga Barang</p>
-          <p>{rupiahConverter(variants.variantValue ? variants.variantValue.variant_price : product.price)}</p>
+          <p>
+            {rupiahConverter(
+              variants.variantValue
+                ? variants.variantValue.variant_price
+                : product.price
+            )}
+          </p>
           <p className="font-bold">Jumlah Barang</p>
           <p>
             {quantity.productQuantity} {product.unit}
@@ -158,7 +165,12 @@ export default function DirectPurchaseOrderDetail() {
       <Button
         variant="default"
         onClick={order.handler.placeOrder}
-        disabled={order.loading}
+        disabled={
+          order.loading ||
+          (shipping.sameDay.isSameDay && !shipping.sameDay.courierSelected) ||
+          (!shipping.sameDay && !shipping.chosenCourier) ||
+          !customer.address.chosenAddress
+        }
       >
         {order.loading ? (
           <>

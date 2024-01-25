@@ -46,6 +46,8 @@ model address {
   label                  String
   recipient_name         String
   recipient_phone_number String
+  latidude               Float
+  longitude              Float
 
   user   user     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   city   city     @relation(fields: [city_id], references: [city_id])
@@ -75,6 +77,8 @@ model orders {
   delivery_receipt     String?
   payment_proof        String?
   order_type           ORDER_TYPE   @default(NORMAL)
+  eta                  Int
+  isSameday            Boolean      @default(false)
 
   address    address?     @relation(fields: [shipping_address], references: [address_id], onDelete: SetNull)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)

@@ -43,96 +43,104 @@ export default function UserCartList() {
                   </p>
                 </div>
 
-                {items[parseInt(sellerID)].map((item) => (
-                  <div
-                    key={item.cart_item_id}
-                    className="w-full p-2 grid grid-cols-2"
-                  >
-                    <div className="w-full flex flex-row items-center gap-2">
-                      <Checkbox
-                        ref={(el) =>
-                          (cartItems.checkbox.current[
-                            Number(
-                              item.cart_item_id.slice(
-                                item.cart_item_id.length - 5,
-                                item.cart_item_id.length
+                {items[parseInt(sellerID)]
+                  .filter((item) =>
+                    item.variant
+                      ? item.variant.variant_stock > 0
+                      : item.product.stock > 0
+                  )
+                  .map((item) => (
+                    <div
+                      key={item.cart_item_id}
+                      className="w-full p-2 grid grid-cols-2"
+                    >
+                      <div className="w-full flex flex-row items-center gap-2">
+                        <Checkbox
+                          ref={(el) =>
+                            (cartItems.checkbox.current[
+                              Number(
+                                item.cart_item_id.slice(
+                                  item.cart_item_id.length - 5,
+                                  item.cart_item_id.length
+                                )
                               )
+                            ] = el)
+                          }
+                          onCheckedChange={(checked) =>
+                            cartItems.handler.cardChecked(
+                              checked,
+                              item,
+                              parseInt(sellerID)
                             )
-                          ] = el)
-                        }
-                        onCheckedChange={(checked) =>
-                          cartItems.handler.cardChecked(
-                            checked,
-                            item,
-                            parseInt(sellerID)
-                          )
-                        }
-                      />
-                      <div className="w-16 h-16 rounded-sm overflow-hidden relative">
-                        <Image
-                          src={remoteImageSource(item.product.images[0])}
-                          sizes="100vw"
-                          alt="foto produk"
-                          fill
-                          className="object-cover"
+                          }
                         />
+                        <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+                          <Image
+                            src={remoteImageSource(item.product.images[0])}
+                            sizes="100vw"
+                            alt="foto produk"
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <p>
+                            {item.product.title}{" "}
+                            {item.variant
+                              ? `- ${item.variant.variant_name}`
+                              : ""}
+                          </p>
+                          <p className="font-bold">
+                            {rupiahConverter(cart.itemPrice(item))}
+                          </p>
+                        </div>
                       </div>
 
-                      <div className="flex flex-col gap-1">
-                        <p>
-                          {item.product.title}{" "}
-                          {item.variant ? `- ${item.variant.variant_name}` : ""}
-                        </p>
-                        <p className="font-bold">
-                          {rupiahConverter(cart.itemPrice(item))}
-                        </p>
+                      <div className="flex flex-row items-center gap-2 self-center justify-self-end">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(event) =>
+                            cart.handler.deleteItem(event, item)
+                          }
+                        >
+                          <Trash2Icon className="w-4 h-4" />
+                        </Button>
+
+                        <div className="min-h-full w-px bg-input" />
+
+                        <Button
+                          variant="destructive"
+                          disabled={item.quantity <= 1}
+                          onClick={(event) =>
+                            cart.handler.itemQuantityChange(
+                              event,
+                              item,
+                              "decrease"
+                            )
+                          }
+                          size="icon"
+                        >
+                          <MinusCircleIcon className="w-4 h-4" />
+                        </Button>
+                        <p className="text-sm">{item.quantity}</p>
+                        <Button
+                          variant="default"
+                          onClick={(event) =>
+                            cart.handler.itemQuantityChange(
+                              event,
+                              item,
+                              "increase"
+                            )
+                          }
+                          size="icon"
+                        >
+                          <PlusCircleIcon className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
-
-                    <div className="flex flex-row items-center gap-2 self-center justify-self-end">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(event) =>
-                          cart.handler.deleteItem(event, item)
-                        }
-                      >
-                        <Trash2Icon className="w-4 h-4" />
-                      </Button>
-
-                      <div className="min-h-full w-px bg-input" />
-
-                      <Button
-                        variant="destructive"
-                        disabled={item.quantity <= 1}
-                        onClick={(event) =>
-                          cart.handler.itemQuantityChange(
-                            event,
-                            item,
-                            "decrease"
-                          )
-                        }
-                        size="icon"
-                      >
-                        <MinusCircleIcon className="w-4 h-4" />
-                      </Button>
-                      <p className="text-sm">{item.quantity}</p>
-                      <Button
-                        variant="default"
-                        onClick={(event) =>
-                          cart.handler.itemQuantityChange(
-                            event,
-                            item,
-                            "increase"
-                          )
-                        }
-                        size="icon"
-                      >
-                        <PlusCircleIcon className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </div>
             ))
           ) : (
@@ -140,6 +148,76 @@ export default function UserCartList() {
               Anda belum menambahkan produk ke keranjang.
             </div>
           )}
+
+          {cartData.length > 0 &&
+            cartData.map((sellerID) => (
+              <div
+                className="w-full flex flex-col gap-4 p-2 rounded-md"
+                key={sellerID}
+              >
+                {items[parseInt(sellerID)]
+                  .filter((item) =>
+                    item.variant
+                      ? item.variant.variant_stock <= 0
+                      : item.product.stock <= 0
+                  )
+                  .map((item) => (
+                    <>
+                      <Separator />
+
+                      <div className="w-full flex flex-col gap-2">
+                        <p className="font-bold">Produk yang tidak tersedia</p>
+                        <p className="text-sm">
+                          Produk-produk berikut saat ini tidak tersedia, jika
+                          anda ingin memesan produk-produk ini, silahkan lakukan
+                          pemesanan pre-order di halaman produk.
+                        </p>
+                      </div>
+
+                      <div
+                        key={item.cart_item_id}
+                        className="w-full p-2 grid grid-cols-2 bg-stone-300 text-stone-600 rounded-md overflow-hidden"
+                      >
+                        <div className="w-full flex flex-row items-center gap-2">
+                          <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+                            <Image
+                              src={remoteImageSource(item.product.images[0])}
+                              sizes="100vw"
+                              alt="foto produk"
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <p>
+                              {item.product.title}{" "}
+                              {item.variant
+                                ? `- ${item.variant.variant_name}`
+                                : ""}
+                            </p>
+                            <p className="font-bold">
+                              {rupiahConverter(cart.itemPrice(item))}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-row items-center gap-2 self-center justify-self-end">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(event) =>
+                              cart.handler.deleteItem(event, item)
+                            }
+                          >
+                            <Trash2Icon className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </>
+                  ))}
+              </div>
+            ))}
         </div>
       );
     } else {

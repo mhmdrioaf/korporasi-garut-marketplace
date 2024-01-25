@@ -36,36 +36,6 @@ async function handler(request: NextRequest) {
   ) {
     if (body.order_status) {
       try {
-        if (body.order_status === "SHIPPED" && body.order_items) {
-          for (const item of body.order_items.order_item) {
-            if (item.variant) {
-              await db.product_variant_item.update({
-                where: {
-                  variant_item_id: item.variant.variant_item_id,
-                },
-                data: {
-                  variant_stock: {
-                    decrement: item.order_quantity,
-                  },
-                  pending_order_count: {
-                    decrement: item.order_quantity,
-                  },
-                },
-              });
-            }
-            await db.product.update({
-              where: {
-                id: item.product.id,
-              },
-              data: {
-                stock: {
-                  decrement: item.order_quantity,
-                },
-              },
-            });
-          }
-        }
-
         const updateOrderStatus = await db.orders.update({
           where: {
             order_id: body.order_id,
