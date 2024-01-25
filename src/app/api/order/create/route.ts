@@ -43,7 +43,7 @@ async function handler(request: NextRequest) {
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
         order_type: body.isPreorder ? "PREORDER" : "NORMAL",
-        eta: body.eta,
+        eta: body.isPreorder ? body.eta + 7 : body.eta,
         order_item: {
           create: {
             order_quantity: body.product_quantity,

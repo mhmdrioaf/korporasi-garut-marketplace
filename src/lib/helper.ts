@@ -985,3 +985,14 @@ export const estimatedTimeArrivalGenerator = (eta: number) => {
 
   return `${decimalDate(_day)} ${monthString} ${_year}`;
 };
+
+export const getCurrentDateString = () => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  const monthString = getMonthString(month, month + 1);
+
+  return `${decimalDate(day)} ${monthString} ${year}`;
+};

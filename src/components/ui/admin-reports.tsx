@@ -35,7 +35,7 @@ export default function AdminReportsComponents() {
 
       <Separator />
 
-      <div className="w-full grid grid-cols-3 gap-2 items-center">
+      <div className="w-full grid grid-cols-4 gap-2 items-center">
         <Button
           variant={reports.sales.state.tabs === "sales" ? "default" : "ghost"}
           onClick={() => reports.sales.handler.changeTab("sales")}
@@ -49,6 +49,14 @@ export default function AdminReportsComponents() {
           onClick={() => reports.sales.handler.changeTab("products")}
         >
           Identifikasi Produk
+        </Button>
+        <Button
+          variant={
+            reports.sales.state.tabs === "preorder" ? "default" : "ghost"
+          }
+          onClick={() => reports.sales.handler.changeTab("preorder")}
+        >
+          Pesanan Preorder
         </Button>
         <Button
           variant={reports.sales.state.tabs === "incomes" ? "default" : "ghost"}

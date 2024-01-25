@@ -37,29 +37,38 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     open: false,
   });
 
-  const customFetcher = useCallback(async () => {
-    async function fetchData(url: string) {
-      const res = await fetch(url, {
-        method: "POST",
-        body: JSON.stringify({
-          token: token,
-        }),
-      });
+  const customFetcher = useCallback(
+    async (url: string) => {
+      async function fetchData(url: string) {
+        const res = await fetch(url, {
+          method: "POST",
+          body: JSON.stringify({
+            token: token,
+          }),
+        });
 
-      const response = await res.json();
-      return response.data as TSalesReportData[] | null;
-    }
+        const response = await res.json();
+        return response.data as TSalesReportData[] | null;
+      }
 
-    const data = await fetchData("/api/report/getSales");
+      const data = await fetchData(url);
 
-    return data;
-  }, [token]);
+      return data;
+    },
+    [token]
+  );
 
   const {
     data: salesData,
     isLoading: salesReportLoading,
     error: salesReportError,
   } = useSWR("/api/report/getSales", customFetcher);
+
+  const {
+    data: preordersData,
+    isLoading: preordersReportLoading,
+    error: preordersReportError,
+  } = useSWR("/api/report/preorders", customFetcher);
 
   const { data: productsData, isLoading: productsDataLoading } = useSWR(
     "/api/product/list",
@@ -124,6 +133,14 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
           changeEndDate: setEndDate,
           changeYear: setYear,
           changeTab: changeTab,
+        },
+      },
+
+      preorders: {
+        data: preordersData ? preordersData : [],
+        state: {
+          loading: preordersReportLoading,
+          error: preordersReportError,
         },
       },
     },

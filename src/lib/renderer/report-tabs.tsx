@@ -2,6 +2,7 @@
 
 import AdminProductsIdentifications from "@/components/ui/admin-products-identifications";
 import AdminReportIncomes from "@/components/ui/admin-report-incomes";
+import PreorderReport from "@/components/ui/admin-report-preorder";
 import ReportsProducts from "@/components/ui/reports-products";
 
 interface IReportTabsProps {
@@ -16,6 +17,8 @@ export default function ReportTabs({ tab }: IReportTabsProps) {
       return <AdminProductsIdentifications />;
     case "incomes":
       return <AdminReportIncomes />;
+    case "preorder":
+      return <PreorderReport />;
     default:
       <ReportsProducts />;
   }

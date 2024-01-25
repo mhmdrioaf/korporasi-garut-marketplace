@@ -167,8 +167,8 @@ export default function DirectPurchaseOrderDetail() {
         onClick={order.handler.placeOrder}
         disabled={
           order.loading ||
-          !state.orderable ||
-          !shipping.sameDay.courierSelected ||
+          (shipping.sameDay.isSameDay && !shipping.sameDay.courierSelected) ||
+          (!shipping.sameDay && !shipping.chosenCourier) ||
           !customer.address.chosenAddress
         }
       >
