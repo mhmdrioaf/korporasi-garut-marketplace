@@ -5,6 +5,7 @@ import {
   TProductVariantItem,
   TCustomerOrder,
   TSellerOrder,
+  TSameDayShippingResult,
 } from "./globals";
 import supabase from "./supabase";
 
@@ -927,4 +928,42 @@ export const fullAddressGenerator = (
   const value = `${fullAddress}, ${properizeWords(villageName)}, ${properizeWords(districtName)}, ${city}, ${province}, Indonesia`;
 
   return value;
+};
+
+export const roundThousands = (value: number): number => {
+  let thousandDigit = Math.floor(value / 1000);
+  const hundredsDigit = Math.floor((value % 1000) / 10);
+
+  console.log(hundredsDigit);
+
+  if (hundredsDigit > 50) {
+    thousandDigit += 1;
+  }
+
+  const hundredsDigitBulat =
+    hundredsDigit > 50 ? 0 : hundredsDigit === 50 ? 5 : 0;
+
+  const roundedTensDigit = 0;
+  const roundedNumberDigit = 0;
+
+  const rounded =
+    thousandDigit * 1000 +
+    hundredsDigitBulat * 100 +
+    roundedTensDigit * 10 +
+    roundedNumberDigit;
+
+  return rounded;
+};
+
+export const calculateSameDayCost = (result: TSameDayShippingResult) => {
+  const { travelDistance } = result;
+  const kilometers = travelDistance * 1000;
+  const costPer200Meters = 1000;
+
+  console.log("kilometers: ", kilometers);
+  console.log("kilometers / 200", kilometers / 200);
+
+  const price = (kilometers / 200) * costPer200Meters;
+
+  return roundThousands(price);
 };

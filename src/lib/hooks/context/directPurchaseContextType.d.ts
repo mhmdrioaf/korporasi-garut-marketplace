@@ -43,6 +43,7 @@ type TDirectPurchaseContext = {
     chosenCourier: TShippingCostServiceCost | null;
     setChosenCourier: (courier: TShippingCostServiceCost | null) => void;
     sellerAddress: TAddress;
+    sameDayCost: number;
     cost: {
       loading: boolean;
       validating: boolean;

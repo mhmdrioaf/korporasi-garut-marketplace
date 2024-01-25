@@ -73,6 +73,17 @@ export default function DirectPurchaseShippingCost() {
             ))}
           </div>
         ))}
+
+        {state.isSameDay && (
+          <div className="w-full flex flex-row items-center gap-2 justify-between">
+            <div className="flex flex-col gap-2">
+              <p className="font-bold">Korporasi Delivery</p>
+              <p className="text-xs">
+                Harga: {rupiahConverter(shippingData.sameDayCost)}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

@@ -19,7 +19,7 @@ import {
 } from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR, { useSWRConfig } from "swr";
-import { fetcher, invoiceMaker } from "@/lib/helper";
+import { calculateSameDayCost, fetcher, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 
@@ -57,6 +57,7 @@ export function DirectPurchaseProvider({
   const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
   const [isSameDay, setIsSameDay] = useState<boolean>(false);
   const [orderable, setOrderable] = useState<boolean>(true);
+  const [sameDayCost, setSameDayCost] = useState<number>(0);
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
@@ -371,6 +372,45 @@ export function DirectPurchaseProvider({
     }
   }, [chosenAddress, sellerAddress, isSameDay]);
 
+  useEffect(() => {
+    if (isSameDay) {
+      if (chosenAddress && sellerAddress) {
+        if (chosenAddress.city.city_id === sellerAddress.city.city_id) {
+          const fetchShippingData = async () => {
+            const res = await fetch(
+              process.env.NEXT_PUBLIC_API_SAMEDAY_SHIPPING_COST!,
+              {
+                method: "POST",
+                body: JSON.stringify({
+                  currentLocation: {
+                    lat: chosenAddress.latitude,
+                    long: chosenAddress.longitude,
+                  },
+                  origin: {
+                    lat: sellerAddress.latitude,
+                    long: sellerAddress.longitude,
+                  },
+                }),
+              }
+            );
+
+            const response = await res.json();
+
+            console.log(response);
+
+            console.log(response.result);
+
+            if (response.ok) {
+              setSameDayCost(calculateSameDayCost(response.result));
+            }
+          };
+
+          fetchShippingData();
+        }
+      }
+    }
+  }, [chosenAddress, sellerAddress, isSameDay]);
+
   const value: TDirectPurchaseContext = {
     quantity: {
       productQuantity: productQuantity,
@@ -399,6 +439,7 @@ export function DirectPurchaseProvider({
         validating: shippingCostValidating,
         data: shippingCosts,
       },
+      sameDayCost: sameDayCost,
 
       handler: {
         onCourierChange: onCourierChangeHandler,
