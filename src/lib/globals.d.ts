@@ -186,6 +186,8 @@ type TAddress = {
   recipient_phone_number: string;
   village: string;
   district: string;
+  latitude: number;
+  longitude: number;
 };
 
 type TDistrict = {
@@ -272,6 +274,11 @@ type TNotificationItem = {
   notifiedAt: Date;
   show_action_button: boolean;
   status: NOTIFICATION_STATUS;
+};
+
+type TSameDayShippingResult = {
+  travelDistance: number;
+  travelDuration: number;
 };
 
 type NOTIFICATION_STATUS = "UNREAD" | "READ";
