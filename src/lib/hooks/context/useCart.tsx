@@ -558,12 +558,16 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       const _items = checkoutItems();
       const sellerItems = _items[parseInt(sellerID)];
       const courier = chosenCourier && chosenCourier[parseInt(sellerID)];
+      const sameDayShippingCost =
+        sameDayCourier && sameDayCourier[parseInt(sellerID)];
       const sellerShippingCourier = courier
         ? Object.keys(chosenCourier[parseInt(sellerID)])
         : null;
       const shippingPrice = sellerShippingCourier
         ? parseInt(sellerShippingCourier[0])
-        : 0;
+        : sameDayShippingCost
+          ? sameDayShippingCost
+          : 0;
 
       totalShippingCost += shippingPrice;
       sellerItems.forEach((item) => items.push(item));
