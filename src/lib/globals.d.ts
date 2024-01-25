@@ -80,6 +80,7 @@ type TOrder = {
   payment_proof: string | null;
   order_type: ORDER_TYPE;
   eta: number;
+  isSameday: boolean;
 
   address: TAddress;
   user: TUser;
@@ -98,6 +99,7 @@ type TSellerOrder = {
   payment_proof: string | null;
   order_type: ORDER_TYPE;
   eta: number;
+  isSameday: boolean;
 
   address: TAddress | null;
   user: {
@@ -152,6 +154,7 @@ type TCustomerOrder = {
   payment_proof: string | null;
   order_type: ORDER_TYPE;
   eta: number;
+  isSameday: boolean;
 
   address: TAddress | null;
   user: TUser;
