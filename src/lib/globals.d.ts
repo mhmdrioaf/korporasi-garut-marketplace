@@ -186,7 +186,7 @@ type TAddress = {
   recipient_phone_number: string;
   village: string;
   district: string;
-  latitude: number;
+  latidude: number;
   longitude: number;
 };
 

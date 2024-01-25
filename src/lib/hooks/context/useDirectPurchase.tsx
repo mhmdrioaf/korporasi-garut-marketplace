@@ -14,12 +14,13 @@ import {
   TAddress,
   TProduct,
   TProductVariantItem,
+  TSameDayShippingResult,
   TShippingCost,
   TShippingCostServiceCost,
 } from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR, { useSWRConfig } from "swr";
-import { calculateSameDayCost, fetcher, invoiceMaker } from "@/lib/helper";
+import { fetcher, getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 
@@ -55,9 +56,19 @@ export function DirectPurchaseProvider({
   const [shippingCost, setShippingCost] = useState<number>(0);
   const [cartLoading, setCartLoading] = useState(false);
   const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
-  const [isSameDay, setIsSameDay] = useState<boolean>(false);
   const [orderable, setOrderable] = useState<boolean>(true);
-  const [sameDayCost, setSameDayCost] = useState<number>(0);
+
+  const [samedayData, setSamedayData] = useState<{
+    isSameDay: boolean;
+    sameDayCost: number;
+    sameDayETA: number;
+    courierSelected: boolean;
+  }>({
+    isSameDay: false,
+    sameDayCost: 0,
+    sameDayETA: 0,
+    courierSelected: false,
+  });
 
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
@@ -98,6 +109,30 @@ export function DirectPurchaseProvider({
 
   const sellerAddress = product.seller.address.find(
     (address) => address.address_id === product.seller.primary_address_id
+  );
+
+  const {
+    data: sameDayShippingData,
+    isLoading: sameDayShippingLoading,
+    mutate: sameDayShippingMutate,
+  } = useSWR(
+    chosenAddress && sellerAddress ? "/api/shipping/same-day-shipping" : null,
+    (url) =>
+      fetch(url, {
+        method: "POST",
+        body: JSON.stringify({
+          currentLocation: {
+            lat: chosenAddress?.latidude,
+            long: chosenAddress?.longitude,
+          },
+          origin: {
+            lat: sellerAddress?.latidude,
+            long: sellerAddress?.longitude,
+          },
+        }),
+      })
+        .then((res) => res.json())
+        .then((res) => res.result as TSameDayShippingResult)
   );
 
   const router = useRouter();
@@ -249,10 +284,23 @@ export function DirectPurchaseProvider({
     setShippingCost(courier.value);
   };
 
+  const onSamedayCourierChangeHandler = () => {
+    if (sameDayShippingData) {
+      const sameDayDetail = getSameDayShippingDetail(sameDayShippingData);
+      setTotalPrice(defaultPrice + sameDayDetail.price);
+      setShippingCost(sameDayDetail.price);
+      setSamedayData((prev) => ({
+        ...prev,
+        courierSelected: true,
+      }));
+    }
+  };
+
   const onAddressChoose = (chosenAddress: TAddress) => {
     setChosenAddress(chosenAddress);
     setOrderStep(2);
     shippingCostMutate();
+    sameDayShippingMutate();
   };
 
   const onOrder = () => {
@@ -310,6 +358,10 @@ export function DirectPurchaseProvider({
 
   const resetPrice = () => {
     setTotalPrice(defaultPrice);
+    setSamedayData((prev) => ({
+      ...prev,
+      courierSelected: false,
+    }));
   };
 
   const onResetAll = () => {
@@ -353,14 +405,17 @@ export function DirectPurchaseProvider({
 
   useEffect(() => {
     if (!product.capable_out_of_town) {
-      setIsSameDay(true);
+      setSamedayData((prev) => ({
+        ...prev,
+        isSameDay: true,
+      }));
       setSameDayModalOpen(true);
     }
   }, [product.capable_out_of_town]);
 
   useEffect(() => {
     if (chosenAddress && sellerAddress) {
-      if (isSameDay) {
+      if (samedayData.isSameDay) {
         if (chosenAddress.city.city_id !== sellerAddress.city.city_id) {
           setOrderable(false);
         } else {
@@ -370,46 +425,29 @@ export function DirectPurchaseProvider({
         setOrderable(true);
       }
     }
-  }, [chosenAddress, sellerAddress, isSameDay]);
+  }, [chosenAddress, sellerAddress, samedayData]);
 
   useEffect(() => {
-    if (isSameDay) {
+    if (samedayData.isSameDay) {
       if (chosenAddress && sellerAddress) {
         if (chosenAddress.city.city_id === sellerAddress.city.city_id) {
-          const fetchShippingData = async () => {
-            const res = await fetch(
-              process.env.NEXT_PUBLIC_API_SAMEDAY_SHIPPING_COST!,
-              {
-                method: "POST",
-                body: JSON.stringify({
-                  currentLocation: {
-                    lat: chosenAddress.latitude,
-                    long: chosenAddress.longitude,
-                  },
-                  origin: {
-                    lat: sellerAddress.latitude,
-                    long: sellerAddress.longitude,
-                  },
-                }),
-              }
-            );
-
-            const response = await res.json();
-
-            console.log(response);
-
-            console.log(response.result);
-
-            if (response.ok) {
-              setSameDayCost(calculateSameDayCost(response.result));
-            }
-          };
-
-          fetchShippingData();
+          if (sameDayShippingData) {
+            const sameDayDetail = getSameDayShippingDetail(sameDayShippingData);
+            setSamedayData((prev) => ({
+              ...prev,
+              sameDayCost: sameDayDetail.price,
+              sameDayETA: sameDayDetail.eta,
+            }));
+          }
         }
       }
     }
-  }, [chosenAddress, sellerAddress, isSameDay]);
+  }, [
+    chosenAddress,
+    sellerAddress,
+    samedayData.isSameDay,
+    sameDayShippingData,
+  ]);
 
   const value: TDirectPurchaseContext = {
     quantity: {
@@ -439,10 +477,11 @@ export function DirectPurchaseProvider({
         validating: shippingCostValidating,
         data: shippingCosts,
       },
-      sameDayCost: sameDayCost,
+      sameDay: samedayData,
 
       handler: {
         onCourierChange: onCourierChangeHandler,
+        onSamedayCourierChange: onSamedayCourierChangeHandler,
       },
     },
     user_id: user_id,
@@ -498,7 +537,6 @@ export function DirectPurchaseProvider({
       setVariantChooserOpen: setIsVariantChooserOpen,
       variantChooserContext: variantChooserContext,
       isPreorder: isPreorder,
-      isSameDay: isSameDay,
       sameDayModalOpen: sameDayModalOpen,
       orderable: orderable,
     },

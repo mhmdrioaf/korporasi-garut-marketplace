@@ -13,7 +13,7 @@ interface IRequestBody {
 }
 
 async function handler(request: NextRequest) {
-  const { currentLocation, origin }: IRequestBody = await request.json();
+  const body: IRequestBody = await request.json();
 
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_SAMEDAY_SHIPPING!, {
@@ -21,14 +21,14 @@ async function handler(request: NextRequest) {
       body: JSON.stringify({
         origins: [
           {
-            latitude: origin.lat,
-            longitude: origin.long,
+            latitude: body.origin.lat,
+            longitude: body.origin.long,
           },
         ],
         destinations: [
           {
-            latitude: currentLocation.lat,
-            longitude: currentLocation.long,
+            latitude: body.currentLocation.lat,
+            longitude: body.currentLocation.long,
           },
         ],
         travelMode: "driving",

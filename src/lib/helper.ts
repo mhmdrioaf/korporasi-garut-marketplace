@@ -955,15 +955,15 @@ export const roundThousands = (value: number): number => {
   return rounded;
 };
 
-export const calculateSameDayCost = (result: TSameDayShippingResult) => {
-  const { travelDistance } = result;
-  const kilometers = travelDistance * 1000;
-  const costPer200Meters = 1000;
+export const getSameDayShippingDetail = (result: TSameDayShippingResult) => {
+  const meters = result.travelDistance * 1000;
+  const cost = 1000;
 
-  console.log("kilometers: ", kilometers);
-  console.log("kilometers / 200", kilometers / 200);
+  const price = (meters / 200) * cost;
+  const eta = result.travelDuration.toFixed(1);
 
-  const price = (kilometers / 200) * costPer200Meters;
-
-  return roundThousands(price);
+  return {
+    price: roundThousands(price),
+    eta: parseInt(eta),
+  };
 };

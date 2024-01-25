@@ -43,7 +43,12 @@ type TDirectPurchaseContext = {
     chosenCourier: TShippingCostServiceCost | null;
     setChosenCourier: (courier: TShippingCostServiceCost | null) => void;
     sellerAddress: TAddress;
-    sameDayCost: number;
+    sameDay: {
+      isSameDay: boolean;
+      sameDayCost: number;
+      sameDayETA: number;
+      courierSelected: boolean;
+    };
     cost: {
       loading: boolean;
       validating: boolean;
@@ -52,6 +57,7 @@ type TDirectPurchaseContext = {
 
     handler: {
       onCourierChange: (courier: TShippingCostServiceCost) => void;
+      onSamedayCourierChange: () => void;
     };
   };
   product: TProduct;
@@ -99,7 +105,6 @@ type TDirectPurchaseContext = {
     setVariantChooserOpen: (isVariantChooser: boolean) => void;
     variantChooserContext: "cart" | "buy" | null;
     isPreorder: boolean;
-    isSameDay: boolean;
     sameDayModalOpen: boolean;
     orderable: boolean;
   };
