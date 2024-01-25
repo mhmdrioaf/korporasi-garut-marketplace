@@ -264,6 +264,10 @@ export default function AddressForm({
             recipientPhoneNumber: data.recipient_phone,
             district: data.district ? data.district : "NO_DATA",
             village: data.village ? data.village : "NO_DATA",
+            currentLocation: {
+              lat: defaultAddress?.latidude ?? 0,
+              long: defaultAddress?.longitude ?? 0,
+            },
           }),
         }
       );
