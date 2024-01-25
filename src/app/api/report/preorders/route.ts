@@ -15,14 +15,7 @@ async function handler(request: NextRequest) {
         where: {
           AND: [
             {
-              OR: [
-                {
-                  order_status: "PENDING",
-                },
-                {
-                  order_status: "PAID",
-                },
-              ],
+              order_status: "PAID",
             },
             {
               order_type: "PREORDER",
