@@ -10,6 +10,7 @@ interface ICartCheckoutBody {
   customer_id: string;
   shipping_address: string;
   isPreorder: boolean;
+  eta: number;
 }
 
 async function handler(request: NextRequest) {
@@ -44,6 +45,7 @@ async function handler(request: NextRequest) {
         order_id: newOrderId,
         shipping_cost: body.total_shipping_cost,
         total_price: body.total_price,
+        eta: body.eta,
         order_item: {
           createMany: {
             data: createManyOrderItems,

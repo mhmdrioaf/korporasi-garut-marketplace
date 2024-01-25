@@ -583,6 +583,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
           customer_id: user_id,
           shipping_address: chosenAddress.address_id,
           isPreorder: isPreOrder,
+          eta: sameDayData.eta,
         }),
       });
 

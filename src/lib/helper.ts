@@ -351,7 +351,8 @@ export const invoiceMaker = async (
   shipping_cost: number,
   product_variant: TProductVariantItem | null,
   total_price: number,
-  isPreorder: boolean = false
+  isPreorder: boolean = false,
+  eta: number
 ) => {
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
@@ -366,6 +367,7 @@ export const invoiceMaker = async (
         total_price: total_price,
         shipping_cost: shipping_cost,
         isPreorder: isPreorder,
+        eta: eta,
       }),
     });
 
@@ -966,4 +968,20 @@ export const getSameDayShippingDetail = (result: TSameDayShippingResult) => {
     price: roundThousands(price),
     eta: parseInt(eta),
   };
+};
+
+export const estimatedTimeArrivalGenerator = (eta: number) => {
+  const date = new Date();
+  const day = date.getDate();
+  const month = date.getMonth();
+  const year = date.getFullYear();
+
+  const _date = new Date(year, month, day + eta);
+  const _day = _date.getDate();
+  const _month = _date.getMonth();
+  const _year = _date.getFullYear();
+
+  const monthString = getMonthString(_month, _month + 1);
+
+  return `${decimalDate(_day)} ${monthString} ${_year}`;
 };

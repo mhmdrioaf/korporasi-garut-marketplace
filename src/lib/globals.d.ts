@@ -79,6 +79,7 @@ type TOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
 
   address: TAddress;
   user: TUser;
@@ -96,6 +97,7 @@ type TSellerOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
 
   address: TAddress | null;
   user: {
@@ -149,6 +151,7 @@ type TCustomerOrder = {
   delivery_receipt: string | null;
   payment_proof: string | null;
   order_type: ORDER_TYPE;
+  eta: number;
 
   address: TAddress | null;
   user: TUser;
