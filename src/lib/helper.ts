@@ -352,7 +352,8 @@ export const invoiceMaker = async (
   product_variant: TProductVariantItem | null,
   total_price: number,
   isPreorder: boolean = false,
-  eta: number
+  eta: number,
+  isSameday: boolean
 ) => {
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
@@ -368,6 +369,7 @@ export const invoiceMaker = async (
         shipping_cost: shipping_cost,
         isPreorder: isPreorder,
         eta: eta,
+        isSameday: isSameday,
       }),
     });
 

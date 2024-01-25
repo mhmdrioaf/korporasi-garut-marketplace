@@ -13,6 +13,7 @@ interface IOrderCreateBody {
   total_price: number;
   isPreorder: boolean;
   eta: number;
+  isSameday: boolean;
 }
 
 async function handler(request: NextRequest) {
@@ -44,6 +45,7 @@ async function handler(request: NextRequest) {
         shipping_cost: body.shipping_cost,
         order_type: body.isPreorder ? "PREORDER" : "NORMAL",
         eta: body.isPreorder ? body.eta + 7 : body.eta,
+        isSameday: body.isSameday,
         order_item: {
           create: {
             order_quantity: body.product_quantity,

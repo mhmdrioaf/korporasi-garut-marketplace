@@ -344,7 +344,8 @@ export function DirectPurchaseProvider({
           variantsValue,
           totalPrice,
           isPreorder,
-          estimatedTimeArrival
+          estimatedTimeArrival,
+          samedayData.isSameDay
         );
         if (!makeOrder.ok) {
           setOrderLoading(false);
