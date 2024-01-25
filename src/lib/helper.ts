@@ -855,7 +855,7 @@ export const reportMessage = (sales: TSalesReportData[]) => {
       )}.`
     : "";
 
-  return highestSelling ? message + breakLine + highestSellingMessage : message;
+  return message;
 };
 
 export const getSalesYears = (sales: TSalesReportData[]) => {

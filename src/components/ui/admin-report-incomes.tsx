@@ -2,6 +2,8 @@
 
 import {
   getMonthString,
+  getPeriodTime,
+  getSalesYears,
   getSellerIncomes,
   getTotalIncome,
   rupiahConverter,
@@ -17,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
+import AdminReportIncomesPDF from "./admin-incomes-report-export-pdf";
 
 export default function AdminReportIncomes() {
   const { reports } = useAdmin();
@@ -28,11 +31,28 @@ export default function AdminReportIncomes() {
     ? new Date(reports.sales.endDate).getMonth()
     : 11;
 
+  const periodMonths = getPeriodTime(
+    parseInt(reports.sales.startDate ?? "1") - 1,
+    parseInt(reports.sales.endDate ?? "12")
+  );
+
   if (reports.sales.data) {
     const sellerIncomes = getSellerIncomes(reports.sales.data);
     return (
       <div className="w-full flex flex-col gap-4">
-        <p className="font-bold text-lg">Pendapatan</p>
+        <div className="w-full flex flex-row items-center justify-between">
+          <p className="font-bold text-lg">Pendapatan</p>
+          <AdminReportIncomesPDF
+            reportsData={reports.sales.data}
+            period={{
+              month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
+              year:
+                reports.sales.year ?? reports.sales.data
+                  ? getSalesYears(reports.sales.data).join(" & ")
+                  : new Date().getFullYear().toString(),
+            }}
+          />
+        </div>
         <div className="grid grid-cols-2">
           <p className="font-bold">
             Total pendapatan {getMonthString(startDate, startDate + 1)} -{" "}

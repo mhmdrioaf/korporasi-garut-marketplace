@@ -13,11 +13,6 @@ import { getPeriodTime, getSalesYears } from "@/lib/helper";
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
 
-  const periodMonths = getPeriodTime(
-    parseInt(reports.sales.startDate ?? "1") - 1,
-    parseInt(reports.sales.endDate ?? "12")
-  );
-
   return (
     <div className="w-full flex flex-col gap-4">
       {reports.sales.state.loading ? (
@@ -66,18 +61,6 @@ export default function AdminReportsComponents() {
         </Button>
       </div>
       <ReportTabs tab={reports.sales.state.tabs} />
-      {reports.sales.data && (
-        <AdminReportExportPDF
-          reportsData={reports.sales.data}
-          period={{
-            month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
-            year:
-              reports.sales.year ?? reports.sales.data
-                ? getSalesYears(reports.sales.data).join(" & ")
-                : new Date().getFullYear().toString(),
-          }}
-        />
-      )}
     </div>
   );
 }
