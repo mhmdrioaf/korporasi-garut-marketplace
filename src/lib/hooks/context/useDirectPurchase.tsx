@@ -334,7 +334,7 @@ export function DirectPurchaseProvider({
         const estimatedTimeArrival =
           !samedayData.isSameDay && chosenCourier
             ? parseInt(chosenCourier.etd)
-            : samedayData.sameDayETA;
+            : 1;
         const makeOrder = await invoiceMaker(
           user_id,
           product,
