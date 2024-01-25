@@ -943,8 +943,6 @@ export const roundThousands = (value: number): number => {
   let thousandDigit = Math.floor(value / 1000);
   const hundredsDigit = Math.floor((value % 1000) / 10);
 
-  console.log(hundredsDigit);
-
   if (hundredsDigit > 50) {
     thousandDigit += 1;
   }

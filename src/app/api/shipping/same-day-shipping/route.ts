@@ -15,8 +15,6 @@ interface IRequestBody {
 async function handler(request: NextRequest) {
   const body: IRequestBody = await request.json();
 
-  console.log(body);
-
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_SAMEDAY_SHIPPING!, {
       method: "POST",

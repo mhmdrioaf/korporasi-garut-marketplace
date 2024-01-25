@@ -233,8 +233,6 @@ export function ProductProvider({
     try {
       const imagesURL = await uploadImages(productsId);
 
-      console.log(data.variant);
-
       const productPrice =
         withVariants && data.variant
           ? data.variant.variant_item[0].variant_item_price
