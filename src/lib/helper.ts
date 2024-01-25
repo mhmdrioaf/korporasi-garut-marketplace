@@ -184,9 +184,14 @@ export const variantItemsIdGenerator = (
 ) => {
   const productPrefix = prefixMaker(productName, "triple");
   const variantPrefix = prefixMaker(variantName, "single");
-  const variantItemPrefix = variantItemName
-    .slice(0, variantItemName.length >= 3 ? 3 : variantItemName.length)
-    .toUpperCase();
+  const variantItemsName = variantItemName.split(" ");
+  const variantItemPrefix =
+    variantItemsName.length > 1
+      ? variantItemsName[0].charAt(0).toUpperCase() +
+        variantItemsName[variantItemsName.length - 1].charAt(0).toUpperCase()
+      : variantItemName
+          .slice(0, variantItemName.length >= 3 ? 3 : variantItemName.length)
+          .toUpperCase();
 
   return `${productPrefix}${variantPrefix}${variantItemPrefix}`;
 };
