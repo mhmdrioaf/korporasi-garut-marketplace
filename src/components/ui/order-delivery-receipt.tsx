@@ -10,6 +10,22 @@ import { useOrderManagement } from "@/lib/hooks/context/useOrderManagement";
 export default function OrderDeliveryReceipt() {
   const { orders } = useOrderManagement();
 
+  const buttonMessage = () => {
+    if (orders.state.orderToUpdate?.isSameday) {
+      if (orders.state.orderToUpdate?.delivery_receipt) {
+        return "Ubah Tautan";
+      } else {
+        return "Kirim Tautan";
+      }
+    } else {
+      if (orders.state.orderToUpdate?.delivery_receipt) {
+        return "Ubah Resi";
+      } else {
+        return "Kirim Resi";
+      }
+    }
+  };
+
   return orders.state.isGivingReceipt ? (
     <Modal
       defaultOpen={orders.state.isGivingReceipt}
@@ -23,16 +39,29 @@ export default function OrderDeliveryReceipt() {
       >
         <div className="w-full flex flex-col gap-2">
           <p className="text-2xl text-primary font-bold">
-            Pemberian Resi Pengiriman
+            {orders.state.orderToUpdate?.isSameday
+              ? "Pemberian Tautan Live Location"
+              : "Pemberian Resi Pengiriman"}
           </p>
           <p className="text-sm">
-            Berikan resi pengiriman yang sesuai dengan resi pada <i>receipt</i>{" "}
-            pengiriman paket.
+            {orders.state.orderToUpdate?.isSameday ? (
+              "Berikan tautan live location dari google maps untuk kurir pengiriman yang mengirimkan pesanan ini. Tautan ini digunakan untuk konsumen melacak pesanannya."
+            ) : (
+              <>
+                Berikan resi pengiriman yang sesuai dengan resi pada{" "}
+                <i>receipt</i> pengiriman paket. Pastikan resi yang diberikan
+                sudah benar dan sesuai
+              </>
+            )}
           </p>
         </div>
 
         <div className="w-full flex flex-col gap-2">
-          <Label htmlFor="noresi">Nomor Resi</Label>
+          <Label htmlFor="noresi">
+            {orders.state.orderToUpdate?.isSameday
+              ? "Tautan Maps"
+              : "Nomor Resi"}
+          </Label>
           <Input
             type="text"
             required
@@ -49,12 +78,14 @@ export default function OrderDeliveryReceipt() {
           {orders.state.isUpdating ? (
             <>
               <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
-              <span>Mengirim Resi...</span>
+              {orders.state.orderToUpdate?.isSameday ? (
+                "Mengirim tautan..."
+              ) : (
+                <span>Mengirim Resi...</span>
+              )}
             </>
-          ) : orders.state.orderToUpdate?.delivery_receipt ? (
-            "Ubah Resi"
           ) : (
-            "Kirim Resi"
+            buttonMessage()
           )}
         </Button>
       </form>

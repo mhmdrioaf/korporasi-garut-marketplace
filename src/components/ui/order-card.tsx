@@ -25,6 +25,7 @@ interface IOrderCardProps {
 export default function OrderCard({ ordersData }: IOrderCardProps) {
   const [buttonLoading, setButtonLoading] = useState(false);
   const [deliveryReceipt, setDeliveryReceipt] = useState<string | null>(null);
+  const [isSameday, setIsSameday] = useState(false);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -168,12 +169,17 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
     }
   };
 
-  const showShippingTrackingModal = (receipt: string | null) => {
+  const showShippingTrackingModal = (
+    receipt: string | null,
+    isSameday: boolean
+  ) => {
     setDeliveryReceipt(receipt);
+    setIsSameday(true);
   };
 
   const onShippingTrackingModalCloses = () => {
     setDeliveryReceipt(null);
+    setIsSameday(false);
   };
 
   return (
@@ -215,7 +221,10 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                   onPaymentClick={() => onPaymentClick(order)}
                   disabled={buttonLoading || order.payment_proof !== null}
                   onShippingTrackingClick={() =>
-                    showShippingTrackingModal(order.delivery_receipt)
+                    showShippingTrackingModal(
+                      order.delivery_receipt,
+                      order.isSameday
+                    )
                   }
                 />
                 {showPaymentProof(order.order_status, order.payment_proof)}
@@ -302,6 +311,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
           delivery_receipt={deliveryReceipt}
           open={deliveryReceipt !== null}
           onClose={onShippingTrackingModalCloses}
+          isSameday={isSameday}
         />
       )}
     </div>
