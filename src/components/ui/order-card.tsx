@@ -174,7 +174,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
     isSameday: boolean
   ) => {
     setDeliveryReceipt(receipt);
-    setIsSameday(true);
+    setIsSameday(isSameday);
   };
 
   const onShippingTrackingModalCloses = () => {
