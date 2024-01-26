@@ -331,10 +331,9 @@ export function DirectPurchaseProvider({
           title: "Anda belum memilih alamat pengiriman.",
         });
       } else {
-        const estimatedTimeArrival =
-          !samedayData.isSameDay && chosenCourier
-            ? parseInt(chosenCourier.etd)
-            : 1;
+        const estimatedTimeArrival = samedayData.isSameDay
+          ? 1
+          : parseInt(chosenCourier?.etd ?? "3");
         const makeOrder = await invoiceMaker(
           user_id,
           product,
