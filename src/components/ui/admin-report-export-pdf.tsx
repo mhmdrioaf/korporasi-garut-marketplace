@@ -59,6 +59,7 @@ export default function AdminReportExportPDF({
       report.order_item.length > 1
         ? report.order_item.map((item) => item.product.title).join("\n")
         : report.order_item[0].product.title,
+    product_unit: report.order_item.map((item) => item.product.unit).join("\n"),
     variant_name:
       report.order_item.length > 1
         ? report.order_item
@@ -191,7 +192,7 @@ export default function AdminReportExportPDF({
                   {data.variant_name}
                 </TableCell>
                 <TableCell className="text-center whitespace-pre border border-input">
-                  {data.order_quantity}
+                  {data.order_quantity} {data.product_unit}
                 </TableCell>
                 <TableCell className="text-center whitespace-pre border border-input">
                   {data.price}

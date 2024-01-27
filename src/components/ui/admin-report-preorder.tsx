@@ -92,7 +92,9 @@ export default function PreorderReport({ adminName }: IReportProps) {
                 </TableCell>
                 <TableCell className="text-center whitespace-pre-wrap">
                   {order.order_item
-                    .map((order) => order.order_quantity)
+                    .map(
+                      (order) => `${order.order_quantity} ${order.product.unit}`
+                    )
                     .join("\n")}
                 </TableCell>
                 <TableCell className="text-center">
@@ -167,7 +169,9 @@ export default function PreorderReport({ adminName }: IReportProps) {
                 </TableCell>
                 <TableCell className="text-center whitespace-pre-wrap">
                   {order.order_item
-                    .map((order) => order.order_quantity)
+                    .map(
+                      (order) => `${order.order_quantity} ${order.product.unit}`
+                    )
                     .join("\n")}
                 </TableCell>
                 <TableCell className="text-center">
