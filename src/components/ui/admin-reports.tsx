@@ -3,7 +3,6 @@
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import { Loader2Icon } from "lucide-react";
 import { Separator } from "./separator";
-import ReportsDatePicker from "./reports-date-picker";
 import ReportsChart from "./reports-chart";
 import { Button } from "./button";
 import ReportTabs from "@/lib/renderer/report-tabs";
@@ -21,10 +20,6 @@ export default function AdminReportsComponents() {
       ) : (
         <ReportsChart />
       )}
-
-      <Separator />
-
-      <ReportsDatePicker />
 
       <Separator />
 
