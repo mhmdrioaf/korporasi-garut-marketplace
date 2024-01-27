@@ -73,7 +73,7 @@ export function DirectPurchaseProvider({
   const [isWarning, setIsWarning] = useState(false);
   const [isVariantChooserOpen, setIsVariantChooserOpen] = useState(false);
   const [variantChooserContext, setVariantChooserContext] = useState<
-    "cart" | "buy" | null
+    "cart" | "buy" | "common" | null
   >(null);
 
   const [isPreorder, setIsPreorder] = useState<boolean>(false);
@@ -141,6 +141,7 @@ export function DirectPurchaseProvider({
     if (option === "increase") {
       if (product.variant && !variantsValue) {
         setIsVariantChooserOpen(true);
+        setVariantChooserContext("common");
       } else if (product.variant && variantsValue) {
         if (variantsValue.variant_stock < 1) {
           setProductQuantity((prevQuantity) => {
@@ -203,6 +204,7 @@ export function DirectPurchaseProvider({
 
     if (product.variant && !variantsValue) {
       setIsVariantChooserOpen(true);
+      setVariantChooserContext("common");
     } else {
       if (!isNaN(value)) {
         if (!variantsValue) {
