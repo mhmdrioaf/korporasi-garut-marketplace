@@ -64,12 +64,6 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     error: salesReportError,
   } = useSWR("/api/report/getSales", customFetcher);
 
-  const {
-    data: preordersData,
-    isLoading: preordersReportLoading,
-    error: preordersReportError,
-  } = useSWR("/api/report/preorders", customFetcher);
-
   const { data: productsData, isLoading: productsDataLoading } = useSWR(
     "/api/product/list",
     fetcher
@@ -81,13 +75,9 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
 
   function getSalesData() {
     if (salesData) {
-      if (date) {
-        return filterSalesByDateRange(salesData, date.from, date.to);
-      } else {
-        return salesData;
-      }
+      return filterSalesByDateRange(salesData, date?.from, date?.to);
     } else {
-      return [];
+      return null;
     }
   }
 
@@ -105,6 +95,12 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     });
   }
 
+  function onDateChanges(date: DateRange | undefined) {
+    setDate(date);
+    const chart = ChartJS.getChart("report-chart");
+    chart?.update();
+  }
+
   useEffect(() => {
     ChartJS.register(...registerables);
   }, []);
@@ -115,7 +111,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     },
     reports: {
       sales: {
-        data: getSalesData(),
+        data: getSalesData()?.finished ?? [],
         date: date,
 
         state: {
@@ -125,16 +121,16 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
         },
 
         handler: {
-          changeDate: setDate,
+          changeDate: onDateChanges,
           changeTab: changeTab,
         },
       },
 
       preorders: {
-        data: preordersData ? preordersData : [],
+        data: getSalesData()?.preorders ?? [],
         state: {
-          loading: preordersReportLoading,
-          error: preordersReportError,
+          loading: salesReportLoading,
+          error: salesReportError,
         },
       },
     },

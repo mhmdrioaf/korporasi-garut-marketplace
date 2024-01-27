@@ -51,7 +51,16 @@ type TSalesReportData = {
   payment_proof: string | null;
   order_type: ORDER_TYPE;
   eta: number;
+  order_status: ORDER_STATUS;
 
   user: TSalesReportUser;
   order_item: TSalesReportOrderItem[];
 };
+
+type ORDER_STATUS =
+  | "PENDING"
+  | "PAID"
+  | "PACKED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "FINISHED";

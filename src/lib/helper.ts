@@ -809,7 +809,15 @@ export const sortReportsData = (data: TSalesReportData[]) => {
     const dateA = new Date(a.order_date);
     const dateB = new Date(b.order_date);
 
-    return dateA.getMonth() - dateB.getMonth();
+    if (dateA < dateB) {
+      return -1;
+    }
+
+    if (dateA > dateB) {
+      return 1;
+    }
+
+    return 0;
   });
 
   return sortedData;
@@ -845,22 +853,10 @@ export const reportMessage = (sales: TSalesReportData[]) => {
     (a, b) => a + b.order_item.reduce((c, d) => c + d.order_quantity, 0),
     0
   );
-  const highestSelling = identifyProducts(sales).highestSelling;
 
-  const breakLine = "\n";
   const message = `Pada periode ini, terdapat ${totalSales} penjualan yang terjadi, dengan total produk yang terjual sebanyak ${productSold} produk, dan total pendapatan adalah sebesar ${rupiahConverter(
     totalIncomes
   )}.`;
-
-  const highestSellingMessage = highestSelling
-    ? `Produk terlaris pada periode ini adalah ${
-        highestSelling.name
-      } dengan total produk terjual sebanyak ${highestSelling.quantity} ${
-        highestSelling.unit
-      }, dan total pendapatan sebesar ${rupiahConverter(
-        highestSelling.quantity * highestSelling.price
-      )}.`
-    : "";
 
   return message;
 };
@@ -877,32 +873,6 @@ export const getSalesYears = (sales: TSalesReportData[]) => {
   });
 
   return years;
-};
-
-export const filterSalesByDate = (
-  year: string,
-  startMonth: string,
-  endMonth: string,
-  sales: TSalesReportData[]
-) => {
-  const isOddDate = () => {
-    const month = parseInt(endMonth);
-    return month % 2 === 0;
-  };
-
-  const startDate = new Date(`${year}-${startMonth}-01`);
-  const endDate = new Date(
-    `${year}-${endMonth}-${
-      isOddDate() ? "30" : isOddDate() && endMonth === "02" ? "28" : "31"
-    }`
-  );
-
-  const salesData = sales.filter((sale) => {
-    const orderDate = new Date(sale.order_date);
-    return orderDate >= startDate && orderDate <= endDate;
-  });
-
-  return salesData;
 };
 
 export const advancedProductIdentifications = (products: TProduct[]) => {
@@ -1008,13 +978,42 @@ export const filterSalesByDateRange = (
   endDate: Date | undefined
 ) => {
   if (startDate && endDate) {
-    const filteredSales = sales.filter((sale) => {
+    const finishedOrders = sales.filter((sale) => {
       const orderDate = new Date(sale.order_date);
-      return orderDate >= startDate && orderDate <= endDate;
+      return (
+        orderDate >= startDate &&
+        orderDate <= endDate &&
+        (sale.order_status === "DELIVERED" || sale.order_status === "FINISHED")
+      );
     });
 
-    return filteredSales;
+    const preorders = sales.filter((sale) => {
+      const orderDate = new Date(sale.order_date);
+      return (
+        orderDate >= startDate &&
+        orderDate <= endDate &&
+        sale.order_type === "PREORDER" &&
+        sale.order_status === "PAID"
+      );
+    });
+
+    return {
+      finished: sortReportsData(finishedOrders),
+      preorders: sortReportsData(preorders),
+    };
   } else {
-    return sales;
+    const finishedOrders = sales.filter(
+      (sale) =>
+        sale.order_status === "FINISHED" || sale.order_status === "DELIVERED"
+    );
+
+    const preorders = sales.filter(
+      (sale) => sale.order_type === "PREORDER" && sale.order_status === "PAID"
+    );
+
+    return {
+      finished: sortReportsData(finishedOrders),
+      preorders: sortReportsData(preorders),
+    };
   }
 };
