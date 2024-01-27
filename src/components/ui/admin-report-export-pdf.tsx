@@ -122,7 +122,11 @@ export default function AdminReportExportPDF({
 
   return (
     <>
-      <Button variant="outline" onClick={exportPDF}>
+      <Button
+        variant="outline"
+        onClick={exportPDF}
+        className="fixed bottom-4 right-4"
+      >
         Unduh Laporan
       </Button>
 
