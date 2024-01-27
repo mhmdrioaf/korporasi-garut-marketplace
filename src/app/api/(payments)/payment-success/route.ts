@@ -56,16 +56,29 @@ async function handler(request: NextRequest) {
       if (productOrder.order_type === "NORMAL") {
         for (const item of productOrder.order_item) {
           if (item.variant) {
-            await db.product_variant_item.update({
+            await db.product.update({
               where: {
-                variant_item_id: item.variant.variant_item_id,
+                id: item.product.id,
               },
               data: {
-                variant_stock: {
+                stock: {
                   decrement: item.order_quantity,
                 },
-                pending_order_count: {
-                  decrement: item.order_quantity,
+                variant: {
+                  update: {
+                    variant_item: {
+                      update: {
+                        where: {
+                          variant_item_id: item.variant.variant_item_id,
+                        },
+                        data: {
+                          variant_stock: {
+                            decrement: item.order_quantity,
+                          },
+                        },
+                      },
+                    },
+                  },
                 },
               },
             });
