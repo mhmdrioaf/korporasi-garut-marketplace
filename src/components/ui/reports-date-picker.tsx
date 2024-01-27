@@ -38,6 +38,8 @@ export default function ReportsDatePicker() {
             selected={reports.sales.date}
             onSelect={reports.sales.handler.changeDate}
             numberOfMonths={2}
+            showOutsideDays
+            fixedWeeks
           />
         </PopoverContent>
       </Popover>
