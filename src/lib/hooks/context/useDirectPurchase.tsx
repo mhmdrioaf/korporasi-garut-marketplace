@@ -57,6 +57,7 @@ export function DirectPurchaseProvider({
   const [cartLoading, setCartLoading] = useState(false);
   const [sameDayModalOpen, setSameDayModalOpen] = useState(false);
   const [orderable, setOrderable] = useState<boolean>(true);
+  const [preorderModalOpen, setPreorderModalOpen] = useState(false);
 
   const [samedayData, setSamedayData] = useState<{
     isSameDay: boolean;
@@ -460,6 +461,10 @@ export function DirectPurchaseProvider({
     setSameDayModalOpen(false);
   };
 
+  const onPreorderModalClose = () => {
+    setPreorderModalOpen(false);
+  };
+
   useEffect(() => {
     const unsub = () => {
       if (product.variant && !variantsValue) {
@@ -546,6 +551,14 @@ export function DirectPurchaseProvider({
     }
   }, [variantsValue]);
 
+  useEffect(() => {
+    if (isPreorder) {
+      setPreorderModalOpen(true);
+    } else {
+      setPreorderModalOpen(false);
+    }
+  }, [isPreorder]);
+
   const value: TDirectPurchaseContext = {
     quantity: {
       productQuantity: productQuantity,
@@ -598,6 +611,7 @@ export function DirectPurchaseProvider({
       resetPrice: resetPrice,
       resetAll: onResetAll,
       onSamedayModalClose: onSamedayModalClose,
+      onPreorderModalClose: onPreorderModalClose,
     },
     customer: {
       user: user ? user.result : null,
@@ -636,6 +650,7 @@ export function DirectPurchaseProvider({
       isPreorder: isPreorder,
       sameDayModalOpen: sameDayModalOpen,
       orderable: orderable,
+      preorderModalOpen: preorderModalOpen,
     },
   };
 

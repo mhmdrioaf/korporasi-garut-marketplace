@@ -19,15 +19,20 @@ import {
 import { Separator } from "./separator";
 import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
-import { remoteImageSource, rupiahConverter } from "@/lib/helper";
+import {
+  getMonthString,
+  remoteImageSource,
+  rupiahConverter,
+} from "@/lib/helper";
 import ProductVariants from "./product-variant";
 import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import VariantChooser from "./variant-chooser";
 import SameDayProductAlert from "./modals/same-day-product-alert";
+import Alert from "@/components/ui/modals/alert";
 
 export default function ProductDetail() {
-  const { product, image, price, variants, cart, quantity, state } =
+  const { product, image, price, variants, cart, quantity, state, handler } =
     useDirectPurchase();
   const getSellerAddress = () => {
     const primarySellerId = product.seller.primary_address_id;
@@ -36,6 +41,36 @@ export default function ProductDetail() {
     );
 
     return primaryAddress ? primaryAddress.city.city_name : "Tidak diketahui";
+  };
+
+  const productAvaibility = () => {
+    let date = new Date();
+    date.setDate(date.getDate() + 5);
+
+    const dateString = date.toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return dateString;
+  };
+
+  const preorderAlertMessage = () => {
+    let productName = "";
+    let productType = "";
+    if (product) {
+      if (variants.variantValue) {
+        productName = variants.variantValue.variant_name;
+        productType = "Varian";
+      } else {
+        productName = product.title;
+        productType = "Produk";
+      }
+    }
+
+    return `${productType} ${productName} sedang tidak tersedia. ${productType} ini akan tersedia kembali pada tanggal ${productAvaibility()}.\n\nJika anda berkenan untuk melakukan pesanan pre-order, maka minimal pembelian untuk produk ini adalah 5 ${product.unit}, sehingga pesanan anda menjadi pesanan prioritas kami.\n\nTerima kasih.`;
   };
   return product ? (
     <Container variant="column" className="overflow-hidden">
@@ -271,6 +306,12 @@ export default function ProductDetail() {
       />
 
       <SameDayProductAlert />
+      <Alert
+        isOpen={state.preorderModalOpen}
+        message={preorderAlertMessage()}
+        title={`Pesanan Pre-Order`}
+        onConfirm={handler.onPreorderModalClose}
+      />
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">
