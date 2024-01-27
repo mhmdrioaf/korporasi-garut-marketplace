@@ -10,7 +10,7 @@ import { Calendar } from "./calendar";
 export default function ReportsDatePicker() {
   const { reports } = useAdmin();
   return (
-    <div className="w-full flex flex-col gap-4">
+    <div className="flex flex-row items-center gap-4 self-end justify-end">
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="default">
@@ -43,6 +43,14 @@ export default function ReportsDatePicker() {
           />
         </PopoverContent>
       </Popover>
+
+      <Button
+        variant={reports.sales.date ? "destructive" : "ghost"}
+        disabled={!reports.sales.date}
+        onClick={() => reports.sales.handler.changeDate(undefined)}
+      >
+        Reset Rentang Waktu
+      </Button>
     </div>
   );
 }
