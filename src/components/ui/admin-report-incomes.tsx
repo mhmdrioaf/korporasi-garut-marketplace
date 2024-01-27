@@ -21,7 +21,11 @@ import {
 } from "./table";
 import AdminReportIncomesPDF from "./admin-incomes-report-export-pdf";
 
-export default function AdminReportIncomes() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function AdminReportIncomes({ adminName }: IReportProps) {
   const { reports } = useAdmin();
 
   const startDate = reports.sales.startDate
@@ -51,6 +55,7 @@ export default function AdminReportIncomes() {
                   ? getSalesYears(reports.sales.data).join(" & ")
                   : new Date().getFullYear().toString(),
             }}
+            adminName={adminName}
           />
         </div>
         <div className="grid grid-cols-2">
@@ -138,52 +143,4 @@ export default function AdminReportIncomes() {
       </div>
     );
   }
-}
-
-{
-  /* <div className="w-full flex flex-col gap-2" key={sellerId}>
-                <p className="font-bold">
-                  {sellerIncomes.incomes[sellerId].name}
-                </p>
-                <Separator />
-                <div className="w-full grid grid-cols-2 gap-2">
-                  <p className="font-bold">Total Pesanan</p>
-                  <p className="font-bold justify-self-end self-center">
-                    {sellerIncomes.incomes[sellerId].products.length} Produk
-                  </p>
-                  <p className="font-bold">
-                    Total Pendapatan {sellerIncomes.incomes[sellerId].name}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(sellerIncomes.incomes[sellerId].income)}
-                  </p>
-                  <p className="font-bold">
-                    Pembagian Pengembangan Produk {"(50%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId]
-                        .product_development
-                    )}
-                  </p>
-                  <p className="font-bold">
-                    Pembagian Tabungan Siswa {"(20%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].student_savings
-                    )}
-                  </p>
-                  <p className="font-bold">
-                    Pendapatan Bersih {sellerIncomes.incomes[sellerId].name}{" "}
-                    {"(30%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].seller_income
-                    )}
-                  </p>
-                </div>
-                <Separator />
-              </div> */
 }

@@ -14,7 +14,11 @@ import Image from "next/image";
 import { Separator } from "./separator";
 import AdminReportExportPDF from "./admin-report-export-pdf";
 
-export default function ReportsProducts() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function ReportsProducts({ adminName }: IReportProps) {
   const { reports } = useAdmin();
 
   const periodMonths = getPeriodTime(
@@ -37,6 +41,7 @@ export default function ReportsProducts() {
                   ? getSalesYears(reports.sales.data).join(" & ")
                   : new Date().getFullYear().toString(),
             }}
+            adminName={adminName}
           />
         </div>
 

@@ -4,22 +4,30 @@ import AdminProductsIdentifications from "@/components/ui/admin-products-identif
 import AdminReportIncomes from "@/components/ui/admin-report-incomes";
 import PreorderReport from "@/components/ui/admin-report-preorder";
 import ReportsProducts from "@/components/ui/reports-products";
+import { useSession } from "next-auth/react";
 
 interface IReportTabsProps {
   tab: TAdminReportTabs;
 }
 
 export default function ReportTabs({ tab }: IReportTabsProps) {
+  const { data: session } = useSession();
   switch (tab) {
     case "sales":
-      return <ReportsProducts />;
+      return (
+        <ReportsProducts adminName={session?.user.name ?? "Adminstrator"} />
+      );
     case "products":
       return <AdminProductsIdentifications />;
     case "incomes":
-      return <AdminReportIncomes />;
+      return (
+        <AdminReportIncomes adminName={session?.user.name ?? "Adminstrator"} />
+      );
     case "preorder":
-      return <PreorderReport />;
+      return (
+        <PreorderReport adminName={session?.user.name ?? "Adminstrator"} />
+      );
     default:
-      <ReportsProducts />;
+      <ReportsProducts adminName={session?.user.name ?? "Adminstrator"} />;
   }
 }

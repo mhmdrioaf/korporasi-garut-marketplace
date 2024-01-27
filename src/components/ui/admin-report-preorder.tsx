@@ -19,7 +19,11 @@ import React from "react";
 import generatePDF, { Margin } from "react-to-pdf";
 import Image from "next/image";
 
-export default function PreorderReport() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function PreorderReport({ adminName }: IReportProps) {
   const { reports } = useAdmin();
   const preorders = reports.preorders.data;
 
@@ -172,16 +176,14 @@ export default function PreorderReport() {
           </TableBody>
         </Table>
 
-        <div className="w-52 flex flex-col justify-end items-end gap-16 self-end">
+        <div className="w-fit flex flex-col justify-end items-end gap-16 self-end">
           <div className="w-full flex flex-col gap-2">
             <p>Garut, {getCurrentDateString()}</p>
             <p>Mengetahui,</p>
           </div>
 
-          <div className="w-full flex flex-row items-center">
-            <p>{"("}</p>
-            <div className="w-full h-1 border-b border-dashed border-black self-end justify-self-end" />
-            <p>{")"}</p>
+          <div className="w-full flex flex-row items-center mb-4">
+            <b>{adminName}</b>
           </div>
         </div>
       </div>
