@@ -7,8 +7,6 @@ import ReportsDatePicker from "./reports-date-picker";
 import ReportsChart from "./reports-chart";
 import { Button } from "./button";
 import ReportTabs from "@/lib/renderer/report-tabs";
-import AdminReportExportPDF from "./admin-report-export-pdf";
-import { getPeriodTime, getSalesYears } from "@/lib/helper";
 
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();

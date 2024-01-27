@@ -10,8 +10,10 @@ import {
 } from "react";
 import useSWR from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
-import { fetcher, filterSalesByDate } from "@/lib/helper";
+import { fetcher, filterSalesByDateRange } from "@/lib/helper";
 import { TProduct } from "@/lib/globals";
+import { DateRange } from "react-day-picker";
+import { TAdminContextType, TAdminReportTabs } from "./adminContextType";
 
 interface IAdminProviderProps {
   token: string;
@@ -25,9 +27,7 @@ export function useAdmin() {
 }
 
 export function AdminProvider({ token, children }: IAdminProviderProps) {
-  const [year, setYear] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string | null>(null);
-  const [endDate, setEndDate] = useState<string | null>(null);
+  const [date, setDate] = useState<DateRange | undefined>();
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
   const [productDetail, setProductDetail] = useState<{
     product: TProduct | null;
@@ -41,10 +41,10 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     async (url: string) => {
       async function fetchData(url: string) {
         const res = await fetch(url, {
-          method: "POST",
-          body: JSON.stringify({
-            token: token,
-          }),
+          method: "GET",
+          headers: {
+            key: token,
+          },
         });
 
         const response = await res.json();
@@ -81,10 +81,8 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
 
   function getSalesData() {
     if (salesData) {
-      if (year) {
-        return filterSalesByDate(year, "01", "12", salesData);
-      } else if (startDate && endDate && year) {
-        return filterSalesByDate(year, startDate, endDate, salesData);
+      if (date) {
+        return filterSalesByDateRange(salesData, date.from, date.to);
       } else {
         return salesData;
       }
@@ -118,9 +116,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     reports: {
       sales: {
         data: getSalesData(),
-        startDate: startDate,
-        endDate: endDate,
-        year: year,
+        date: date,
 
         state: {
           loading: salesReportLoading,
@@ -129,9 +125,7 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
         },
 
         handler: {
-          changeStartDate: setStartDate,
-          changeEndDate: setEndDate,
-          changeYear: setYear,
+          changeDate: setDate,
           changeTab: changeTab,
         },
       },

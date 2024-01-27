@@ -1,3 +1,5 @@
+import { DateRange } from "react-day-picker";
+
 type TAdminReportTabs = "sales" | "incomes" | "products" | "preorder";
 
 type TAdminContextType = {
@@ -8,9 +10,7 @@ type TAdminContextType = {
   reports: {
     sales: {
       data: TSalesReportData[] | null | undefined;
-      startDate: string | null;
-      endDate: string | null;
-      year: string | null;
+      date: DateRange | undefined;
 
       state: {
         loading: boolean;
@@ -19,9 +19,7 @@ type TAdminContextType = {
       };
 
       handler: {
-        changeStartDate: (startDate: string | null) => void;
-        changeEndDate: (endDate: string | null) => void;
-        changeYear: (year: string | null) => void;
+        changeDate: (date: DateRange | undefined) => void;
         changeTab: (tab: TAdminReportTabs) => void;
       };
     };

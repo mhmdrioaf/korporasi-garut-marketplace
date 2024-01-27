@@ -5,6 +5,7 @@ import AdminReportIncomes from "@/components/ui/admin-report-incomes";
 import PreorderReport from "@/components/ui/admin-report-preorder";
 import ReportsProducts from "@/components/ui/reports-products";
 import { useSession } from "next-auth/react";
+import { TAdminReportTabs } from "../hooks/context/adminContextType";
 
 interface IReportTabsProps {
   tab: TAdminReportTabs;

@@ -1001,3 +1001,20 @@ export const getCurrentDateString = () => {
 
   return `${decimalDate(day)} ${monthString} ${year}`;
 };
+
+export const filterSalesByDateRange = (
+  sales: TSalesReportData[],
+  startDate: Date | undefined,
+  endDate: Date | undefined
+) => {
+  if (startDate && endDate) {
+    const filteredSales = sales.filter((sale) => {
+      const orderDate = new Date(sale.order_date);
+      return orderDate >= startDate && orderDate <= endDate;
+    });
+
+    return filteredSales;
+  } else {
+    return sales;
+  }
+};
