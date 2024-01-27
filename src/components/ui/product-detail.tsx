@@ -170,7 +170,37 @@ export default function ProductDetail() {
             <AccordionItem value="product-descriptions">
               <AccordionTrigger>Deskripsi Produk</AccordionTrigger>
               <AccordionContent className="whitespace-pre-wrap">
-                {product.description}
+                <div className="w-full flex flex-col gap-2">
+                  <p>{product.description}</p>
+
+                  <Separator />
+
+                  <div className="w-full grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <b>Tanggal Kedaluwarsa</b>
+                      <p>
+                        {new Date(product.expire_date).toLocaleDateString(
+                          "id-ID"
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Berat Produk</b>
+                      <p>{product.weight} gram</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Masa Penyimpanan</b>
+                      <p>{product.storage_period} hari</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Dapat dikirim ke luar kota</b>
+                      <p>{product.capable_out_of_town ? "Ya" : "Tidak"}</p>
+                    </div>
+                  </div>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
