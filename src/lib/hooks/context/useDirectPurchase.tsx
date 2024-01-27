@@ -139,12 +139,55 @@ export function DirectPurchaseProvider({
 
   const onQuantityChangeHandler = (option: "increase" | "decrease") => {
     if (option === "increase") {
-      setProductQuantity((prev) => (prev === product.stock ? prev : prev + 1));
-      setTotalPrice((prev) =>
-        variantsValue
-          ? variantsValue.variant_price + prev
-          : prev + product.price
-      );
+      if (product.variant && !variantsValue) {
+        setIsVariantChooserOpen(true);
+      } else if (product.variant && variantsValue) {
+        if (variantsValue.variant_stock < 1) {
+          setProductQuantity((prevQuantity) => {
+            if (prevQuantity < 5) {
+              setTotalPrice(variantsValue.variant_price * 5);
+              return 5;
+            } else {
+              setTotalPrice((prevQuantity + 1) * variantsValue.variant_price);
+              return prevQuantity + 1;
+            }
+          });
+        } else {
+          setProductQuantity((prevQuantity) => {
+            if (prevQuantity === variantsValue.variant_stock) {
+              setTotalPrice(
+                variantsValue.variant_price * variantsValue.variant_stock
+              );
+              return variantsValue.variant_stock;
+            } else {
+              setTotalPrice((prevQuantity + 1) * variantsValue.variant_price);
+              return prevQuantity + 1;
+            }
+          });
+        }
+      } else {
+        if (product.stock < 1) {
+          setProductQuantity((prevQuantity) => {
+            if (prevQuantity < 5) {
+              setTotalPrice(product.price * 5);
+              return 5;
+            } else {
+              setTotalPrice((prevQuantity + 1) * product.price);
+              return prevQuantity + 1;
+            }
+          });
+        } else {
+          setProductQuantity((prevQuantity) => {
+            if (prevQuantity === product.stock) {
+              setTotalPrice(product.price * product.stock);
+              return product.stock;
+            } else {
+              setTotalPrice((prevQuantity + 1) * product.price);
+              return prevQuantity + 1;
+            }
+          });
+        }
+      }
     } else {
       setProductQuantity((prev) => (prev === 1 ? 1 : prev - 1));
       setTotalPrice((prev) =>
@@ -158,39 +201,74 @@ export function DirectPurchaseProvider({
   const onQuantityInputChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
 
-    if (!isNaN(value)) {
-      if (!variantsValue) {
-        if (value > product.stock) {
-          setProductQuantity(product.stock);
-          setTotalPrice(product.price * product.stock);
-        } else if (value < 1) {
-          setProductQuantity(1);
-          setTotalPrice(product.price);
+    if (product.variant && !variantsValue) {
+      setIsVariantChooserOpen(true);
+    } else {
+      if (!isNaN(value)) {
+        if (!variantsValue) {
+          if (product.stock < 1) {
+            if (value < 5) {
+              setProductQuantity(5);
+              setTotalPrice(product.price * 5);
+            } else {
+              setProductQuantity(value);
+              setTotalPrice(product.price * value);
+            }
+          } else {
+            if (value > product.stock) {
+              setProductQuantity(product.stock);
+              setTotalPrice(product.price * product.stock);
+            } else if (value < 1) {
+              setProductQuantity(1);
+              setTotalPrice(product.price);
+            } else {
+              setProductQuantity(value);
+              setTotalPrice(product.price * value);
+            }
+          }
         } else {
-          setProductQuantity(value);
-          setTotalPrice(product.price * value);
+          if (variantsValue.variant_stock < 1) {
+            if (value < 5) {
+              setProductQuantity(5);
+              setTotalPrice(variantsValue.variant_price * 5);
+            } else {
+              setProductQuantity(value);
+              setTotalPrice(variantsValue.variant_price * value);
+            }
+          } else {
+            if (value > variantsValue.variant_stock) {
+              setProductQuantity(variantsValue.variant_stock);
+              setTotalPrice(
+                variantsValue.variant_price * variantsValue.variant_stock
+              );
+            } else if (value < 1) {
+              setProductQuantity(1);
+              setTotalPrice(variantsValue.variant_price);
+            } else {
+              setProductQuantity(value);
+              setTotalPrice(variantsValue.variant_price * value);
+            }
+          }
         }
       } else {
-        if (value > variantsValue.variant_stock) {
-          setProductQuantity(variantsValue.variant_stock);
-          setTotalPrice(
-            variantsValue.variant_price * variantsValue.variant_stock
-          );
-        } else if (value < 1) {
-          setProductQuantity(1);
-          setTotalPrice(variantsValue.variant_price);
+        if (!variantsValue) {
+          if (product.stock < 1) {
+            setProductQuantity(5);
+            setTotalPrice(product.price * 5);
+          } else {
+            setProductQuantity(1);
+            setTotalPrice(product.price);
+          }
         } else {
-          setProductQuantity(value);
-          setTotalPrice(variantsValue.variant_price * value);
+          if (variantsValue.variant_stock < 1) {
+            setProductQuantity(5);
+            setTotalPrice(variantsValue.variant_price * 5);
+          } else {
+            setProductQuantity(1);
+            setTotalPrice(variantsValue.variant_price);
+          }
         }
       }
-    } else {
-      setProductQuantity(1);
-      setTotalPrice(
-        variantsValue
-          ? variantsValue.variant_price + product.price
-          : product.price
-      );
     }
   };
 
