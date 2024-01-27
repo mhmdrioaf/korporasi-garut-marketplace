@@ -179,14 +179,24 @@ export default function ProductDetail() {
                 variant="destructive"
                 size="icon"
                 onClick={() => quantity.handler.onQuantityChange("decrease")}
-                disabled={quantity.productQuantity === 1}
+                disabled={
+                  state.isPreorder
+                    ? quantity.productQuantity === 5
+                    : quantity.productQuantity === 1
+                }
               >
                 <MinusIcon className="w-4 h-4" />
               </Button>
               <Input
                 type="number"
-                min={1}
-                max={product.stock}
+                min={state.isPreorder ? 5 : 1}
+                max={
+                  product.variant
+                    ? variants.variantValue
+                      ? variants.variantValue.variant_stock
+                      : product.stock
+                    : product.stock
+                }
                 value={quantity.productQuantity}
                 onChange={quantity.handler.onQuantityInputChange}
                 className="w-[9ch] text-center appearance-none"
@@ -195,7 +205,14 @@ export default function ProductDetail() {
                 variant="default"
                 size="icon"
                 onClick={() => quantity.handler.onQuantityChange("increase")}
-                disabled={quantity.productQuantity === product.stock}
+                disabled={
+                  state.isPreorder
+                    ? false
+                    : variants.variantValue
+                      ? variants.variantValue.variant_stock ===
+                        quantity.productQuantity
+                      : product.stock === quantity.productQuantity
+                }
               >
                 <PlusIcon className="w-4 h-4" />
               </Button>

@@ -534,6 +534,18 @@ export function DirectPurchaseProvider({
     sameDayShippingData,
   ]);
 
+  useEffect(() => {
+    if (variantsValue) {
+      if (variantsValue.variant_stock < 1) {
+        setProductQuantity(5);
+        setTotalPrice(variantsValue.variant_price * 5);
+      } else {
+        setProductQuantity(1);
+        setTotalPrice(variantsValue.variant_price);
+      }
+    }
+  }, [variantsValue]);
+
   const value: TDirectPurchaseContext = {
     quantity: {
       productQuantity: productQuantity,
