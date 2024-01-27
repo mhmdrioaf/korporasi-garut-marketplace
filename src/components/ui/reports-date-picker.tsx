@@ -1,109 +1,56 @@
 "use client";
 
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./select";
-import { decimalDate, getMonthString, getSalesYears } from "@/lib/helper";
 import { Button } from "./button";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "./calendar";
 
 export default function ReportsDatePicker() {
   const { reports } = useAdmin();
   return (
-    <div className="w-full flex flex-col gap-4">
-      <p className="font-bold text-primary">Rentang Waktu</p>
-
-      <div className="w-full flex flex-row items-center gap-4">
-        <div className="w-fit flex flex-col gap-2">
-          <p className="font-bold">Tahun</p>
-          <Select
-            onValueChange={(value) =>
-              reports.sales.handler.changeYear(value !== "null" ? value : null)
-            }
-            disabled={reports.sales.year !== null}
-            value={reports.sales.year ?? "null"}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih periode tahun" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="null">Semua</SelectItem>
-              {reports.sales.data
-                ? getSalesYears(reports.sales.data).map((year) => (
-                    <SelectItem value={year} key={year}>
-                      {year}
-                    </SelectItem>
-                  ))
-                : null}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="w-full flex flex-col gap-2">
-          <p className="font-bold">Bulan</p>
-          <div className="w-full flex flex-row items-center">
-            <Select
-              onValueChange={(value) =>
-                reports.sales.handler.changeStartDate(
-                  decimalDate(parseInt(value)).toString()
-                )
-              }
-              disabled={!reports.sales.year}
-            >
-              <SelectTrigger className="col-span-2">
-                <SelectValue placeholder="Januari" />
-              </SelectTrigger>
-              <SelectContent defaultValue="0">
-                {getMonthString(0, 12).map((month, index) => (
-                  <SelectItem value={(index + 1).toString()} key={month}>
-                    {month}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <div className="flex flex-row items-center justify-center w-full h-[1px] bg-border relative">
-              <p className="text-nowrap text-xs absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-background p-2">
-                Sampai Dengan
-              </p>
-            </div>
-
-            <Select
-              onValueChange={(value) =>
-                reports.sales.handler.changeEndDate(
-                  decimalDate(parseInt(value)).toString()
-                )
-              }
-              disabled={!reports.sales.year}
-            >
-              <SelectTrigger className="col-span-2">
-                <SelectValue placeholder="Desember" />
-              </SelectTrigger>
-              <SelectContent defaultValue="12">
-                {getMonthString(0, 12).map((month, index) => (
-                  <SelectItem value={(index + 1).toString()} key={month}>
-                    {month}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {reports.sales.year && (
-              <Button
-                variant="destructive"
-                onClick={() => reports.sales.handler.changeYear(null)}
-                className="shrink-0"
-              >
-                Reset Rentang Waktu
-              </Button>
+    <div className="flex flex-row items-center gap-4 self-end justify-end">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="default">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {reports.sales.date?.from ? (
+              reports.sales.date.to ? (
+                <>
+                  {format(reports.sales.date.from, "LLL dd, y")} -{" "}
+                  {format(reports.sales.date.to, "LLL dd, y")}
+                </>
+              ) : (
+                format(reports.sales.date.from, "LLL dd, y")
+              )
+            ) : (
+              <span>Pilih Rentang Waktu</span>
             )}
-          </div>
-        </div>
-      </div>
+          </Button>
+        </PopoverTrigger>
+
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            initialFocus
+            mode="range"
+            defaultMonth={reports.sales.date?.from}
+            selected={reports.sales.date}
+            onSelect={reports.sales.handler.changeDate}
+            numberOfMonths={2}
+            showOutsideDays
+            fixedWeeks
+          />
+        </PopoverContent>
+      </Popover>
+
+      <Button
+        variant={reports.sales.date ? "destructive" : "ghost"}
+        disabled={!reports.sales.date}
+        onClick={() => reports.sales.handler.changeDate(undefined)}
+      >
+        Reset Rentang Waktu
+      </Button>
     </div>
   );
 }

@@ -14,34 +14,51 @@ import Image from "next/image";
 import { Separator } from "./separator";
 import AdminReportExportPDF from "./admin-report-export-pdf";
 
-export default function ReportsProducts() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function ReportsProducts({ adminName }: IReportProps) {
   const { reports } = useAdmin();
 
+  const startDate = reports.sales.date?.from;
+  const endDate = reports.sales.date?.to;
+
+  const periodYears = () => {
+    if (reports.sales.data) {
+      if (startDate && endDate) {
+        if (startDate.getFullYear() !== endDate.getFullYear()) {
+          return `${startDate.getFullYear()} & ${endDate.getFullYear()}`;
+        } else {
+          return startDate.getFullYear().toString();
+        }
+      } else {
+        return getSalesYears(reports.sales.data).join(" & ");
+      }
+    } else {
+      return new Date().getFullYear().toString();
+    }
+  };
+
   const periodMonths = getPeriodTime(
-    parseInt(reports.sales.startDate ?? "1") - 1,
-    parseInt(reports.sales.endDate ?? "12")
+    startDate?.getMonth() ?? 0,
+    endDate?.getMonth() ?? 12
   );
 
   if (reports.sales.data && reports.sales.data.length > 0) {
     const salesData = getSalesByMonth(reports.sales.data);
     return (
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-row items-center justify-between">
-          <p className="font-bold text-lg">Penjualan</p>
-          <AdminReportExportPDF
-            reportsData={reports.sales.data}
-            period={{
-              month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
-              year:
-                reports.sales.year ?? reports.sales.data
-                  ? getSalesYears(reports.sales.data).join(" & ")
-                  : new Date().getFullYear().toString(),
-            }}
-          />
-        </div>
-
+        <AdminReportExportPDF
+          reportsData={reports.sales.data}
+          period={{
+            month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
+            year: periodYears(),
+          }}
+          adminName={adminName}
+        />
         {salesData.salesMonths.map((month) => (
-          <div className="w-full flex flex-col gap-2" key={month}>
+          <div className="w-full flex flex-col gap-2 text-sm" key={month}>
             <p className="font-bold text-lg">
               {getMonthString(month, month + 1)}
             </p>

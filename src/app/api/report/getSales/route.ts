@@ -1,73 +1,63 @@
 import { db } from "@/lib/db";
 import { permissionHelper } from "@/lib/helper";
+import { headers } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-interface IGetSalesRequest {
-  token: string;
-}
+async function handler(_request: NextRequest) {
+  const headersList = headers();
+  const key = headersList.get("key");
 
-async function handler(request: NextRequest) {
-  const body: IGetSalesRequest = await request.json();
-
-  if (permissionHelper(body.token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
-    try {
-      const ordersData: TSalesReportData[] = await db.orders.findMany({
-        where: {
-          OR: [
-            {
-              order_status: "FINISHED",
-            },
-            {
-              order_status: "DELIVERED",
-            },
-          ],
-        },
-        include: {
-          user: {
-            select: {
-              user_id: true,
-              account: {
-                select: {
-                  user_name: true,
+  if (key) {
+    if (permissionHelper(key, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
+      try {
+        const ordersData: TSalesReportData[] = await db.orders.findMany({
+          include: {
+            user: {
+              select: {
+                user_id: true,
+                account: {
+                  select: {
+                    user_name: true,
+                  },
                 },
               },
             },
-          },
-          order_item: {
-            select: {
-              order_quantity: true,
-              product: {
-                select: {
-                  id: true,
-                  images: true,
-                  price: true,
-                  title: true,
-                  unit: true,
-                  visitor: true,
-                  cart_count: true,
-                  search_count: true,
-                  seller: {
-                    select: {
-                      user_id: true,
-                      account: {
-                        select: {
-                          user_name: true,
+            order_item: {
+              select: {
+                order_quantity: true,
+                product: {
+                  select: {
+                    id: true,
+                    images: true,
+                    price: true,
+                    title: true,
+                    unit: true,
+                    visitor: true,
+                    cart_count: true,
+                    search_count: true,
+                    seller: {
+                      select: {
+                        user_id: true,
+                        account: {
+                          select: {
+                            user_name: true,
+                          },
                         },
                       },
                     },
                   },
                 },
-              },
-              variant: {
-                select: {
-                  variant_item_id: true,
-                  variant_name: true,
-                  variant_price: true,
-                  variant: {
-                    select: {
-                      product: {
-                        select: {
-                          seller_id: true,
+                variant: {
+                  select: {
+                    variant_item_id: true,
+                    variant_name: true,
+                    variant_price: true,
+                    variant: {
+                      select: {
+                        product: {
+                          select: {
+                            seller_id: true,
+                          },
                         },
                       },
                     },
@@ -76,18 +66,23 @@ async function handler(request: NextRequest) {
               },
             },
           },
-        },
-      });
+        });
 
-      if (ordersData) {
-        return NextResponse.json({ ok: true, data: ordersData });
-      } else {
+        if (ordersData) {
+          return NextResponse.json({ ok: true, data: ordersData });
+        } else {
+          return NextResponse.json({ ok: false, data: null });
+        }
+      } catch (error) {
+        console.error(
+          "Terjadi kesalahan ketika mendapatkan data penjualan: ",
+          error
+        );
         return NextResponse.json({ ok: false, data: null });
       }
-    } catch (error) {
+    } else {
       console.error(
-        "Terjadi kesalahan ketika mendapatkan data penjualan: ",
-        error
+        "Anda tidak mempunyai akses untuk melakukan permintaan ini!"
       );
       return NextResponse.json({ ok: false, data: null });
     }
@@ -97,4 +92,4 @@ async function handler(request: NextRequest) {
   }
 }
 
-export { handler as POST };
+export { handler as GET };

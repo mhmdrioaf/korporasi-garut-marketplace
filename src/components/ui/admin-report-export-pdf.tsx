@@ -29,11 +29,13 @@ interface IAdminReportExportPDFProps {
     month: string;
     year: string;
   };
+  adminName: string;
 }
 
 export default function AdminReportExportPDF({
   reportsData,
   period,
+  adminName,
 }: IAdminReportExportPDFProps) {
   const tableRef = useRef(null);
   const reports = sortReportsData(reportsData);
@@ -48,37 +50,6 @@ export default function AdminReportExportPDF({
     "Harga",
     "Total Harga",
   ];
-  //   index + 1,
-  //   report.order_id,
-  //   getDateString(report.order_date),
-  //   report.order_item.length > 1
-  //     ? report.order_item.map((item) => item.product.title).join("\n")
-  //     : report.order_item[0].product.title,
-  //   report.order_item.length > 1
-  //     ? report.order_item
-  //         .map((item) => (item.variant ? item.variant.variant_name : "-"))
-  //         .join("\n")
-  //     : report.order_item[0].variant
-  //       ? report.order_item[0].variant.variant_name
-  //       : "-",
-  //   report.order_item.map((item) => item.order_quantity).join("\n"),
-  //   report.order_item
-  //     .map((item) =>
-  //       rupiahConverter(
-  //         item.variant ? item.variant.variant_price : item.product.price
-  //       )
-  //     )
-  //     .join("\n"),
-  //   report.order_item
-  //     .map((item) =>
-  //       rupiahConverter(
-  //         item.variant
-  //           ? item.variant.variant_price * item.order_quantity
-  //           : item.product.price * item.order_quantity
-  //       )
-  //     )
-  //     .join("\n"),
-  // ]);
 
   const tablesData = reports.map((report, index) => ({
     no: index + 1,
@@ -88,6 +59,7 @@ export default function AdminReportExportPDF({
       report.order_item.length > 1
         ? report.order_item.map((item) => item.product.title).join("\n")
         : report.order_item[0].product.title,
+    product_unit: report.order_item.map((item) => item.product.unit).join("\n"),
     variant_name:
       report.order_item.length > 1
         ? report.order_item
@@ -151,7 +123,11 @@ export default function AdminReportExportPDF({
 
   return (
     <>
-      <Button variant="outline" onClick={exportPDF}>
+      <Button
+        variant="outline"
+        onClick={exportPDF}
+        className="fixed bottom-4 right-4"
+      >
         Unduh Laporan
       </Button>
 
@@ -216,7 +192,7 @@ export default function AdminReportExportPDF({
                   {data.variant_name}
                 </TableCell>
                 <TableCell className="text-center whitespace-pre border border-input">
-                  {data.order_quantity}
+                  {data.order_quantity} {data.product_unit}
                 </TableCell>
                 <TableCell className="text-center whitespace-pre border border-input">
                   {data.price}
@@ -243,16 +219,14 @@ export default function AdminReportExportPDF({
           </TableFooter>
         </Table>
 
-        <div className="w-52 flex flex-col justify-end items-end gap-16 self-end">
+        <div className="w-fit flex flex-col justify-end items-end gap-16 self-end">
           <div className="w-full flex flex-col gap-2">
             <p>Garut, {getCurrentDateString()}</p>
             <p>Mengetahui,</p>
           </div>
 
-          <div className="w-full flex flex-row items-center">
-            <p>{"("}</p>
-            <div className="w-full h-1 border-b border-dashed border-black self-end justify-self-end" />
-            <p>{")"}</p>
+          <div className="w-full flex flex-row items-center mb-4">
+            <b>{adminName}</b>
           </div>
         </div>
       </div>

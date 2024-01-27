@@ -3,12 +3,9 @@
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import { Loader2Icon } from "lucide-react";
 import { Separator } from "./separator";
-import ReportsDatePicker from "./reports-date-picker";
 import ReportsChart from "./reports-chart";
 import { Button } from "./button";
 import ReportTabs from "@/lib/renderer/report-tabs";
-import AdminReportExportPDF from "./admin-report-export-pdf";
-import { getPeriodTime, getSalesYears } from "@/lib/helper";
 
 export default function AdminReportsComponents() {
   const { reports } = useAdmin();
@@ -26,11 +23,7 @@ export default function AdminReportsComponents() {
 
       <Separator />
 
-      <ReportsDatePicker />
-
-      <Separator />
-
-      <div className="w-full grid grid-cols-4 gap-2 items-center">
+      <div className="w-full grid grid-cols-5 gap-2 items-center">
         <Button
           variant={reports.sales.state.tabs === "sales" ? "default" : "ghost"}
           onClick={() => reports.sales.handler.changeTab("sales")}
@@ -58,6 +51,12 @@ export default function AdminReportsComponents() {
           onClick={() => reports.sales.handler.changeTab("incomes")}
         >
           Pendapatan
+        </Button>
+        <Button
+          variant={reports.sales.state.tabs === "restock" ? "default" : "ghost"}
+          onClick={() => reports.sales.handler.changeTab("restock")}
+        >
+          Pengadaan Barang
         </Button>
       </div>
       <ReportTabs tab={reports.sales.state.tabs} />

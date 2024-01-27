@@ -19,15 +19,20 @@ import {
 import { Separator } from "./separator";
 import { Input } from "./input";
 import { ROUTES } from "@/lib/constants";
-import { remoteImageSource, rupiahConverter } from "@/lib/helper";
+import {
+  getMonthString,
+  remoteImageSource,
+  rupiahConverter,
+} from "@/lib/helper";
 import ProductVariants from "./product-variant";
 import ProductDirectPurchase from "./product-direct-purchase";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import VariantChooser from "./variant-chooser";
 import SameDayProductAlert from "./modals/same-day-product-alert";
+import Alert from "@/components/ui/modals/alert";
 
 export default function ProductDetail() {
-  const { product, image, price, variants, cart, quantity, state } =
+  const { product, image, price, variants, cart, quantity, state, handler } =
     useDirectPurchase();
   const getSellerAddress = () => {
     const primarySellerId = product.seller.primary_address_id;
@@ -36,6 +41,36 @@ export default function ProductDetail() {
     );
 
     return primaryAddress ? primaryAddress.city.city_name : "Tidak diketahui";
+  };
+
+  const productAvaibility = () => {
+    let date = new Date();
+    date.setDate(date.getDate() + 5);
+
+    const dateString = date.toLocaleDateString("id-ID", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    return dateString;
+  };
+
+  const preorderAlertMessage = () => {
+    let productName = "";
+    let productType = "";
+    if (product) {
+      if (variants.variantValue) {
+        productName = variants.variantValue.variant_name;
+        productType = "Varian";
+      } else {
+        productName = product.title;
+        productType = "Produk";
+      }
+    }
+
+    return `${productType} ${productName} sedang tidak tersedia. ${productType} ini akan tersedia kembali pada tanggal ${productAvaibility()}.\n\nJika anda berkenan untuk melakukan pesanan pre-order, maka minimal pembelian untuk produk ini adalah 5 ${product.unit}, sehingga pesanan anda menjadi pesanan prioritas kami.\n\nTerima kasih.`;
   };
   return product ? (
     <Container variant="column" className="overflow-hidden">
@@ -135,7 +170,37 @@ export default function ProductDetail() {
             <AccordionItem value="product-descriptions">
               <AccordionTrigger>Deskripsi Produk</AccordionTrigger>
               <AccordionContent className="whitespace-pre-wrap">
-                {product.description}
+                <div className="w-full flex flex-col gap-2">
+                  <p>{product.description}</p>
+
+                  <Separator />
+
+                  <div className="w-full grid grid-cols-2 gap-2">
+                    <div className="flex flex-col gap-1">
+                      <b>Tanggal Kedaluwarsa</b>
+                      <p>
+                        {new Date(product.expire_date).toLocaleDateString(
+                          "id-ID"
+                        )}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Berat Produk</b>
+                      <p>{product.weight} gram</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Masa Penyimpanan</b>
+                      <p>{product.storage_period} hari</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <b>Dapat dikirim ke luar kota</b>
+                      <p>{product.capable_out_of_town ? "Ya" : "Tidak"}</p>
+                    </div>
+                  </div>
+                </div>
               </AccordionContent>
             </AccordionItem>
           </Accordion>
@@ -179,14 +244,24 @@ export default function ProductDetail() {
                 variant="destructive"
                 size="icon"
                 onClick={() => quantity.handler.onQuantityChange("decrease")}
-                disabled={quantity.productQuantity === 1}
+                disabled={
+                  state.isPreorder
+                    ? quantity.productQuantity === 5
+                    : quantity.productQuantity === 1
+                }
               >
                 <MinusIcon className="w-4 h-4" />
               </Button>
               <Input
                 type="number"
-                min={1}
-                max={product.stock}
+                min={state.isPreorder ? 5 : 1}
+                max={
+                  product.variant
+                    ? variants.variantValue
+                      ? variants.variantValue.variant_stock
+                      : product.stock
+                    : product.stock
+                }
                 value={quantity.productQuantity}
                 onChange={quantity.handler.onQuantityInputChange}
                 className="w-[9ch] text-center appearance-none"
@@ -195,7 +270,14 @@ export default function ProductDetail() {
                 variant="default"
                 size="icon"
                 onClick={() => quantity.handler.onQuantityChange("increase")}
-                disabled={quantity.productQuantity === product.stock}
+                disabled={
+                  state.isPreorder
+                    ? false
+                    : variants.variantValue
+                      ? variants.variantValue.variant_stock ===
+                        quantity.productQuantity
+                      : product.stock === quantity.productQuantity
+                }
               >
                 <PlusIcon className="w-4 h-4" />
               </Button>
@@ -254,6 +336,12 @@ export default function ProductDetail() {
       />
 
       <SameDayProductAlert />
+      <Alert
+        isOpen={state.preorderModalOpen}
+        message={preorderAlertMessage()}
+        title={`Pesanan Pre-Order`}
+        onConfirm={handler.onPreorderModalClose}
+      />
     </Container>
   ) : (
     <Container className="w-full h-screen grid place-items-center gap-2">

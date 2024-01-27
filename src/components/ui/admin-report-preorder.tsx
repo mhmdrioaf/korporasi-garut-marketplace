@@ -19,7 +19,11 @@ import React from "react";
 import generatePDF, { Margin } from "react-to-pdf";
 import Image from "next/image";
 
-export default function PreorderReport() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function PreorderReport({ adminName }: IReportProps) {
   const { reports } = useAdmin();
   const preorders = reports.preorders.data;
 
@@ -46,24 +50,14 @@ export default function PreorderReport() {
 
   return preorders && preorders.length > 0 ? (
     <div className="w-full flex flex-col gap-4">
-      <div className="w-full flex flex-row justify-between items-center">
-        <div className="flex flex-col gap-2">
-          <p className="text-2xl text-primary font-bold">
-            Daftar Pesanan Preorder
-          </p>
-          <p className="text-sm">
-            Berikut merupakan daftar pesanan preorder yang harus segera
-            dilakukan produksi
-          </p>
-        </div>
-
-        <Button variant="outline" onClick={exportPDF}>
-          Unduh Laporan
-        </Button>
-      </div>
       <Table>
         <TableCaption />
         <TableHeader>
+          <TableRow>
+            <TableHead colSpan={5} className="text-center">
+              DAFTAR PESANAN PREORDER
+            </TableHead>
+          </TableRow>
           <TableRow>
             <TableHead className="text-center">ID Pesanan</TableHead>
             <TableHead className="text-center">Nama Produk</TableHead>
@@ -76,31 +70,45 @@ export default function PreorderReport() {
         </TableHeader>
 
         <TableBody>
-          {preorders.map((order, index) => (
-            <TableRow key={index}>
-              <TableCell className="text-center">{order.order_id}</TableCell>
-              <TableCell className="text-center whitespace-pre-wrap">
-                {order.order_item.map((item) => item.product.title).join("\n")}
-              </TableCell>
-              <TableCell className="text-center whitespace-pre-wrap">
-                {order.order_item
-                  .map((order) =>
-                    order.variant ? order.variant.variant_name : "-"
-                  )
-                  .join("\n")}
-              </TableCell>
-              <TableCell className="text-center whitespace-pre-wrap">
-                {order.order_item
-                  .map((order) => order.order_quantity)
-                  .join("\n")}
-              </TableCell>
-              <TableCell className="text-center">
-                {estimatedTimeArrivalGenerator(order.eta)}
-              </TableCell>
+          {reports.preorders.state.loading ? (
+            <TableRow>
+              <TableCell colSpan={5} className="animate-pulse bg-stone-500" />
             </TableRow>
-          ))}
+          ) : (
+            preorders.map((order, index) => (
+              <TableRow key={index}>
+                <TableCell className="text-center">{order.order_id}</TableCell>
+                <TableCell className="text-center whitespace-pre-wrap">
+                  {order.order_item
+                    .map((item) => item.product.title)
+                    .join("\n")}
+                </TableCell>
+                <TableCell className="text-center whitespace-pre-wrap">
+                  {order.order_item
+                    .map((order) =>
+                      order.variant ? order.variant.variant_name : "-"
+                    )
+                    .join("\n")}
+                </TableCell>
+                <TableCell className="text-center whitespace-pre-wrap">
+                  {order.order_item
+                    .map(
+                      (order) => `${order.order_quantity} ${order.product.unit}`
+                    )
+                    .join("\n")}
+                </TableCell>
+                <TableCell className="text-center">
+                  {estimatedTimeArrivalGenerator(order.eta)}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
+
+      <Button variant="outline" className="w-full" onClick={exportPDF}>
+        Unduh Laporan
+      </Button>
 
       <div className="w-full hidden flex-col gap-4" ref={divRef}>
         <div className="w-full flex flex-row gap-4 items-center px-4 py-2 text-primary">
@@ -118,14 +126,14 @@ export default function PreorderReport() {
         </div>
 
         <div className="w-full h-1 bg-primary" />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-4">
           <p className="text-center text-2xl font-bold">
             DAFTAR PESANAN PREORDER
           </p>
           <p>
-            Berikut ini kami lampirkan data pesanan preorder. Produksi untuk
-            produk yang tertera dibawah ini harus segera dilakukan, sebelum
-            batas tanggal produksi yang tertera.
+            Berikut ini kami lampirkan daftar pesanan preorder. Produksi
+            terhadap produk yang tertera dibawah ini harus segera dilakukan
+            sebelum batas tanggal produksi yang tercantum.
           </p>
         </div>
 
@@ -161,7 +169,9 @@ export default function PreorderReport() {
                 </TableCell>
                 <TableCell className="text-center whitespace-pre-wrap">
                   {order.order_item
-                    .map((order) => order.order_quantity)
+                    .map(
+                      (order) => `${order.order_quantity} ${order.product.unit}`
+                    )
                     .join("\n")}
                 </TableCell>
                 <TableCell className="text-center">
@@ -172,16 +182,19 @@ export default function PreorderReport() {
           </TableBody>
         </Table>
 
-        <div className="w-52 flex flex-col justify-end items-end gap-16 self-end">
+        <p className="whitespace-pre-line">
+          {
+            "Mohon perhatian dan kerjasamanya dalam memastikan produk-produk tersebut diproduksi sesuai dengan jadwal yang telah ditetapkan.\n\nTerima kasih"
+          }
+        </p>
+        <div className="w-fit flex flex-col justify-end items-end gap-16 self-end">
           <div className="w-full flex flex-col gap-2">
             <p>Garut, {getCurrentDateString()}</p>
             <p>Mengetahui,</p>
           </div>
 
-          <div className="w-full flex flex-row items-center">
-            <p>{"("}</p>
-            <div className="w-full h-1 border-b border-dashed border-black self-end justify-self-end" />
-            <p>{")"}</p>
+          <div className="w-full flex flex-row items-center mb-4">
+            <b>{adminName}</b>
           </div>
         </div>
       </div>

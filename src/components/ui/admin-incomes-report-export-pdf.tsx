@@ -25,11 +25,13 @@ interface IAdminReportIncomesPDFProps {
     month: string;
     year: string;
   };
+  adminName: string;
 }
 
 export default function AdminReportIncomesPDF({
   reportsData,
   period,
+  adminName,
 }: IAdminReportIncomesPDFProps) {
   const divRef = useRef<HTMLDivElement>(null);
   const sellerIncomes = getSellerIncomes(reportsData);
@@ -155,16 +157,14 @@ export default function AdminReportIncomesPDF({
           </Table>
         )}
 
-        <div className="w-52 flex flex-col justify-end items-end gap-16 self-end">
+        <div className="w-fit flex flex-col justify-end items-end gap-16 self-end">
           <div className="w-full flex flex-col gap-2">
             <p>Garut, {getCurrentDateString()}</p>
             <p>Mengetahui,</p>
           </div>
 
-          <div className="w-full flex flex-row items-center">
-            <p>{"("}</p>
-            <div className="w-full h-1 border-b border-dashed border-black self-end justify-self-end" />
-            <p>{")"}</p>
+          <div className="w-full flex flex-row items-center mb-4">
+            <b>{adminName}</b>
           </div>
         </div>
       </div>

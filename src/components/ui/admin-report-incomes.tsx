@@ -1,11 +1,9 @@
 "use client";
 
 import {
-  getMonthString,
   getPeriodTime,
   getSalesYears,
   getSellerIncomes,
-  getTotalIncome,
   rupiahConverter,
 } from "@/lib/helper";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
@@ -21,52 +19,41 @@ import {
 } from "./table";
 import AdminReportIncomesPDF from "./admin-incomes-report-export-pdf";
 
-export default function AdminReportIncomes() {
+interface IReportProps {
+  adminName: string;
+}
+
+export default function AdminReportIncomes({ adminName }: IReportProps) {
   const { reports } = useAdmin();
 
-  const startDate = reports.sales.startDate
-    ? new Date(reports.sales.startDate).getMonth()
-    : 0;
-  const endDate = reports.sales.endDate
-    ? new Date(reports.sales.endDate).getMonth()
-    : 11;
+  const startDate = reports.sales.date?.from;
+  const endDate = reports.sales.date?.to;
+
+  const periodYears = () => {
+    if (reports.sales.data) {
+      if (startDate && endDate) {
+        if (startDate.getFullYear() !== endDate.getFullYear()) {
+          return `${startDate.getFullYear()} & ${endDate.getFullYear()}`;
+        } else {
+          return startDate.getFullYear().toString();
+        }
+      } else {
+        return getSalesYears(reports.sales.data).join(" & ");
+      }
+    } else {
+      return new Date().getFullYear().toString();
+    }
+  };
 
   const periodMonths = getPeriodTime(
-    parseInt(reports.sales.startDate ?? "1") - 1,
-    parseInt(reports.sales.endDate ?? "12")
+    startDate?.getMonth() ?? 0,
+    endDate?.getMonth() ?? 12
   );
 
   if (reports.sales.data) {
     const sellerIncomes = getSellerIncomes(reports.sales.data);
     return (
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-row items-center justify-between">
-          <p className="font-bold text-lg">Pendapatan</p>
-          <AdminReportIncomesPDF
-            reportsData={reports.sales.data}
-            period={{
-              month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
-              year:
-                reports.sales.year ?? reports.sales.data
-                  ? getSalesYears(reports.sales.data).join(" & ")
-                  : new Date().getFullYear().toString(),
-            }}
-          />
-        </div>
-        <div className="grid grid-cols-2">
-          <p className="font-bold">
-            Total pendapatan {getMonthString(startDate, startDate + 1)} -{" "}
-            {getMonthString(endDate, endDate + 1)} tahun {reports.sales.year}
-          </p>
-          <p className="font-bold self-center justify-self-end">
-            {reports.sales.data
-              ? rupiahConverter(getTotalIncome(reports.sales.data))
-              : rupiahConverter(0)}
-          </p>
-        </div>
-
-        <Separator />
-        <p className="font-bold text-lg">Pendapatan Penjual</p>
         {sellerIncomes.sellerIds.length > 0 && (
           <Table>
             <TableCaption>Detail Pendapatan</TableCaption>
@@ -135,55 +122,17 @@ export default function AdminReportIncomes() {
             </TableBody>
           </Table>
         )}
+
+        <Separator />
+        <AdminReportIncomesPDF
+          reportsData={reports.sales.data}
+          period={{
+            month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
+            year: periodYears(),
+          }}
+          adminName={adminName}
+        />
       </div>
     );
   }
-}
-
-{
-  /* <div className="w-full flex flex-col gap-2" key={sellerId}>
-                <p className="font-bold">
-                  {sellerIncomes.incomes[sellerId].name}
-                </p>
-                <Separator />
-                <div className="w-full grid grid-cols-2 gap-2">
-                  <p className="font-bold">Total Pesanan</p>
-                  <p className="font-bold justify-self-end self-center">
-                    {sellerIncomes.incomes[sellerId].products.length} Produk
-                  </p>
-                  <p className="font-bold">
-                    Total Pendapatan {sellerIncomes.incomes[sellerId].name}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(sellerIncomes.incomes[sellerId].income)}
-                  </p>
-                  <p className="font-bold">
-                    Pembagian Pengembangan Produk {"(50%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId]
-                        .product_development
-                    )}
-                  </p>
-                  <p className="font-bold">
-                    Pembagian Tabungan Siswa {"(20%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].student_savings
-                    )}
-                  </p>
-                  <p className="font-bold">
-                    Pendapatan Bersih {sellerIncomes.incomes[sellerId].name}{" "}
-                    {"(30%)"}
-                  </p>
-                  <p className="font-bold justify-self-end self-center">
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].seller_income
-                    )}
-                  </p>
-                </div>
-                <Separator />
-              </div> */
 }
