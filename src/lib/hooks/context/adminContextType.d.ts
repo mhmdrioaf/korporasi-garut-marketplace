@@ -1,6 +1,11 @@
 import { DateRange } from "react-day-picker";
 
-type TAdminReportTabs = "sales" | "incomes" | "products" | "preorder";
+type TAdminReportTabs =
+  | "sales"
+  | "incomes"
+  | "products"
+  | "preorder"
+  | "restock";
 
 type TAdminContextType = {
   credentials: {

@@ -6,6 +6,7 @@ import PreorderReport from "@/components/ui/admin-report-preorder";
 import ReportsProducts from "@/components/ui/reports-products";
 import { useSession } from "next-auth/react";
 import { TAdminReportTabs } from "../hooks/context/adminContextType";
+import AdminReportRestock from "@/components/ui/admin-report-restock";
 
 interface IReportTabsProps {
   tab: TAdminReportTabs;
@@ -27,6 +28,10 @@ export default function ReportTabs({ tab }: IReportTabsProps) {
     case "preorder":
       return (
         <PreorderReport adminName={session?.user.name ?? "Adminstrator"} />
+      );
+    case "restock":
+      return (
+        <AdminReportRestock adminName={session?.user.name ?? "Adminstrator"} />
       );
     default:
       <ReportsProducts adminName={session?.user.name ?? "Adminstrator"} />;
