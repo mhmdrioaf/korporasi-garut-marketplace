@@ -6,6 +6,7 @@ import {
   TCustomerOrder,
   TSellerOrder,
   TSameDayShippingResult,
+  TUser,
 } from "./globals";
 import supabase from "./supabase";
 
@@ -1020,4 +1021,21 @@ export const filterSalesByDateRange = (
 
 export function disableOrderButton(conditions: boolean[]) {
   return conditions.includes(true);
+}
+
+export function getStoreProducts(products: Partial<TProduct>[]) {
+  const _products = products.filter((product) => product.status === "APPROVED");
+  const popularProducts = _products
+    .filter((product) => product.visitor! > 0 && product.sold_count! > 0)
+    .sort((a, b) => b.visitor! - a.visitor!);
+  const mostSearchedProducts = _products
+    .filter((product) => product.search_count! > 0)
+    .sort((a, b) => b.search_count! - a.search_count!);
+  const allProducts = _products.sort((a, b) => b.sold_count! - a.sold_count!);
+
+  return {
+    popular: popularProducts,
+    mostSearched: mostSearchedProducts,
+    all: allProducts,
+  };
 }

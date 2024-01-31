@@ -124,7 +124,10 @@ export default function ProductDetail() {
             <p className="text-3xl font-bold">{product.title}</p>
           </div>
 
-          <div className="w-full flex flex-row items-center gap-2">
+          <Link
+            href={ROUTES.USER.STORE_PROFILE(product.seller.user_id.toString())}
+            className="w-full flex flex-row items-center gap-2"
+          >
             {product.seller.account.profile_picture && (
               <div className="w-8 h-8 rounded-sm overflow-hidden relative">
                 <Image
@@ -144,7 +147,7 @@ export default function ProductDetail() {
               </p>
               <p className="text-xs">{getSellerAddress()}</p>
             </div>
-          </div>
+          </Link>
 
           <Accordion
             type="single"
