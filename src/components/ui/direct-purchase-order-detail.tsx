@@ -2,6 +2,7 @@
 
 import { Separator } from "./separator";
 import {
+  disableOrderButton,
   phoneNumberGenerator,
   remoteImageSource,
   rupiahConverter,
@@ -165,20 +166,26 @@ export default function DirectPurchaseOrderDetail() {
       <Button
         variant="default"
         onClick={order.handler.placeOrder}
-        disabled={
-          order.loading ||
-          (shipping.sameDay.isSameDay && !shipping.sameDay.courierSelected) ||
-          (!shipping.sameDay && !shipping.chosenCourier) ||
-          !customer.address.chosenAddress
-        }
+        disabled={disableOrderButton([
+          order.loading,
+          !shipping.sameDay.isSameDay && !shipping.chosenCourier,
+          shipping.sameDay.isSameDay && !shipping.sameDay.courierSelected,
+          !customer.address.chosenAddress,
+        ])}
       >
         {order.loading ? (
           <>
             <Loader2Icon className="w-4 h-4 mr-2 animate-spin" />
             <span>Memproses...</span>
           </>
+        ) : !shipping.sameDay.isSameDay && !shipping.chosenCourier ? (
+          "Harap pilih kurir yang tersedia"
+        ) : shipping.sameDay.isSameDay && !shipping.sameDay.courierSelected ? (
+          "Harap pilih kurir yang tersedia"
+        ) : !customer.address.chosenAddress ? (
+          "Harap pilih alamat pengiriman"
         ) : (
-          "Lanjutkan"
+          "Lanjutkan Pemesanan"
         )}
       </Button>
       <Button variant="secondary" onClick={onCancelClick}>

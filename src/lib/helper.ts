@@ -1017,3 +1017,7 @@ export const filterSalesByDateRange = (
     };
   }
 };
+
+export function disableOrderButton(conditions: boolean[]) {
+  return conditions.includes(true);
+}
