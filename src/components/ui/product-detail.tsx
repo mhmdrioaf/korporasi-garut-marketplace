@@ -146,20 +146,6 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          {/* TODO: Product ratings */}
-          {/* <div className="flex flex-row gap-2 items-center">
-            <div className="flex flex-row gap-1 items-center">
-              {[...Array(5)].map((_, idx) => (
-                <StarIcon
-                  className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                  key={idx}
-                />
-              ))}
-            </div>
-
-            <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
-          </div> */}
-
           <ProductVariants />
 
           <Accordion
@@ -309,26 +295,6 @@ export default function ProductDetail() {
         </div>
       </div>
       <Separator />
-
-      {/* TODO: Product Reviews */}
-      {/* <div className="w-full p-2 border border-input rounded-md flex flex-col gap-4">
-        <p className="text-xl font-bold">Penilaian Produk</p>
-
-        <div className="w-full p-2 border border-input flex flex-col gap-2">
-          <div className="flex flex-row gap-2 items-center">
-            <p className="font-bold">Nama Reviewer</p>
-            <div className="w-1 h-1 bg-stone-950 rounded-sm" />
-            <div className="flex flex-row items-center gap-1">
-              <StarIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <p className="font-bold">4</p>
-            </div>
-          </div>
-          <p className="text-sm">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Neque
-            omnis quaerat ducimus ullam error?
-          </p>
-        </div>
-      </div> */}
 
       <VariantChooser
         isOpen={state.isVariantChooserOpen}
