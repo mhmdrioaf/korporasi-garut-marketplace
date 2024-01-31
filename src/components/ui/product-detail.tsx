@@ -146,8 +146,6 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <ProductVariants />
-
           <Accordion
             type="single"
             collapsible
@@ -191,6 +189,10 @@ export default function ProductDetail() {
             </AccordionItem>
           </Accordion>
 
+          <ProductVariants />
+
+          <Separator />
+
           <div className="flex flex-col gap-1">
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
@@ -207,7 +209,7 @@ export default function ProductDetail() {
 
           <div className="w-full flex flex-col gap-4">
             {state.isWarning && (
-              <div className="w-full bg-yellow-400 text-stone-500 flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
+              <div className="w-full bg-yellow-300 text-stone-950 text-sm flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
                 <AlertTriangleIcon className="w-4 h-4" />
                 <p>
                   Harap pilih varian produk, jika tidak akan kami kirim secara
@@ -217,10 +219,10 @@ export default function ProductDetail() {
             )}
 
             {state.isPreorder && (
-              <div className="w-full bg-blue-400 text-stone-50 grid place-items-center px-2 py-2 rounded-sm font-medium">
+              <div className="w-full bg-primary text-white text-sm grid place-items-center px-2 py-2 rounded-sm">
                 <b>
-                  Pesanan ini merupakan pesanan pre-order, karena saat ini
-                  permintaan untuk produk ini sedang tinggi.
+                  Pesanan ini merupakan pesanan <b>pre-order</b>, sehingga
+                  minimal pembelian untuk produk ini adalah 5 {product.unit}.
                 </b>
               </div>
             )}
