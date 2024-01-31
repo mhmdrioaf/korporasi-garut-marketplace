@@ -124,7 +124,10 @@ export default function ProductDetail() {
             <p className="text-3xl font-bold">{product.title}</p>
           </div>
 
-          <div className="w-full flex flex-row items-center gap-2">
+          <Link
+            href={ROUTES.USER.STORE_PROFILE(product.seller.user_id.toString())}
+            className="w-full flex flex-row items-center gap-2"
+          >
             {product.seller.account.profile_picture && (
               <div className="w-8 h-8 rounded-sm overflow-hidden relative">
                 <Image
@@ -144,23 +147,7 @@ export default function ProductDetail() {
               </p>
               <p className="text-xs">{getSellerAddress()}</p>
             </div>
-          </div>
-
-          {/* TODO: Product ratings */}
-          {/* <div className="flex flex-row gap-2 items-center">
-            <div className="flex flex-row gap-1 items-center">
-              {[...Array(5)].map((_, idx) => (
-                <StarIcon
-                  className="w-4 h-4 fill-yellow-400 text-yellow-400"
-                  key={idx}
-                />
-              ))}
-            </div>
-
-            <p className="text-xs font-bold">{"5.0 (25 Penilaian)"}</p>
-          </div> */}
-
-          <ProductVariants />
+          </Link>
 
           <Accordion
             type="single"
@@ -205,6 +192,10 @@ export default function ProductDetail() {
             </AccordionItem>
           </Accordion>
 
+          <ProductVariants />
+
+          <Separator />
+
           <div className="flex flex-col gap-1">
             <p className="text-sm uppercase text-stone-500">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
@@ -221,7 +212,7 @@ export default function ProductDetail() {
 
           <div className="w-full flex flex-col gap-4">
             {state.isWarning && (
-              <div className="w-full bg-yellow-400 text-stone-500 flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
+              <div className="w-full bg-yellow-300 text-stone-950 text-sm flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
                 <AlertTriangleIcon className="w-4 h-4" />
                 <p>
                   Harap pilih varian produk, jika tidak akan kami kirim secara
@@ -231,10 +222,10 @@ export default function ProductDetail() {
             )}
 
             {state.isPreorder && (
-              <div className="w-full bg-blue-400 text-stone-50 grid place-items-center px-2 py-2 rounded-sm font-medium">
+              <div className="w-full bg-primary text-white text-sm grid place-items-center px-2 py-2 rounded-sm">
                 <b>
-                  Pesanan ini merupakan pesanan pre-order, karena saat ini
-                  permintaan untuk produk ini sedang tinggi.
+                  Pesanan ini merupakan pesanan <b>pre-order</b>, sehingga
+                  minimal pembelian untuk produk ini adalah 5 {product.unit}.
                 </b>
               </div>
             )}
@@ -309,26 +300,6 @@ export default function ProductDetail() {
         </div>
       </div>
       <Separator />
-
-      {/* TODO: Product Reviews */}
-      {/* <div className="w-full p-2 border border-input rounded-md flex flex-col gap-4">
-        <p className="text-xl font-bold">Penilaian Produk</p>
-
-        <div className="w-full p-2 border border-input flex flex-col gap-2">
-          <div className="flex flex-row gap-2 items-center">
-            <p className="font-bold">Nama Reviewer</p>
-            <div className="w-1 h-1 bg-stone-950 rounded-sm" />
-            <div className="flex flex-row items-center gap-1">
-              <StarIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <p className="font-bold">4</p>
-            </div>
-          </div>
-          <p className="text-sm">
-            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Neque
-            omnis quaerat ducimus ullam error?
-          </p>
-        </div>
-      </div> */}
 
       <VariantChooser
         isOpen={state.isVariantChooserOpen}

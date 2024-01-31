@@ -36,43 +36,49 @@ export default function DirectPurchaseShippingCost() {
                     <p className="text-xs">{service.description}</p>
                   </div>
 
-                  {service.cost.map((cost) => (
-                    <div key={cost.value} className={shippingCostStyle}>
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="font-bold">Harga</p>
-                        <p>{rupiahConverter(cost.value)}</p>
-                        <p className="font-bold">Estimasi Pengiriman</p>
-                        <p>
-                          {state.isPreorder
-                            ? shippingEstimation(cost.etd) + 7
-                            : shippingEstimation(cost.etd)}{" "}
-                          Hari
-                        </p>
-                      </div>
+                  {service.cost
+                    .filter(
+                      (cost) =>
+                        shippingEstimation(cost.etd) < product.storage_period
+                    )
+                    .map((cost) => (
+                      <div key={cost.value} className={shippingCostStyle}>
+                        <div className="grid grid-cols-2 gap-2">
+                          <p className="font-bold">Harga</p>
+                          <p>{rupiahConverter(cost.value)}</p>
+                          <p className="font-bold">Estimasi Pengiriman</p>
+                          <p>
+                            {state.isPreorder
+                              ? shippingEstimation(cost.etd) + 7
+                              : shippingEstimation(cost.etd)}{" "}
+                            Hari
+                          </p>
+                        </div>
 
-                      {shippingData.chosenCourier &&
-                      shippingData.chosenCourier === cost ? (
-                        <CheckIcon className="w-8 h-8 text-primary" />
-                      ) : (
-                        <Button
-                          variant="default"
-                          onClick={() =>
-                            shippingData.handler.onCourierChange(cost)
-                          }
-                          disabled={
-                            !state.orderable ||
-                            shippingEstimation(cost.etd) >=
+                        {shippingData.chosenCourier &&
+                        shippingData.chosenCourier === cost ? (
+                          <CheckIcon className="w-8 h-8 text-primary" />
+                        ) : (
+                          <Button
+                            variant="default"
+                            onClick={() =>
+                              shippingData.handler.onCourierChange(cost)
+                            }
+                            disabled={
+                              !state.orderable ||
+                              shippingEstimation(cost.etd) >=
+                                product.storage_period
+                            }
+                          >
+                            {state.orderable &&
+                            shippingEstimation(cost.etd) <=
                               product.storage_period
-                          }
-                        >
-                          {state.orderable &&
-                          shippingEstimation(cost.etd) <= product.storage_period
-                            ? "Pilih Kurir"
-                            : "Pengiriman tidak didukung"}
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                              ? "Pilih Kurir"
+                              : "Pengiriman tidak didukung"}
+                          </Button>
+                        )}
+                      </div>
+                    ))}
                   <Separator />
                 </div>
               ))}

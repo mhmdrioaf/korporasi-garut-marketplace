@@ -287,6 +287,13 @@ type TSameDayShippingResult = {
   travelDuration: number;
 };
 
+type TSellerProfile = Pick<
+  TUser,
+  "account" | "address" | "primary_address_id" | "email"
+> & {
+  products: Partial<TProduct>[];
+};
+
 type NOTIFICATION_STATUS = "UNREAD" | "READ";
 
 type ORDER_TYPE = "NORMAL" | "PREORDER";
