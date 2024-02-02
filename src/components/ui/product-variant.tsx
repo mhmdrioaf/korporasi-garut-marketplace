@@ -7,7 +7,7 @@ export default function ProductVariants() {
 
   const variantItemCardStyle = (itemID: string, selectedID: string) => {
     const baseStyle =
-      "p-1 w-full rounded-sm text-sm border border-input cursor-pointer text-center select-none";
+      "p-1 w-full rounded-sm text-xs lg:text-sm border border-input cursor-pointer text-center select-none";
     const selectedStyle = `${baseStyle} bg-primary text-white font-bold`;
 
     if (itemID === selectedID) {
@@ -19,7 +19,7 @@ export default function ProductVariants() {
 
   if (product.variant) {
     return (
-      <div className="w-full flex flex-col gap-4">
+      <div className="text-xs lg:text-base w-full flex flex-col gap-4">
         <div className="w-full flex flex-col gap-2">
           <p className="font-bold">Varian {product.variant.variant_title}</p>
           <div className="w-full grid grid-cols-2 gap-2">
