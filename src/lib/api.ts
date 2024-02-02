@@ -35,3 +35,25 @@ export async function listProducts() {
 
   return listProducts.products as unknown as TProduct[] | null;
 }
+
+export async function getProductDetail(product_id: string) {
+  const products = new Product(db.product, null, null);
+  const product = await products.getProductDetail(product_id);
+
+  if (product) {
+    await db.product.update({
+      where: {
+        id: parseInt(product_id),
+      },
+      data: {
+        visitor: {
+          increment: 1,
+        },
+      },
+    });
+
+    return product as unknown as TProduct;
+  } else {
+    return null;
+  }
+}

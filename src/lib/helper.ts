@@ -42,24 +42,6 @@ export const properizeWords = (words: string): string => {
   return properized.join(" ");
 };
 
-export const getProductDetail = async (id: string) => {
-  const fetchProduct = await fetch(
-    process.env.NEXT_PUBLIC_API_PRODUCT_GET! + id,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-      cache: "no-store",
-    }
-  );
-
-  const response = await fetchProduct.json();
-  if (!response.ok) {
-    return null;
-  } else {
-    return response.result as TProduct;
-  }
-};
-
 const decimalsNumber = (value: number, approximateNumber: 10 | 100) => {
   switch (approximateNumber) {
     case 10:
