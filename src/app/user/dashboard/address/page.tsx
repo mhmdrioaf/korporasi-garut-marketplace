@@ -1,5 +1,6 @@
 import { Container } from "@/components/ui/container";
 import UserAddressList from "@/components/ui/user-address";
+import { getUserDetail } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
 import { TAddress } from "@/lib/globals";
@@ -7,34 +8,13 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-async function getUserAddresses(id: string) {
-  const fetchAddress = await fetch(
-    process.env.NEXT_PUBLIC_API_GET_USER_ADDRESSES! + id,
-    {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    }
-  );
-
-  const addressResponse = await fetchAddress.json();
-  if (!addressResponse.ok) {
-    return {
-      address: [],
-      primary_address_id: null,
-    };
-  } else {
-    return addressResponse.result as {
-      address: TAddress[];
-      primary_address_id: string | null;
-    };
-  }
-}
-
 export default async function UserAddress() {
   const session = await getServerSession(authOptions);
 
   if (!session) redirect(ROUTES.AUTH.LOGIN);
-  const userAddress = await getUserAddresses(session.user.id);
+  const user = await getUserDetail(session.user.id);
+
+  if (!user) return null;
 
   return (
     <Container className="flex flex-col gap-4 lg:gap-8">
@@ -53,8 +33,8 @@ export default async function UserAddress() {
         </Link>
       </div>
       <UserAddressList
-        addresses={userAddress.address}
-        primaryAddressId={userAddress.primary_address_id}
+        addresses={user.address}
+        primaryAddressId={user.primary_address_id}
         user_id={session.user.id}
       />
     </Container>

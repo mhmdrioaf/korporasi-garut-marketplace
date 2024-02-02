@@ -17,17 +17,18 @@ import {
   TSameDayShippingResult,
   TShippingCost,
   TShippingCostServiceCost,
+  TUser,
 } from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
-import useSWR, { useSWRConfig } from "swr";
-import { fetcher, getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
+import useSWR from "swr";
+import { getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 import { addToCart } from "@/lib/actions/cart";
 
 interface IDirectPurchaseContextProps {
   product: TProduct;
-  user_id: string | null;
+  user: TUser | null;
   children: ReactNode;
 }
 
@@ -40,7 +41,7 @@ export function useDirectPurchase() {
 
 export function DirectPurchaseProvider({
   product,
-  user_id,
+  user,
   children,
 }: IDirectPurchaseContextProps) {
   const [withVariants, setWithVariants] = useState<boolean>(false);
@@ -79,16 +80,14 @@ export function DirectPurchaseProvider({
   >(null);
 
   const [isPreorder, setIsPreorder] = useState<boolean>(false);
+  const user_id = user?.user_id.toString() ?? null;
 
   const defaultPrice = variantsValue
     ? variantsValue.variant_price * productQuantity
     : product.price * productQuantity;
 
   const { toast } = useToast();
-  const { data: user, isLoading: userLoading } = useSWR(
-    user_id ? "/api/get-detail/" + user_id : null,
-    fetcher
-  );
+
   const {
     data: shippingCosts,
     isLoading: shippingCostLoading,
@@ -106,8 +105,6 @@ export function DirectPurchaseProvider({
       .then((res) => res.json())
       .then((res) => res.result as TShippingCost[])
   );
-
-  const { mutate } = useSWRConfig();
 
   const sellerAddress = product.seller.address.find(
     (address) => address.address_id === product.seller.primary_address_id
@@ -607,8 +604,7 @@ export function DirectPurchaseProvider({
       onPreorderModalClose: onPreorderModalClose,
     },
     customer: {
-      user: user ? user.result : null,
-      loading: userLoading,
+      user: user,
 
       address: {
         chosenAddress: chosenAddress,

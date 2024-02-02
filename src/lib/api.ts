@@ -1,8 +1,9 @@
 import Xendit from "xendit-node";
 import Carts from "./prisma-classes/Carts";
 import { db } from "./db";
-import { TCustomerCart, TProduct } from "./globals";
+import { TCustomerCart, TProduct, TUser } from "./globals";
 import Product from "./prisma-classes/Product";
+import Users from "./prisma-classes/User";
 
 export async function getInvoice(invoice_id: string) {
   const xendit = new Xendit({
@@ -56,4 +57,11 @@ export async function getProductDetail(product_id: string) {
   } else {
     return null;
   }
+}
+
+export async function getUserDetail(user_id: string) {
+  const users = new Users(db.user);
+  const user = await users.getUserDetail(user_id);
+
+  return user as TUser | null;
 }

@@ -1,6 +1,7 @@
 import Loading from "@/app/loading";
-import { getProductDetail } from "@/lib/api";
+import { getProductDetail, getUserDetail } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
+import { TUser } from "@/lib/globals";
 import { DirectPurchaseProvider } from "@/lib/hooks/context/useDirectPurchase";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
@@ -41,8 +42,14 @@ export default async function ProductDetailPage({
 }: IProductDetailPageProps) {
   const productData = getProductDetail(params.id);
   const sessionData = getServerSession(authOptions);
+  let user: TUser | null = null;
 
   const [product, session] = await Promise.all([productData, sessionData]);
+
+  if (session) {
+    user = await getUserDetail(session.user.id);
+  }
+
   if (!product)
     return (
       <div className="w-full h-screen grid place-items-center">
@@ -53,10 +60,7 @@ export default async function ProductDetailPage({
   else
     return (
       <Suspense fallback={<Loading />}>
-        <DirectPurchaseProvider
-          product={product}
-          user_id={session ? session.user.id : null}
-        >
+        <DirectPurchaseProvider product={product} user={user}>
           <ProductDetail />
         </DirectPurchaseProvider>
       </Suspense>
