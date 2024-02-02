@@ -1,48 +1,46 @@
 "use client";
 
-import { remoteImageSource, rupiahConverter } from "@/lib/helper";
-import { Button } from "./button";
 import { useCart } from "@/lib/hooks/context/useCart";
-import CartItemDeleteModal from "./modals/cart-item-delete";
-import { Separator } from "./separator";
 import { Checkbox } from "./checkbox";
 import Image from "next/image";
-import {
-  AlertOctagon,
-  HelpCircleIcon,
-  MinusCircleIcon,
-  PlusCircleIcon,
-  Trash2Icon,
-} from "lucide-react";
+import { remoteImageSource, rupiahConverter } from "@/lib/helper";
+import { Button } from "./button";
+import { MinusCircleIcon, PlusCircleIcon, Trash2Icon } from "lucide-react";
+import CartItemDeleteModal from "./modals/cart-item-delete";
 import CartCheckout from "./cart-checkout";
-import CartCheckoutProductsDetail from "./cart-checkout-products-detail";
 import CartCheckoutAddress from "./cart-checkout-address";
+import CartCheckoutProductsDetail from "./cart-checkout-products-detail";
 
 export default function UserCartList() {
-  const { cart, cartItems, checkout, state } = useCart();
+  const { cart, cartItems, checkout } = useCart();
+  const cartData = cart.items ? Object.keys(cart.items) : null;
 
-  function showCartItems() {
-    const cartData = cart.items ? Object.keys(cart.items) : null;
+  function onCheckoutButtonClicked() {
+    checkout.handler.changeStep(1);
+  }
 
-    if (cartData && cart.items) {
-      const items = cart.items;
-      return (
-        <div className="w-full flex flex-col gap-8 divide-y-4">
+  if (cartData && cart.items) {
+    const items = cart.items;
+
+    return (
+      <div className="w-full relative flex flex-col gap-4 md:gap-8">
+        <div className="w-full flex flex-col gap-2 md:gap-4 divide-y">
           {cartData.length > 0 ? (
             cartData.map((sellerID) => (
               <div
-                className="w-full flex flex-col gap-4 p-2 rounded-md divide-y"
+                className="w-full flex flex-col gap-2 px-0 py-0 md:px-4 md:py-2"
                 key={sellerID}
               >
-                <div className="flex flex-col gap-1">
-                  <p className="font-bold">
+                <div className="w-full flex flex-col gap-0">
+                  <p className="text-sm lg:text-base font-bold">
                     {cart.handler.getSellerName(parseInt(sellerID))}
                   </p>
-                  <p className="text-sm">
-                    {cart.handler.getSellerAddress(parseInt(sellerID) ?? "")}
+                  <p className="text-xs">
+                    {cart.handler.getSellerAddress(parseInt(sellerID))}
                   </p>
                 </div>
 
+                {/* seller items */}
                 {items[parseInt(sellerID)]
                   .filter((item) =>
                     item.variant
@@ -51,10 +49,10 @@ export default function UserCartList() {
                   )
                   .map((item) => (
                     <div
+                      className="w-full px-4 py-2 grid grid-cols-1 md:grid-cols-2 rounded-sm border border-input gap-4 md:gap-0"
                       key={item.cart_item_id}
-                      className="w-full p-2 grid grid-cols-2"
                     >
-                      <div className="w-full flex flex-row items-center gap-2">
+                      <div className="flex flex-row items-center gap-2">
                         <Checkbox
                           ref={(el) =>
                             (cartItems.checkbox.current[
@@ -74,7 +72,8 @@ export default function UserCartList() {
                             )
                           }
                         />
-                        <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+
+                        <div className="w-16 h-16 rounded-sm overflow-hidden relative shrink-0">
                           <Image
                             src={remoteImageSource(item.product.images[0])}
                             sizes="100vw"
@@ -84,7 +83,7 @@ export default function UserCartList() {
                           />
                         </div>
 
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-1 text-xs lg:text-sm">
                           <p>
                             {item.product.title}{" "}
                             {item.variant
@@ -97,7 +96,7 @@ export default function UserCartList() {
                         </div>
                       </div>
 
-                      <div className="flex flex-row items-center gap-2 self-center justify-self-end">
+                      <div className="w-full md:w-fit flex flex-row-reverse md:flex-row items-center justify-between md:justify-normal gap-2 self-center justify-self-center md:justify-self-end">
                         <Button
                           variant="ghost"
                           size="icon"
@@ -110,49 +109,64 @@ export default function UserCartList() {
 
                         <div className="min-h-full w-px bg-input" />
 
-                        <Button
-                          variant="destructive"
-                          disabled={item.quantity <= 1}
-                          onClick={(event) =>
-                            cart.handler.itemQuantityChange(
-                              event,
-                              item,
-                              "decrease"
-                            )
-                          }
-                          size="icon"
-                        >
-                          <MinusCircleIcon className="w-4 h-4" />
-                        </Button>
-                        <p className="text-sm">{item.quantity}</p>
-                        <Button
-                          variant="default"
-                          onClick={(event) =>
-                            cart.handler.itemQuantityChange(
-                              event,
-                              item,
-                              "increase"
-                            )
-                          }
-                          size="icon"
-                        >
-                          <PlusCircleIcon className="w-4 h-4" />
-                        </Button>
+                        <div className="flex flex-row items-center gap-4">
+                          <Button
+                            variant="destructive"
+                            disabled={item.quantity <= 1}
+                            onClick={(event) =>
+                              cart.handler.itemQuantityChange(
+                                event,
+                                item,
+                                "decrease"
+                              )
+                            }
+                            size="icon"
+                          >
+                            <MinusCircleIcon className="w-4 h-4" />
+                          </Button>
+                          <p className="text-sm">{item.quantity}</p>
+                          <Button
+                            variant="default"
+                            onClick={(event) =>
+                              cart.handler.itemQuantityChange(
+                                event,
+                                item,
+                                "increase"
+                              )
+                            }
+                            size="icon"
+                          >
+                            <PlusCircleIcon className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
               </div>
             ))
           ) : (
-            <div className="w-full text-center">
+            <div className="text-xs w-full">
               Anda belum menambahkan produk ke keranjang.
             </div>
           )}
+        </div>
 
-          {cartData.length > 0 &&
-            cartData.map((sellerID) => (
+        {cartData.length > 0 && (
+          <div className="w-full flex flex-col gap-2 md:gap-4 divide-y mb-32 md:mb-0">
+            <div className="w-full flex flex-col gap-1 lg:gap-2">
+              <p className="font-bold text-base lg:text-2xl text-primary">
+                Produk yang tidak tersedia
+              </p>
+              <p className="text-xs lg:text-sm">
+                Produk-produk berikut saat ini tidak tersedia, jika anda ingin
+                memesan produk-produk ini, silahkan lakukan pemesanan pre-order
+                di halaman produk.
+              </p>
+            </div>
+
+            {cartData.map((sellerID) => (
               <div
-                className="w-full flex flex-col gap-4 p-2 rounded-md"
+                className="w-full flex flex-col gap-2 px-0 py-0 md:px-4 md:py-2"
                 key={sellerID}
               >
                 {items[parseInt(sellerID)]
@@ -163,23 +177,12 @@ export default function UserCartList() {
                   )
                   .map((item) => (
                     <>
-                      <Separator />
-
-                      <div className="w-full flex flex-col gap-2">
-                        <p className="font-bold">Produk yang tidak tersedia</p>
-                        <p className="text-sm">
-                          Produk-produk berikut saat ini tidak tersedia, jika
-                          anda ingin memesan produk-produk ini, silahkan lakukan
-                          pemesanan pre-order di halaman produk.
-                        </p>
-                      </div>
-
                       <div
                         key={item.cart_item_id}
-                        className="w-full p-2 grid grid-cols-2 bg-stone-300 text-stone-600 rounded-md overflow-hidden"
+                        className="w-full px-4 py-2 grid grid-cols-1 md:grid-cols-2 rounded-sm border border-input gap-4 md:gap-0 opacity-70"
                       >
-                        <div className="w-full flex flex-row items-center gap-2">
-                          <div className="w-16 h-16 rounded-sm overflow-hidden relative">
+                        <div className="flex flex-row items-center gap-2">
+                          <div className="w-16 h-16 rounded-sm overflow-hidden relative shrink-0">
                             <Image
                               src={remoteImageSource(item.product.images[0])}
                               sizes="100vw"
@@ -189,7 +192,7 @@ export default function UserCartList() {
                             />
                           </div>
 
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-1 text-xs lg:text-sm">
                             <p>
                               {item.product.title}{" "}
                               {item.variant
@@ -202,15 +205,19 @@ export default function UserCartList() {
                           </div>
                         </div>
 
-                        <div className="flex flex-row items-center gap-2 self-center justify-self-end">
+                        <div className="w-full md:w-fit self-center justify-self-center md:justify-self-end">
                           <Button
                             variant="ghost"
                             size="icon"
                             onClick={(event) =>
                               cart.handler.deleteItem(event, item)
                             }
+                            className="w-full md:w-fit bg-destructive md:bg-white text-destructive-foreground md:text-black"
                           >
-                            <Trash2Icon className="w-4 h-4" />
+                            <Trash2Icon className="w-4 h-4 hidden md:block" />
+                            <span className="block md:hidden">
+                              Hapus Produk
+                            </span>
                           </Button>
                         </div>
                       </div>
@@ -218,120 +225,33 @@ export default function UserCartList() {
                   ))}
               </div>
             ))}
-        </div>
-      );
-    } else {
-      return (
-        <div className="w-full text-center">
-          Anda belum menambahkan produk ke keranjang.
-        </div>
-      );
-    }
-  }
-
-  function onCheckoutButtonClicked() {
-    checkout.handler.changeStep(1);
-  }
-
-  return (
-    <div className="w-full grid grid-cols-4 relative">
-      <div className="w-full flex flex-col gap-4 col-span-3">
-        <div className="flex flex-col gap-2">
-          <p className="text-2xl font-bold text-primary">Keranjang</p>
-          <p className="text-sm">
-            Berikut adalah daftar produk yang telah anda tambahkan ke keranjang
-            belanjaan anda.
-          </p>
-        </div>
-
-        {cart.loading ? (
-          <div className="w-full flex flex-col gap-8">
-            <div className="w-full flex flex-col gap-4 p-2">
-              <div className="flex flex-col gap-1">
-                <div className="w-[8ch] h-8 rounded-sm bg-stone-300 animate-pulse" />
-                <div className="w-[16ch] h-4 rounded-sm bg-stone-300 animate-pulse" />
-              </div>
-            </div>
-
-            {[...Array(4)].map((_, idx) => (
-              <div className="w-full grid grid-cols-2 p-2" key={idx}>
-                <div className="w-full flex flex-row items-center gap-2">
-                  <div className="w-3 h-3 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="w-16 h-16 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="flex flex-col gap-1">
-                    <div className="w-[12ch] h-3 rounded-sm bg-stone-300 animate-pulse" />
-                    <div className="w-[9ch] h-2 rounded-sm bg-stone-300 animate-pulse" />
-                  </div>
-                </div>
-
-                <div className="flex flex-row items-center gap-2 self-center justify-self-end">
-                  <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="w-px min-h-full rounded-sm bg-stone-300" />
-                  <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                  <div className="w-8 h-8 rounded-sm bg-stone-300 animate-pulse" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : !cart.data ? (
-          <div className="w-full text-center">
-            Anda belum menambahkan produk ke keranjang.
-          </div>
-        ) : cart.error ? (
-          <div className="w-full text-center">
-            Gagal mendapatkan data keranjang.
-          </div>
-        ) : (
-          showCartItems()
-        )}
-      </div>
-
-      <div className="w-[calc(25%-4rem)] p-4 flex flex-col gap-2 rounded-md border border-input fixed justify-self-end">
-        {state.isPreOrder && (
-          <div className="w-full rounded-md flex flex-row justify-between items-center bg-blue-500 text-stone-50 px-2 py-2 text-sm">
-            <div className="flex flex-row items-center gap-2">
-              <AlertOctagon className="w-4 h-4" />
-              <p>Pesanan pre-order</p>
-            </div>
-
-            <div
-              className="cursor-pointer"
-              title="Pesanan ini merupakan pesanan pre-order, karena permintaan untuk salah satu produk dalam keranjang anda sedang mengalami peningkatan permintaan."
-            >
-              <HelpCircleIcon className="w-4 h-4 fill-yellow-500 text-stone-950" />
-            </div>
           </div>
         )}
-        <p className="font-bold">Detail Belanja</p>
-        <div className="w-full flex flex-row items-center justify-between text-sm">
-          <p>Total Harga ({cartItems.checkedItemsCount} produk)</p>
-          <p>{rupiahConverter(cartItems.checkedItemsPrice)}</p>
+
+        <div className="w-[calc(100%-2.5rem)] md:w-[calc(100%-8rem)] fixed bottom-4 rounded-md border border-input bg-white z-30 px-4 py-2 flex flex-col md:flex-row items-start md:items-center gap-2 lg:gap-4 justify-normal md:justify-between">
+          <div className="flex flex-col gap-1 lg:gap-2">
+            <p className="text-xs">Total Harga</p>
+            <p className="text-lg font-bold">
+              {rupiahConverter(cartItems.checkedItemsPrice)}
+            </p>
+          </div>
+          <Button
+            variant="default"
+            disabled={cartItems.checkedItemsCount < 1}
+            onClick={onCheckoutButtonClicked}
+            className="w-full md:w-fit"
+          >
+            Checkout ({cartItems.checkedItemsCount})
+          </Button>
         </div>
 
-        <Separator />
+        <CartItemDeleteModal />
 
-        <div className="w-full flex flex-row items-center justify-between font-bold text-lg">
-          <p>Total Harga</p>
-          <p>{rupiahConverter(cartItems.checkedItemsPrice)}</p>
-        </div>
-
-        <Separator />
-        <Button
-          variant="default"
-          disabled={cartItems.checkedItemsCount < 1}
-          onClick={onCheckoutButtonClicked}
-        >
-          Checkout ({cartItems.checkedItemsCount})
-        </Button>
+        <CartCheckout open={checkout.step !== null}>
+          <CartCheckoutAddress />
+          <CartCheckoutProductsDetail />
+        </CartCheckout>
       </div>
-
-      <CartItemDeleteModal />
-
-      <CartCheckout open={checkout.step !== null}>
-        <CartCheckoutAddress />
-        <CartCheckoutProductsDetail />
-      </CartCheckout>
-    </div>
-  );
+    );
+  }
 }
