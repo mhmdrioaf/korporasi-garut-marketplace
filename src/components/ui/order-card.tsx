@@ -117,7 +117,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
         } else {
           return (
             <Button asChild variant="ghost">
-              <Link href={paymentProof} target="_blank">
+              <Link href={ROUTES.USER.PAYMENT_PROOF(paymentProof ?? "")}>
                 Lihat Bukti Pembayaran
               </Link>
             </Button>
@@ -126,7 +126,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
       } else {
         return (
           <Button asChild variant="default">
-            <Link href={paymentProof} target="_blank">
+            <Link href={ROUTES.USER.PAYMENT_PROOF(paymentProof ?? "")}>
               Lanjutkan Pembayaran
             </Link>
           </Button>

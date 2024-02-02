@@ -29,7 +29,7 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
     if (paymentProof && orderStatus !== "PENDING") {
       return (
         <Button variant="ghost" asChild>
-          <Link href={paymentProof} target="_blank">
+          <Link href={ROUTES.USER.PAYMENT_PROOF(paymentProof ?? "")}>
             Bukti Pembayaran
           </Link>
         </Button>

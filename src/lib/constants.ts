@@ -39,6 +39,8 @@ export const ROUTES = {
     CART: "/user/dashboard/cart",
     ORDERS_MANAGEMENT: "/user/dashboard/seller-orders",
     STORE_PROFILE: (sellerID: string) => "/store/" + sellerID,
+    PAYMENT_PROOF: (invoiceID: string) =>
+      "/user/dashboard/payment/" + invoiceID,
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,
