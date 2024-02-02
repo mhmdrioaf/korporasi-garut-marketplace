@@ -10,7 +10,7 @@ export default async function ProductsList({
 }: IProductListComponentProps) {
   if (products.length > 0) {
     return (
-      <div className="w-full grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-4 md:place-items-center overflow-auto">
+      <div className="w-full grid grid-cols-2 gap-1 md:gap-2 md:grid-cols-3 lg:grid-cols-4 md:place-items-center overflow-auto">
         {products.map((product: TProduct) => (
           <ProductCard product={product} key={product.id} />
         ))}
