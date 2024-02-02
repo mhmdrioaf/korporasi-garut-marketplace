@@ -33,29 +33,17 @@ import { Avatar, AvatarFallback } from "./avatar";
 import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
 import { signOut } from "next-auth/react";
-import useSWR from "swr";
 import { TCustomerCart } from "@/lib/globals";
 import NotificationsProvider from "./notifications-provider";
 
 interface IHeaderComponentProps {
   session: Session | null;
+  cart: TCustomerCart | null;
 }
 
-export default function Header({ session }: IHeaderComponentProps) {
+export default function Header({ session, cart }: IHeaderComponentProps) {
   const router = useRouter();
   const { toast } = useToast();
-
-  const { data: cartData, isLoading: cartLoading } = useSWR(
-    "/api/cart-list",
-    (url) =>
-      fetch(url, {
-        headers: {
-          user_id: session ? session.user.id : "",
-        },
-      })
-        .then((res) => res.json())
-        .then((res) => res.result as TCustomerCart)
-  );
 
   const onButtonLinkClickHandler = (options: "LOGIN" | "REGISTER") => {
     if (options === "LOGIN") {
@@ -109,10 +97,7 @@ export default function Header({ session }: IHeaderComponentProps) {
                     <ShoppingCartIcon className="w-4 h-4" />
                   </Link>
                   <div className="w-6 h-6 text-xs rounded-full p-1 text-center bg-destructive text-destructive-foreground absolute -top-1 -right-1">
-                    {cartLoading && (
-                      <Loader2Icon className="w-4 h-4 animate-spin" />
-                    )}
-                    {cartData ? <p>{cartData.cart_items.length}</p> : "0"}
+                    {cart ? <p>{cart.cart_items.length}</p> : "0"}
                   </div>
                 </div>
               </Button>

@@ -23,6 +23,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { fetcher, getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
+import { addToCart } from "@/lib/actions/cart";
 
 interface IDirectPurchaseContextProps {
   product: TProduct;
@@ -293,20 +294,13 @@ export function DirectPurchaseProvider({
       if (!user_id) {
         router.push(ROUTES.AUTH.LOGIN);
       } else {
-        const res = await fetch(process.env.NEXT_PUBLIC_API_CART_ADD_ITEM!, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: user_id,
-            product: product,
-            product_variant: variantsValue,
-            product_quantity: productQuantity,
-          }),
+        const response = await addToCart({
+          user_id: user_id,
+          product: product,
+          product_variant: variantsValue,
+          product_quantity: productQuantity,
         });
 
-        const response = await res.json();
         if (!response.ok) {
           setCartLoading(false);
           toast({
@@ -321,7 +315,6 @@ export function DirectPurchaseProvider({
             title: "Berhasil menambahkan produk ke keranjang",
             description: response.message,
           });
-          mutate("/api/cart-list");
           setIsVariantChooserOpen(false);
         }
       }

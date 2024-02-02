@@ -1,7 +1,14 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { db } from "../db";
-import { TCustomerCart, TCustomerCartItem } from "../globals";
+import {
+  TCustomerCart,
+  TCustomerCartItem,
+  TProduct,
+  TProductVariantItem,
+} from "../globals";
+import Carts from "../prisma-classes/Carts";
 
 export async function cartItemsQuantityChangeHandler(cart: TCustomerCart) {
   const updateQuantity = await db.customer_cart.update({
@@ -102,8 +109,40 @@ export async function cartItemDeleteHandler(cartItem: TCustomerCartItem) {
   });
 
   if (deleteItem) {
+    revalidatePath("/user/cart");
     return deleteItem;
   } else {
     return undefined;
+  }
+}
+
+export async function addToCart(props: {
+  user_id: string;
+  product: TProduct;
+  product_variant: TProductVariantItem | null;
+  product_quantity: number;
+}) {
+  const carts = new Carts(db.customer_cart, db.customer_cart_item);
+  const addNewCart = await carts.initializeCart(props);
+
+  const updateProductCartCount = await db.product.update({
+    where: {
+      id: props.product.id,
+    },
+    data: {
+      cart_count: {
+        increment: props.product_quantity,
+      },
+    },
+  });
+
+  if (updateProductCartCount) {
+    revalidatePath("/");
+    return addNewCart;
+  } else {
+    return {
+      ok: false,
+      message: "Gagal menambahkan item ke keranjang",
+    };
   }
 }
