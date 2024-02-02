@@ -44,7 +44,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="w-full rounded-md overflow-hidden border border-input flex flex-row items-center justify-between relative">
+    <div className="hidden w-full rounded-md overflow-hidden border border-input md:flex flex-row items-center justify-between relative">
       <input
         className="ml-4 w-full outline-none text-sm"
         type="text"

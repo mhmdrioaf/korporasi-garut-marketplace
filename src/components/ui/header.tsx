@@ -79,19 +79,15 @@ export default function Header({ session }: IHeaderComponentProps) {
 
   return (
     <div className="w-full flex flex-col sticky top-0 left-0 z-50 border-b border-b-stone-300 bg-background">
-      <div className="w-full flex flex-row items-center self-stretch justify-center gap-4 px-8 py-2 md:px-16">
+      <div className="w-full flex flex-row items-center self-stretch justify-between lg:justify-center gap-4 px-4 py-2 md:px-16">
         <Link
           href={ROUTES.LANDING_PAGE}
           className="flex flex-row gap-4 items-center shrink-0 select-none"
         >
-          <Image
-            src={logo}
-            width={64}
-            height={64}
-            alt="Logo SMK"
-            sizes="100vw"
-          />
-          <div className="flex flex-col text-primary font-bold">
+          <div className="w-12 h-12 lg:w-16 lg:h-16 relative overflow-hidden">
+            <Image src={logo} alt="Logo SMK" sizes="100vw" fill />
+          </div>
+          <div className="hidden lg:flex flex-col text-primary font-bold">
             <p>SMKs Korporasi Garut</p>
             <p>Marketplace</p>
           </div>
@@ -99,32 +95,38 @@ export default function Header({ session }: IHeaderComponentProps) {
 
         <SearchBar />
 
-        <div className="flex flex-row items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <div className="relative">
-              <Link href={ROUTES.USER.CART}>
-                <ShoppingCartIcon className="w-4 h-4" />
-              </Link>
-              <div className="w-6 h-6 text-xs rounded-full p-1 text-center bg-destructive text-destructive-foreground absolute -top-1 -right-1">
-                {cartLoading && (
-                  <Loader2Icon className="w-4 h-4 animate-spin" />
-                )}
-                {cartData ? <p>{cartData.cart_items.length}</p> : "0"}
-              </div>
-            </div>
-          </Button>
-          <span>|</span>
-          {!session ? (
-            <Button variant="ghost" size="icon" asChild>
-            <Link href={ROUTES.AUTH.LOGIN}><BellIcon className="w-4 h-4" /></Link>
-          </Button>
-          ) : (
-            <NotificationsProvider subscriber_id={session.user.id} />
-          )}
-        </div>
-
         {session && (
-          <>
+          <div className="flex flex-row items-center gap-2">
+            <div className="flex flex-row items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                asChild
+                className="hidden md:inline-flex"
+              >
+                <div className="relative">
+                  <Link href={ROUTES.USER.CART}>
+                    <ShoppingCartIcon className="w-4 h-4" />
+                  </Link>
+                  <div className="w-6 h-6 text-xs rounded-full p-1 text-center bg-destructive text-destructive-foreground absolute -top-1 -right-1">
+                    {cartLoading && (
+                      <Loader2Icon className="w-4 h-4 animate-spin" />
+                    )}
+                    {cartData ? <p>{cartData.cart_items.length}</p> : "0"}
+                  </div>
+                </div>
+              </Button>
+              <span className="hidden md:block">|</span>
+              {!session ? (
+                <Button variant="ghost" size="icon" asChild>
+                  <Link href={ROUTES.AUTH.LOGIN}>
+                    <BellIcon className="w-4 h-4" />
+                  </Link>
+                </Button>
+              ) : (
+                <NotificationsProvider subscriber_id={session.user.id} />
+              )}
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="flex flex-row items-center gap-2 select-none cursor-pointer">
@@ -206,6 +208,16 @@ export default function Header({ session }: IHeaderComponentProps) {
                     </>
                   )}
 
+                  <DropdownMenuItem className="flex md:hidden">
+                    <Link
+                      href={ROUTES.USER.CART}
+                      className="w-full flex flex-row"
+                    >
+                      <ShoppingCartIcon className="w-4 h-4 mr-2" />
+                      <span>Keranjang</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuItem
                     className="py-2 bg-destructive text-destructive-foreground cursor-pointer hover:bg-destructive/95"
                     onClick={signOutHandler}
@@ -216,7 +228,7 @@ export default function Header({ session }: IHeaderComponentProps) {
                 </DropdownMenuGroup>
               </DropdownMenuContent>
             </DropdownMenu>
-          </>
+          </div>
         )}
 
         {!session && (

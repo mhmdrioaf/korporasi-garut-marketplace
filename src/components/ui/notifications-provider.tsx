@@ -4,16 +4,18 @@ import { NotificationContextProvider } from "@/lib/hooks/context/useNotification
 import { NotificationContent, NotificationTrigger } from "./notifications";
 
 interface INotificationProviderProps {
-    subscriber_id: string;
-};
+  subscriber_id: string;
+}
 
-export default function NotificationsProvider({ subscriber_id }: INotificationProviderProps) {
-    return (
-        <NotificationContextProvider subscriber_id={subscriber_id}>
-            <div className="relative">
-                <NotificationTrigger />
-                <NotificationContent className="absolute top-12 -left-[22rem] z-[70]" />
-            </div>
-        </NotificationContextProvider>
-    )
+export default function NotificationsProvider({
+  subscriber_id,
+}: INotificationProviderProps) {
+  return (
+    <NotificationContextProvider subscriber_id={subscriber_id}>
+      <div className="relative">
+        <NotificationTrigger />
+        <NotificationContent className="absolute top-12 -left-[10rem] md:-left-[22rem] z-[70]" />
+      </div>
+    </NotificationContextProvider>
+  );
 }
