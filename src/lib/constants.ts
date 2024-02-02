@@ -36,7 +36,7 @@ export const ROUTES = {
     ADDRESSES: "/user/dashboard/address",
     ADD_ADDRESS: "/user/dashboard/address/create",
     PRODUCTS_LIST: "/user/dashboard/product-list",
-    CART: "/user/dashboard/cart",
+    CART: "/user/cart",
     ORDERS_MANAGEMENT: "/user/dashboard/seller-orders",
     STORE_PROFILE: (sellerID: string) => "/store/" + sellerID,
     PAYMENT_PROOF: (invoiceID: string) =>
