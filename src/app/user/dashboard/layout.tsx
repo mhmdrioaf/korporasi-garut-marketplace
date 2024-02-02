@@ -12,6 +12,7 @@ import Link from "next/link";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  payment: React.ReactNode;
 }
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 export default async function DashboardLayout({
   children,
+  payment,
 }: DashboardLayoutProps) {
   const session = await getServerSession(authOptions);
   return (
@@ -71,6 +73,7 @@ export default async function DashboardLayout({
       </div>
 
       {children}
+      {payment}
     </div>
   );
 }
