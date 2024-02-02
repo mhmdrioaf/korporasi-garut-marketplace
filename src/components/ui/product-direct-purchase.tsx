@@ -58,8 +58,11 @@ export default function ProductDirectPurchase() {
       )}
       <Button
         variant="default"
-        onClick={() => state.isWarning ? variants.handler.showVariantChooser("buy") : order.handler.onOrder()}
-        disabled={customer.loading}
+        onClick={() =>
+          state.isWarning
+            ? variants.handler.showVariantChooser("buy")
+            : order.handler.onOrder()
+        }
         className="w-fit shrink-0"
       >
         Beli Sekarang
