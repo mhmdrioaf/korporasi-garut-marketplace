@@ -14,6 +14,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useOptimistic,
   useRef,
   useState,
 } from "react";
@@ -35,6 +36,7 @@ import { useToast } from "@/components/ui/use-toast";
 interface ICartContextProps {
   children: ReactNode;
   user_id: string;
+  cartData: TCustomerCart;
 }
 
 export const CartContext = createContext<TCartContext | null>(null);
@@ -43,7 +45,11 @@ export function useCart() {
   return useContext(CartContext) as TCartContext;
 }
 
-export function CartProvider({ user_id, children }: ICartContextProps) {
+export function CartProvider({
+  user_id,
+  children,
+  cartData,
+}: ICartContextProps) {
   const [checkedItems, setCheckedItems] = useState<IProductsBySeller>({});
   const [isDelete, setIsDelete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +65,8 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
   const [isPreOrder, setIsPreOrder] = useState<boolean>(false);
   const [orderable, setOrderable] = useState(true);
   const [sameDay, setSameDay] = useState(false);
+  const [optimisticCart, addOptimisticCart] =
+    useOptimistic<TCustomerCart>(cartData);
 
   const [sameDayData, setSameDayData] = useState<{
     price: number;
@@ -68,21 +76,6 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
   const [sameDayCourier, setSameDayCourier] = useState<{
     [sellerId: number]: number;
   }>({});
-
-  const {
-    data: cartData,
-    isLoading: cartLoading,
-    error: cartError,
-    mutate,
-  } = useSWR("/api/cart-list", (url) =>
-    fetch(url, {
-      headers: {
-        user_id: user_id,
-      },
-    })
-      .then((res) => res.json())
-      .then((res) => res.result as TCustomerCart)
-  );
 
   const { data: userData, isLoading: userLoading } = useSWR(
     "/api/get-detail/" + user_id,
@@ -277,12 +270,14 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       });
 
       try {
-        await mutate(cartItemsQuantityChangeHandler(_currentCart), {
-          optimisticData: _currentCart,
-          populateCache: true,
-          rollbackOnError: true,
-          revalidate: false,
-        });
+        // await mutate(cartItemsQuantityChangeHandler(_currentCart), {
+        //   optimisticData: _currentCart,
+        //   populateCache: true,
+        //   rollbackOnError: true,
+        //   revalidate: false,
+        // });
+        addOptimisticCart(_currentCart);
+        await cartItemsQuantityChangeHandler(_currentCart);
         calculateCheckedItemsPrice();
       } catch (error) {
         console.error(
@@ -312,12 +307,8 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
       setCheckedItems(_checkedItems);
 
       try {
-        await mutate(cartItemDeleteHandler(itemToDelete), {
-          optimisticData: currentCart,
-          populateCache: true,
-          rollbackOnError: true,
-          revalidate: false,
-        });
+        addOptimisticCart(currentCart);
+        await cartItemDeleteHandler(itemToDelete);
         setIsLoading(false);
         setIsDelete(false);
         setItemToDelete(null);
@@ -609,12 +600,7 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
           items.forEach(async (item) => {
             let _checkedItems = checkedItems;
             delete _checkedItems[item.product.seller.user_id];
-            await mutate(cartItemDeleteHandler(item), {
-              optimisticData: cartData,
-              populateCache: true,
-              rollbackOnError: true,
-              revalidate: false,
-            });
+            await cartItemDeleteHandler(item);
           });
         } catch (error) {
           console.error("An error occurred while deleting cart item: ", error);
@@ -783,11 +769,9 @@ export function CartProvider({ user_id, children }: ICartContextProps) {
         delete: onCartItemDelete,
       },
     },
-    currentCart: cartData!,
+    currentCart: optimisticCart,
     cart: {
-      data: cartData,
-      error: cartError,
-      loading: cartLoading,
+      data: optimisticCart,
       items: groupCartItemsBySeller(),
       itemRefs: itemRef,
       itemPrice: calculateTotalPrice,

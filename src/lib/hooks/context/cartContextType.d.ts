@@ -56,9 +56,7 @@ type TCartContext = {
   };
 
   cart: {
-    data: TCustomerCart | undefined;
-    error: any;
-    loading: boolean;
+    data: TCustomerCart;
 
     itemRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>;
 
