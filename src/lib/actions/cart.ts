@@ -1,35 +1,109 @@
+"use server";
+
+import { db } from "../db";
 import { TCustomerCart, TCustomerCartItem } from "../globals";
 
 export async function cartItemsQuantityChangeHandler(cart: TCustomerCart) {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_CART_QUANTITY!, {
-    method: "PATCH",
-    body: JSON.stringify({
-      cart: cart,
-    }),
+  const updateQuantity = await db.customer_cart.update({
+    where: {
+      cart_id: cart.cart_id,
+    },
+    data: {
+      cart_items: {
+        update: cart.cart_items.map((item) => ({
+          where: {
+            cart_item_id: item.cart_item_id,
+          },
+          data: {
+            quantity: {
+              set: item.quantity,
+            },
+          },
+        })),
+      },
+    },
+    include: {
+      cart_items: {
+        include: {
+          product: {
+            include: {
+              seller: {
+                select: {
+                  address: {
+                    select: {
+                      city: true,
+                      address_id: true,
+                    },
+                  },
+                  account: {
+                    select: {
+                      user_name: true,
+                    },
+                  },
+                  user_id: true,
+                  primary_address_id: true,
+                },
+              },
+            },
+          },
+          variant: true,
+        },
+      },
+    },
   });
 
-  const response = await res.json();
-
-  if (!response.ok) {
-    return undefined;
+  if (updateQuantity) {
+    return updateQuantity;
   } else {
-    return response.result as TCustomerCart;
+    return undefined;
   }
 }
 
 export async function cartItemDeleteHandler(cartItem: TCustomerCartItem) {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_CART_DELETE!, {
-    method: "PATCH",
-    body: JSON.stringify({
-      cart_item: cartItem,
-    }),
+  const deleteItem = await db.customer_cart.update({
+    where: {
+      cart_id: cartItem.cart_id,
+    },
+    data: {
+      cart_items: {
+        delete: {
+          cart_item_id: cartItem.cart_item_id,
+        },
+      },
+    },
+    include: {
+      cart_items: {
+        include: {
+          product: {
+            include: {
+              seller: {
+                select: {
+                  address: {
+                    select: {
+                      city: true,
+                      address_id: true,
+                    },
+                  },
+                  account: {
+                    select: {
+                      user_name: true,
+                    },
+                  },
+                  user_id: true,
+                  primary_address_id: true,
+                },
+              },
+            },
+          },
+          variant: true,
+        },
+      },
+    },
   });
 
-  const response = await res.json();
-
-  if (!response.ok) {
-    return undefined;
+  if (deleteItem) {
+    return deleteItem;
   } else {
-    return response.result as TCustomerCart;
+    return undefined;
   }
 }
