@@ -58,7 +58,7 @@ export default function UserAddressList({
         />
       )}
 
-      <div className="w-full flex flex-col gap-4 mb-16 lg:mb-0">
+      <div className="w-full flex flex-col gap-4 mb-10 lg:mb-0">
         {sortedAddress.map((address) => (
           <UserAddressCard
             address={address}
