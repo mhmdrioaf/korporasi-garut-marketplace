@@ -183,32 +183,46 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="mb-10 lg:md-0 flex flex-col gap-8">
       {ordersData.length > 0 ? (
         ordersData.map((order) => (
           <div
-            className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input"
+            className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input text-xs md:text-sm lg:text-base"
             key={order.order_id}
           >
-            <div className="w-full grid grid-cols-3">
-              <div className="col-span-2 grid grid-cols-2 gap-2">
-                <p className="font-bold">ID Pesanan</p>
-                <p>{order.order_id}</p>
-                <p className="font-bold">Tanggal Pesanan</p>
-                <p>{getDateString(order.order_date)}</p>
-                <p className="font-bold">Alamat Pengiriman</p>
-                <p>
-                  {order.address
-                    ? order.address.full_address
-                    : "Alamat telah dihapus."}
-                </p>
-                <p className="font-bold">Ongkos Kirim</p>
-                <p>{rupiahConverter(order.shipping_cost)}</p>
-                <p className="font-bold">Tipe Pesanan</p>
-                <p>{getOrderType(order.order_type)}</p>
+            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <div className="col-span-2 flex flex-col gap-2">
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">ID Pesanan</p>
+                  <p>{order.order_id}</p>
+                </div>
+
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">Tanggal Pesanan</p>
+                  <p>{getDateString(order.order_date)}</p>
+                </div>
+
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">Alamat Pengiriman</p>
+                  <p>
+                    {order.address
+                      ? order.address.full_address
+                      : "Alamat telah dihapus."}
+                  </p>
+                </div>
+
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">Ongkos Kirim</p>
+                  <p>{rupiahConverter(order.shipping_cost)}</p>
+                </div>
+
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">Tipe Pesanan</p>
+                  <p>{getOrderType(order.order_type)}</p>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-2 justify-self-end self-center">
+              <div className="flex flex-col gap-2 justify-self-auto self-auto lg:justify-self-end lg:self-center">
                 <p className="font-bold">
                   Status Pesanan: {orderStatusConverter(order.order_status)}
                 </p>
@@ -235,7 +249,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
 
             {order.order_item.map((orderItem) => (
               <div
-                className="w-full rounded-sm overflow-hidden p-2 grid grid-cols-3 gap-4 border border-input"
+                className="w-full rounded-sm overflow-hidden p-2 flex flex-col lg:grid lg:grid-cols-3 gap-4 border border-input"
                 key={`${order.order_id} - ${
                   orderItem.variant
                     ? orderItem.variant.variant_item_id

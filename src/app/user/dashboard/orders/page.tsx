@@ -35,10 +35,12 @@ export default async function UserOrders() {
 
   if (userOrders.length > 0) {
     return (
-      <Container variant="column">
-        <div className="w-full flex flex-col gap-2">
-          <p className="text-2xl text-primary font-bold">Pesanan Anda</p>
-          <p className="text-sm">
+      <Container className="flex flex-col gap-2 md:gap-4 lg:gap-8">
+        <div className="w-full flex flex-col gap-1 lg:gap-2">
+          <p className="text-base lg:text-2xl text-primary font-bold">
+            Pesanan Anda
+          </p>
+          <p className="text-xs lg:text-sm">
             Berikut adalah data-data pesanan yang telah anda lakukan.
           </p>
         </div>
@@ -48,7 +50,7 @@ export default async function UserOrders() {
     );
   } else {
     return (
-      <Container variant="column">
+      <Container className="flex flex-col gap-2 md:gap-4 lg:gap-8">
         <p className="text-sm">
           Anda belum melakukan pesanan apapun,{" "}
           <Link href={ROUTES.LANDING_PAGE} className="font-bold text-primary">
