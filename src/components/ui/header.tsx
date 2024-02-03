@@ -33,15 +33,20 @@ import { Avatar, AvatarFallback } from "./avatar";
 import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
 import { signOut } from "next-auth/react";
-import { TCustomerCart } from "@/lib/globals";
+import { TCustomerCart, TNotification } from "@/lib/globals";
 import NotificationsProvider from "./notifications-provider";
 
 interface IHeaderComponentProps {
   session: Session | null;
   cart: TCustomerCart | null;
+  notification: TNotification | null;
 }
 
-export default function Header({ session, cart }: IHeaderComponentProps) {
+export default function Header({
+  session,
+  cart,
+  notification,
+}: IHeaderComponentProps) {
   const router = useRouter();
   const { toast } = useToast();
 
@@ -109,7 +114,7 @@ export default function Header({ session, cart }: IHeaderComponentProps) {
                   </Link>
                 </Button>
               ) : (
-                <NotificationsProvider subscriber_id={session.user.id} />
+                <NotificationsProvider notification={notification} />
               )}
             </div>
             <DropdownMenu>

@@ -1,146 +1,200 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useOptimistic,
+  useState,
+} from "react";
 import { TNotificationContext } from "./notificationContext";
 import useSWR from "swr";
 import { fetcher } from "@/lib/helper";
-import { deleteAllNotificationsHandler, deleteNotificationHandler, readAllNotificationsHandler, readNotificationHandler } from "@/lib/actions/notification";
-import { useRouter } from "next/navigation";
-import { TNotification } from "@/lib/globals";
+import {
+  deleteAllNotificationsHandler,
+  deleteNotificationHandler,
+  readAllNotificationsHandler,
+  readNotificationHandler,
+} from "@/lib/actions/notification";
+import { usePathname, useRouter } from "next/navigation";
+import { NOTIFICATION_STATUS, TNotification } from "@/lib/globals";
 
-export const NotificationContext = createContext<TNotificationContext | null>(null);
+export const NotificationContext = createContext<TNotificationContext | null>(
+  null
+);
 
 export function useNotifications() {
-    return useContext(NotificationContext) as TNotificationContext;
-};
-
-interface INotificationContextProviderProps {
-    children: React.ReactNode;
-    subscriber_id: string;
+  return useContext(NotificationContext) as TNotificationContext;
 }
 
-export function NotificationContextProvider({ children, subscriber_id }: INotificationContextProviderProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [notification, setNotification] = useState<TNotification | null>(null)
+interface INotificationContextProviderProps {
+  children: React.ReactNode;
+  notification: TNotification | null;
+}
 
-    const router = useRouter();
+export function NotificationContextProvider({
+  children,
+  notification,
+}: INotificationContextProviderProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [optimisticNotification, addNotification] = useOptimistic(notification);
 
-    const toggleOpen = () => {
-        setIsOpen(prev => !prev)
-    }
+  const router = useRouter();
+  const pathname = usePathname();
 
-    const { data: notificationsData, isLoading: notificationsLoading, error: notificationsError, isValidating: notificationsValidating, mutate} = useSWR("/api/notifications/get", fetcher);
+  const toggleOpen = () => {
+    setIsOpen((prev) => !prev);
+  };
 
-    const readNotifications = async (
-        body: {
-            notification_id: string;
-            notification_item_id: string;
-        }
-    ) => {
-        try {
-            const updatedNotification = await readNotificationHandler(body);
-            if (updatedNotification) {
-                setNotification(updatedNotification);
-                await mutate("/api/notifications/get");
+  const readNotifications = async (body: {
+    notification_id: string;
+    notification_item_id: string;
+  }) => {
+    try {
+      if (optimisticNotification) {
+        let updatedNotification = {
+          ...optimisticNotification,
+          items: optimisticNotification.items.map((item) => {
+            if (item.notification_item_id === body.notification_item_id) {
+              return {
+                ...item,
+                status: "READ" as NOTIFICATION_STATUS,
+              };
             }
-        } catch (error) {
-            console.error(error);          
-        }
+            return item;
+          }),
+        };
+
+        addNotification(updatedNotification);
+
+        await readNotificationHandler({
+          ...body,
+          contextURL: pathname,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const actionButtonClick = async (
-        body: {
-            notification_id: string;
-            notification_item_id: string;
-            redirect_url: string;
-        }
-    ) => {
-        router.push(body.redirect_url);
-        await readNotifications({
-            notification_item_id: body.notification_item_id,
-            notification_id: body.notification_id
-        })
-        toggleOpen();
+  const actionButtonClick = async (body: {
+    notification_id: string;
+    notification_item_id: string;
+    redirect_url: string;
+  }) => {
+    if (optimisticNotification) {
+      let updatedNotification = {
+        ...optimisticNotification,
+        items: optimisticNotification.items.map((item) => {
+          if (item.notification_item_id === body.notification_item_id) {
+            return {
+              ...item,
+              status: "READ" as NOTIFICATION_STATUS,
+              show_action_button: false,
+            };
+          }
+          return item;
+        }),
+      };
+
+      addNotification(updatedNotification);
+
+      await readNotificationHandler({
+        ...body,
+        contextURL: pathname,
+      });
     }
+    router.push(body.redirect_url);
+    toggleOpen();
+  };
 
-    const deleteNotification = async (
-        body: {
-            notification_id: string;
-            notification_item_id: string;
-        }
-    ) => {
-        try {
-            const updatedNotification = await deleteNotificationHandler(body);
-            if (updatedNotification) {
-                setNotification(updatedNotification);
-                await mutate("/api/notifications/get");
-            }
-        } catch (error) {
-            console.error(error);          
-        }
+  const deleteNotification = async (body: {
+    notification_id: string;
+    notification_item_id: string;
+  }) => {
+    try {
+      if (optimisticNotification) {
+        let updatedNotification = {
+          ...optimisticNotification,
+          items: optimisticNotification.items.filter(
+            (item) => item.notification_item_id !== body.notification_item_id
+          ),
+        };
+
+        addNotification(updatedNotification);
+        await deleteNotificationHandler({
+          ...body,
+          contextURL: pathname,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const readAllNotifications = async (
-        body: {
-            notification_id: string;
-        }
-    ) => {
-        try {
-            const updatedNotification = await readAllNotificationsHandler(body);
-            if (updatedNotification) {
-                setNotification(updatedNotification);
-                await mutate("/api/notifications/get");
-            }
-        } catch (error) {
-            console.error(error);          
-        }
+  const readAllNotifications = async (body: { notification_id: string }) => {
+    try {
+      if (optimisticNotification) {
+        let updatedNotification = {
+          ...optimisticNotification,
+          items: optimisticNotification.items.map((item) => {
+            return {
+              ...item,
+              status: "READ" as NOTIFICATION_STATUS,
+            };
+          }),
+        };
+
+        addNotification(updatedNotification);
+        await readAllNotificationsHandler({
+          ...body,
+          contextURL: pathname,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const deleteAllNotifications = async (
-        body: {
-            notification_id: string;
-        }
-    ) => {
-        try {
-            const updatedNotification = await deleteAllNotificationsHandler(body);
-            if (updatedNotification) {
-                setNotification(updatedNotification);
-                await mutate("/api/notifications/get");
-            }
-        } catch (error) {
-            console.error(error);          
-        }
+  const deleteAllNotifications = async (body: { notification_id: string }) => {
+    try {
+      if (optimisticNotification) {
+        let updatedNotification = {
+          ...optimisticNotification,
+          items: [],
+        };
+
+        addNotification(updatedNotification);
+        await deleteAllNotificationsHandler({
+          ...body,
+          contextURL: pathname,
+        });
+      }
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    const value: TNotificationContext = {
-        data: {
-            notification: notification
-        },
-        state: {
-            loading: notificationsLoading || notificationsValidating,
-            error: notificationsError,
-            isOpen: isOpen,
-        },
-        handler: {
-            toggleOpen: toggleOpen,
-            read: readNotifications,
-            actionButtonClick: actionButtonClick,
-            delete: deleteNotification,
-            readAll: readAllNotifications,
-            deleteAll: deleteAllNotifications,
-        }
-    }
+  const value: TNotificationContext = {
+    data: {
+      notification: optimisticNotification,
+    },
+    state: {
+      isOpen: isOpen,
+    },
+    handler: {
+      toggleOpen: toggleOpen,
+      read: readNotifications,
+      actionButtonClick: actionButtonClick,
+      delete: deleteNotification,
+      readAll: readAllNotifications,
+      deleteAll: deleteAllNotifications,
+    },
+  };
 
-    useEffect(() => {
-        if (notificationsData) {
-            setNotification(notificationsData.result)
-        }
-    
-    }, [notificationsData])
-
-    return (
-        <NotificationContext.Provider value={value}>
-            {children}
-        </NotificationContext.Provider>
-    );
+  return (
+    <NotificationContext.Provider value={value}>
+      {children}
+    </NotificationContext.Provider>
+  );
 }

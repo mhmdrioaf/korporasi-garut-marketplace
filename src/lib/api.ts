@@ -1,7 +1,7 @@
 import Xendit from "xendit-node";
 import Carts from "./prisma-classes/Carts";
 import { db } from "./db";
-import { TCustomerCart, TProduct, TUser } from "./globals";
+import { TCustomerCart, TNotification, TProduct, TUser } from "./globals";
 import Product from "./prisma-classes/Product";
 import Users from "./prisma-classes/User";
 
@@ -64,4 +64,21 @@ export async function getUserDetail(user_id: string) {
   const user = await users.getUserDetail(user_id);
 
   return user as TUser | null;
+}
+
+export async function getUserNotification(subscriber_id: string) {
+  const userNotification = await db.notification.findUnique({
+    where: {
+      subscriber_id: parseInt(subscriber_id),
+    },
+    include: {
+      items: {
+        orderBy: {
+          status: "asc",
+        },
+      },
+    },
+  });
+
+  return userNotification as TNotification | null;
 }

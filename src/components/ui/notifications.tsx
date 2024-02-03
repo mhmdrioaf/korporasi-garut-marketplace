@@ -209,15 +209,7 @@ export function NotificationContent({ className }: { className?: string }) {
         </div>
 
         <div className="w-full flex flex-col gap-4 p-4">
-          {state.loading && (
-            <div className="w-full min-h-[16rem] flex flex-col gap-2 items-center justify-center">
-              <Loader2Icon className="w-8 h-8 text-primary animate-spin" />
-              <p className="font-light text-sm">Memuat notifikasi...</p>
-            </div>
-          )}
-          {!state.loading &&
-          data.notification &&
-          data.notification.items.length > 0 ? (
+          {data.notification && data.notification.items.length > 0 ? (
             <>
               {data.notification.items.map((notification) => (
                 <NotificationCard
@@ -235,11 +227,6 @@ export function NotificationContent({ className }: { className?: string }) {
                 Untuk saat ini tidak ada notifikasi untuk anda.
               </p>
             </div>
-          )}
-          {state.error && (
-            <p className="font-light">
-              Gagal memuat notifikasi, silahkan coba lagi nanti.
-            </p>
           )}
         </div>
       </div>
