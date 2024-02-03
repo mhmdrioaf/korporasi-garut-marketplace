@@ -307,9 +307,10 @@ export function ProductProvider({
           body: JSON.stringify({
             product: {
               ...productData,
-              price: data.variant
-                ? data.variant.variant_item[0].variant_item_price
-                : price,
+              price:
+                data.variant && data.variant.variant_item.length > 0
+                  ? data.variant.variant_item[0].variant_item_price
+                  : price,
               seller_id: session.user.id,
               stock:
                 controlledVariantItems.length > 0
