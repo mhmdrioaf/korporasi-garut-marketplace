@@ -48,22 +48,47 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
             className="w-full flex flex-col gap-2 rounded-md border border-input px-4 py-2"
           >
             <div className="w-full flex flex-col gap-2">
-              <div className="grid grid-cols-3 mb-2">
-                <div className="col-span-2 flex flex-col gap-2">
+              <div className="grid grid-cols-1 gap-4 md:gap-0 md:grid-cols-3 mb-2">
+                <div className="col-span-1 md:col-span-2 flex flex-col gap-2">
                   <p className="font-bold text-lg">Detail Pesanan</p>
-                  <div className="grid grid-cols-2">
-                    <p className="font-bold">ID Pesanan</p>
-                    <p>{order.order_id}</p>
-                    <p className="font-bold">Tanggal Pesanan</p>
-                    <p>{getDateString(order.order_date)}</p>
-                    <p className="font-bold">Dipesan Oleh</p>
-                    <p>{order.user.account?.user_name}</p>
-                    <p className="font-bold">Tipe Pesanan</p>
-                    <p>{getOrderType(order.order_type)}</p>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm md:text-base font-bold">
+                        ID Pesanan
+                      </p>
+                      <p className="text-xs md:text-sm">{order.order_id}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm md:text-base font-bold">
+                        Tanggal Pesanan
+                      </p>
+                      <p className="text-xs md:text-sm">
+                        {getDateString(order.order_date)}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm md:text-base font-bold">
+                        Dipesan Oleh
+                      </p>
+                      <p className="text-xs md:text-sm">
+                        {order.user.account?.user_name}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm md:text-base font-bold">
+                        Tipe Pesanan
+                      </p>
+                      <p className="text-xs md:text-sm">
+                        {getOrderType(order.order_type)}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 justify-self-end self-center">
+                <div className="w-full md:w-fit flex flex-col gap-2 justify-self-center md:justify-self-end self-center">
                   <p className="font-bold">
                     Status Pesanan: {orderStatusConverter(order.order_status)}
                   </p>
@@ -78,13 +103,18 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
                 </div>
               </div>
               <Separator />
-              <p className="font-bold text-lg">Detail Pengiriman</p>
-              <div className="grid grid-cols-3 mb-2">
-                <div className="col-span-2 grid grid-cols-2">
+              <p className="font-bold text-base md:text-lg">
+                Detail Pengiriman
+              </p>
+              <div className="grid grid-cols-1 gap-2 md:gap-4 md:grid-cols-2 mb-2">
+                <div className="flex flex-col gap-1 md:grid md:grid-cols-2 md:col-span-2 md:gap-2">
                   <p className="font-bold">Nama Penerima</p>
                   <p>
                     {order.address?.recipient_name ?? "Detail alamat di hapus"}
                   </p>
+                </div>
+
+                <div className="flex flex-col gap-1 md:grid md:grid-cols-2 md:col-span-2 md:gap-2">
                   <p className="font-bold">Nomor Telpon Penerima</p>
                   <p>
                     {order.address
@@ -93,10 +123,16 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
                         )
                       : "Detail alamat di hapus"}
                   </p>
+                </div>
+
+                <div className="flex flex-col gap-1 md:grid md:grid-cols-2 md:col-span-2 md:gap-2">
                   <p className="font-bold">Alamat Lengkap Pengiriman</p>
                   <p>
                     {order.address?.full_address ?? "Detail alamat di hapus"}
                   </p>
+                </div>
+
+                <div className="flex flex-col gap-1 md:grid md:grid-cols-2 md:col-span-2 md:gap-2">
                   <p className="font-bold">Ongkos Kirim</p>
                   <p>{rupiahConverter(order.shipping_cost)}</p>
                 </div>
@@ -105,7 +141,7 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
 
             {order.order_item.map((orderItem) => (
               <div
-                className="w-full rounded-sm overflow-hidden p-2 grid grid-cols-3 gap-4 border border-input"
+                className="w-full rounded-sm overflow-hidden p-2 grid grid-cols-1 md:grid-cols-3 gap-4 border border-input"
                 key={`${order.order_id} - ${
                   orderItem.variant
                     ? orderItem.variant.variant_item_id
@@ -159,7 +195,7 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
 
                 <Link
                   href={ROUTES.PRODUCT.DETAIL(orderItem.product.id.toString())}
-                  className="font-bold text-primary self-center place-self-end"
+                  className="w-full md:w-fit font-bold text-primary self-center justify-self-center text-center"
                 >
                   Lihat Produk
                 </Link>

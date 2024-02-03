@@ -19,10 +19,10 @@ export default function ProductVariantInput() {
 
   return (
     <div className="w-full flex flex-col gap-4">
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3">
         <p className="font-medium">Varian</p>
         <div className="col-span-2 flex flex-col gap-2">
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3">
             <p>Nama Varian</p>
             <div className="col-span-2 flex flex-row items-center gap-2">
               <Input
@@ -50,7 +50,7 @@ export default function ProductVariantInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 lg:grid-cols-3">
             <p>Jenis Varian</p>
             <div className="col-span-2 grid grid-cols-1 gap-2">
               {form.variant.items.map((item, index) => (
@@ -90,10 +90,10 @@ export default function ProductVariantInput() {
         </div>
       </div>
 
-      <div className="grid grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3">
         <p className="font-medium">Detail Varian</p>
-        <div className="col-span-2">
-          <Table>
+        <div className="col-span-2 relative overflow-hidden">
+          <Table className="w-full overflow-auto">
             <TableCaption>Daftar detail varian produk.</TableCaption>
 
             <TableHeader>
@@ -119,6 +119,7 @@ export default function ProductVariantInput() {
                           }
                         )}
                         required={form.variant.withVariants}
+                        className="w-[12ch] md:w-full"
                       />
                     </TableCell>
                     <TableCell>
@@ -131,6 +132,7 @@ export default function ProductVariantInput() {
                           }
                         )}
                         required={form.variant.withVariants}
+                        className="w-[6ch] md:w-full"
                       />
                     </TableCell>
                   </TableRow>
