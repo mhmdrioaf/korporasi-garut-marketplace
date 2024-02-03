@@ -183,12 +183,14 @@ export function CartProvider({
     if (!cartData) {
       return "Tidak diketahui";
     } else {
-      const sellerProduct = cartData.cart_items.find(
-        (item) => item.product.seller.user_id === sellerId
-      );
+      const sellerProduct = cartData.cart_items
+        .filter((item) =>
+          item.variant ? item.variant.variant_stock > 0 : item.product.stock > 0
+        )
+        .find((item) => item.product.seller.user_id === sellerId);
       const sellerName = sellerProduct?.product.seller.account.user_name;
 
-      return sellerName ?? "Tidak diketahui";
+      return sellerName ?? null;
     }
   }
 

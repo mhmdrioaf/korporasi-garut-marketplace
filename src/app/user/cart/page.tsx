@@ -13,8 +13,8 @@ export default async function UserCart() {
     const cartData = await getUserCart(parseInt(session.user.id));
 
     return (
-      <Container className="flex flex-col gap-4 lg:gap-8">
-        <div className="w-full flex flex-col gap-1 lg:gap-2">
+      <Container className="flex flex-col gap-2 md:gap-4">
+        <div className="w-full flex flex-col gap-1 md:gap-2">
           <p className="font-bold text-base lg:text-2xl text-primary">
             Keranjang
           </p>
