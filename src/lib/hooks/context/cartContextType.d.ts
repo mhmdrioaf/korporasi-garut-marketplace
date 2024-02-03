@@ -19,7 +19,7 @@ export interface ICourierBySeller {
 
 export interface ITotalCostBySeller {
   [sellerId: number]: {
-    sellerName: string;
+    sellerName: string | null;
     itemsCost: number;
     shippingCost: number;
   };
@@ -65,7 +65,7 @@ type TCartContext = {
     itemPrice: (item: TCustomerCartItem) => number;
 
     handler: {
-      getSellerName: (sellerId: number) => string;
+      getSellerName: (sellerId: number) => string | null;
       getSellerAddress: (sellerId: number) => string | undefined;
 
       deleteItem: (
