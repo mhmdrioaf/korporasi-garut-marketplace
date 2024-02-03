@@ -9,7 +9,8 @@ import { CheckIcon } from "lucide-react";
 export default function DirectPurchaseShippingCost() {
   const { shipping: shippingData, state, product } = useDirectPurchase();
 
-  const shippingCostStyle = "w-full flex flex-row items-center justify-between";
+  const shippingCostStyle =
+    "w-full flex flex-col gap-2 md:flex-row items-start justify-normal md:items-center md:justify-between";
 
   if (shippingData.cost.loading || shippingData.cost.validating) {
     return (
@@ -19,7 +20,7 @@ export default function DirectPurchaseShippingCost() {
 
   if (state.orderable && shippingData.cost.data) {
     return (
-      <div className="w-full rounded-md flex flex-col gap-4">
+      <div className="w-full rounded-md flex flex-col gap-4 text-xs md:text-base">
         {!shippingData.sameDay.isSameDay &&
           shippingData.cost.data.map((shipping) => (
             <div key={shipping.code} className="w-full flex flex-col gap-2">
@@ -32,7 +33,9 @@ export default function DirectPurchaseShippingCost() {
                   className="w-full flex flex-col gap-2"
                 >
                   <div className="flex flex-col gap-1">
-                    <p className="text-lg">{service.service}</p>
+                    <p className="font-bold text-xs md:text-base">
+                      {service.service}
+                    </p>
                     <p className="text-xs">{service.description}</p>
                   </div>
 
@@ -43,16 +46,21 @@ export default function DirectPurchaseShippingCost() {
                     )
                     .map((cost) => (
                       <div key={cost.value} className={shippingCostStyle}>
-                        <div className="grid grid-cols-2 gap-2">
-                          <p className="font-bold">Harga</p>
-                          <p>{rupiahConverter(cost.value)}</p>
-                          <p className="font-bold">Estimasi Pengiriman</p>
-                          <p>
-                            {state.isPreorder
-                              ? shippingEstimation(cost.etd) + 7
-                              : shippingEstimation(cost.etd)}{" "}
-                            Hari
-                          </p>
+                        <div className="w-fit flex flex-col gap-2">
+                          <div className="w-full flex flex-col gap-1">
+                            <p className="font-bold">Harga</p>
+                            <p>{rupiahConverter(cost.value)}</p>
+                          </div>
+
+                          <div className="w-full flex flex-col gap-1">
+                            <p className="font-bold">Estimasi Pengiriman</p>
+                            <p>
+                              {state.isPreorder
+                                ? shippingEstimation(cost.etd) + 7
+                                : shippingEstimation(cost.etd)}{" "}
+                              Hari
+                            </p>
+                          </div>
                         </div>
 
                         {shippingData.chosenCourier &&
@@ -69,6 +77,7 @@ export default function DirectPurchaseShippingCost() {
                               shippingEstimation(cost.etd) >=
                                 product.storage_period
                             }
+                            className="w-full md:w-fit"
                           >
                             {state.orderable &&
                             shippingEstimation(cost.etd) <=

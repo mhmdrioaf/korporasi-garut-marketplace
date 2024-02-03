@@ -1,5 +1,5 @@
 import AdminProductDetailComponent from "@/components/ui/admin-product-detail";
-import { getProductDetail } from "@/lib/helper";
+import { getProductDetail } from "@/lib/api";
 
 export default async function AdminProductDetailPage({
   params,

@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import AuthProvider from "@/lib/AuthProvider";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/authOptions";
+import { getUserCart, getUserNotification } from "@/lib/api";
+import { TCustomerCart, TNotification } from "@/lib/globals";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,12 +24,18 @@ export default async function RootLayout({
   modal: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
+  let cart: TCustomerCart | null = null;
+  let notification: TNotification | null = null;
+  if (session) {
+    cart = await getUserCart(parseInt(session.user.id));
+    notification = await getUserNotification(session.user.id);
+  }
   return (
     <html lang="en">
       <body className={inter.className}>
         <AuthProvider>
           <main>
-            <Header session={session} />
+            <Header session={session} cart={cart} notification={notification} />
             {children}
           </main>
           {modal}

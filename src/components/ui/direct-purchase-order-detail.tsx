@@ -49,8 +49,10 @@ export default function DirectPurchaseOrderDetail() {
   return order.handler.isModalOpen(2) ? (
     <div className="w-full flex flex-col gap-4 text-sm">
       <div className="w-full flex flex-col gap-2">
-        <p className="text-2xl font-bold text-primary">Detail Pemesanan</p>
-        <p className="text-sm">
+        <p className="text-base md:text-2xl font-bold text-primary">
+          Detail Pemesanan
+        </p>
+        <p className="text-xs md:text-sm">
           Berikut merupakan detail pemesanan yang akan di lakukan, ketuk tombol{" "}
           {'"Lanjutkan"'} jika sudah sesuai.
         </p>
@@ -60,28 +62,28 @@ export default function DirectPurchaseOrderDetail() {
       <div className="w-full flex flex-row items-center justify-between">
         <p className="font-bold">Detail Pengiriman</p>
         <Button variant="default" size="sm" onClick={onChangeAddressClick}>
-          Ubah
+          Ubah Alamat
         </Button>
       </div>
-      <div className="w-full grid grid-cols-2 gap-2">
-        <p>Penerima</p>
-        <p>{customer.address.chosenAddress!.recipient_name}</p>
-        <p>Nomor telepon penerima</p>
-        <p>
-          {phoneNumberGenerator(
-            customer.address.chosenAddress!.recipient_phone_number
-          )}
-        </p>
-        <p>Alamat Lengkap</p>
-        <p>
-          <span className="font-bold">
-            {`${customer.address.chosenAddress!.city.city_name}, ${
-              customer.address.chosenAddress!.city.province
-            }`}
-            ,{" "}
-          </span>
-          {customer.address.chosenAddress!.full_address}
-        </p>
+      <div className="text-xs md:text-sm w-full flex flex-col gap-2">
+        <div className="w-full flex flex-col gap-1">
+          <b>Penerima</b>
+          <p>{customer.address.chosenAddress!.recipient_name}</p>
+        </div>
+
+        <div className="w-full flex flex-col gap-1">
+          <b>Nomor telepon penerima</b>
+          <p>
+            {phoneNumberGenerator(
+              customer.address.chosenAddress!.recipient_phone_number
+            )}
+          </p>
+        </div>
+
+        <div className="w-full flex flex-col gap-1">
+          <b>Alamat Lengkap</b>
+          <p>{customer.address.chosenAddress!.full_address}</p>
+        </div>
       </div>
 
       <Separator />
@@ -134,32 +136,32 @@ export default function DirectPurchaseOrderDetail() {
           </AccordionItem>
         </Accordion>
 
-        <p className="font-bold">Rincian Biaya</p>
-        <div className="grid grid-cols-2 gap-2">
-          <p className="font-bold">Harga Barang</p>
-          <p>
-            {rupiahConverter(
-              variants.variantValue
-                ? variants.variantValue.variant_price
-                : product.price
+        <div className="w-full flex flex-col gap-2 text-xs md:text-base">
+          <p className="font-bold">Rincian Biaya</p>
+          <div className="grid grid-cols-2 gap-2">
+            <p className="font-bold">Harga Barang</p>
+            <p>
+              {rupiahConverter(
+                variants.variantValue
+                  ? variants.variantValue.variant_price
+                  : product.price
+              )}
+            </p>
+            <p className="font-bold">Jumlah Barang</p>
+            <p>
+              {quantity.productQuantity} {product.unit}
+            </p>
+            {variants.variantValue && (
+              <>
+                <p className="font-bold">Varian Barang</p>
+                <div className="flex flex-row items-center gap-1">
+                  <p>{variants.variantValue.variant_name}</p>
+                </div>
+              </>
             )}
-          </p>
-          <p className="font-bold">Jumlah Barang</p>
-          <p>
-            {quantity.productQuantity} {product.unit}
-          </p>
-          {variants.variantValue && (
-            <>
-              <p className="font-bold">Varian Barang</p>
-              <div className="flex flex-row items-center gap-1">
-                <p>{variants.variantValue.variant_name}</p>
-              </div>
-            </>
-          )}
-          <p className="text-lg font-bold">Total Harga</p>
-          <p className="text-lg font-bold">
-            {rupiahConverter(price.totalPrice)}
-          </p>
+            <p className="font-bold">Total Harga</p>
+            <p className="font-bold">{rupiahConverter(price.totalPrice)}</p>
+          </div>
         </div>
       </div>
 

@@ -7,7 +7,10 @@ import { sortOrders } from "@/lib/helper";
 import dynamic from "next/dynamic";
 import Loading from "@/app/loading";
 
-const OrderCard = dynamic(() => import("./order-card"), {ssr: false, loading: () => <Loading />})
+const OrderCard = dynamic(() => import("./order-card"), {
+  ssr: false,
+  loading: () => <Loading />,
+});
 
 interface ICustomerOrdersListProps {
   orders: TCustomerOrder[];
@@ -20,7 +23,7 @@ export default function CustomerOrderList({
 }: ICustomerOrdersListProps) {
   const searchParams = useSearchParams();
   const orderState = searchParams.get("state") ?? "ALL";
-  
+
   const ordersData = {
     ALL: sortOrders(orders),
     PENDING: orders.filter((order) => order.order_status === "PENDING"),
@@ -46,17 +49,26 @@ export default function CustomerOrderList({
     }
   };
   return (
-    <Tabs defaultValue={orderState} className="w-full flex flex-col gap-4 lg:gap-8">
-      <TabsList>
-        <TabsTrigger value="ALL">{orderShownLabel("ALL")}</TabsTrigger>
-        <TabsTrigger value="PENDING">{orderShownLabel("PENDING")}</TabsTrigger>
-        <TabsTrigger value="PAID">{orderShownLabel("PAID")}</TabsTrigger>
-        <TabsTrigger value="PACKED">{orderShownLabel("PACKED")}</TabsTrigger>
-        <TabsTrigger value="SHIPPED">{orderShownLabel("SHIPPED")}</TabsTrigger>
-        <TabsTrigger value="DELIVERED">
-          {orderShownLabel("DELIVERED")}
-        </TabsTrigger>
-      </TabsList>
+    <Tabs
+      defaultValue={orderState}
+      className="w-full flex flex-col gap-4 lg:gap-8 overflow-hidden"
+    >
+      <div className="w-full overflow-auto">
+        <TabsList>
+          <TabsTrigger value="ALL">{orderShownLabel("ALL")}</TabsTrigger>
+          <TabsTrigger value="PENDING">
+            {orderShownLabel("PENDING")}
+          </TabsTrigger>
+          <TabsTrigger value="PAID">{orderShownLabel("PAID")}</TabsTrigger>
+          <TabsTrigger value="PACKED">{orderShownLabel("PACKED")}</TabsTrigger>
+          <TabsTrigger value="SHIPPED">
+            {orderShownLabel("SHIPPED")}
+          </TabsTrigger>
+          <TabsTrigger value="DELIVERED">
+            {orderShownLabel("DELIVERED")}
+          </TabsTrigger>
+        </TabsList>
+      </div>
 
       <TabsContent value="ALL">
         <OrderCard ordersData={ordersData.ALL as TCustomerOrder[]} />

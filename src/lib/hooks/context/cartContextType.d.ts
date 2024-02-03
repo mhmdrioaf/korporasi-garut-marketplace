@@ -19,7 +19,7 @@ export interface ICourierBySeller {
 
 export interface ITotalCostBySeller {
   [sellerId: number]: {
-    sellerName: string;
+    sellerName: string | null;
     itemsCost: number;
     shippingCost: number;
   };
@@ -56,9 +56,7 @@ type TCartContext = {
   };
 
   cart: {
-    data: TCustomerCart | undefined;
-    error: any;
-    loading: boolean;
+    data: TCustomerCart;
 
     itemRefs: React.MutableRefObject<(HTMLButtonElement | null)[]>;
 
@@ -67,7 +65,7 @@ type TCartContext = {
     itemPrice: (item: TCustomerCartItem) => number;
 
     handler: {
-      getSellerName: (sellerId: number) => string;
+      getSellerName: (sellerId: number) => string | null;
       getSellerAddress: (sellerId: number) => string | undefined;
 
       deleteItem: (

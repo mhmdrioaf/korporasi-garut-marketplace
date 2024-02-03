@@ -37,11 +37,14 @@ export default function SellerProductCard({
         />
       </div>
 
-      <p title={product.title} className="text-lg font-bold truncate">
+      <p
+        title={product.title}
+        className="text-sm md:text-lg font-bold truncate"
+      >
         {product.title}
       </p>
 
-      <div className="absolute top-4 right-4 z-50">
+      <div className="absolute top-4 right-4 z-30">
         <DropdownMenu>
           <DropdownMenuTrigger>
             <div className="p-1 rounded-md bg-background bg-opacity-30 backdrop-blur-sm">
@@ -87,8 +90,10 @@ export default function SellerProductCard({
         </DropdownMenu>
       </div>
 
-      <div className="w-full flex flex-row items-center justify-between">
-        <p className="text-sm font-bold">{rupiahConverter(product.price)}</p>
+      <div className="w-full flex flex-col md:flex-row items-start justify-normal md:items-center md:justify-between gap-2 md:gap-0">
+        <p className="text-xs md:text-sm font-bold">
+          {rupiahConverter(product.price)}
+        </p>
         <p className="text-xs">
           Stok: {product.stock} {product.unit}
         </p>

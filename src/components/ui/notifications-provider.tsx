@@ -2,18 +2,21 @@
 
 import { NotificationContextProvider } from "@/lib/hooks/context/useNotifications";
 import { NotificationContent, NotificationTrigger } from "./notifications";
+import { TNotification } from "@/lib/globals";
 
 interface INotificationProviderProps {
-    subscriber_id: string;
-};
+  notification: TNotification | null;
+}
 
-export default function NotificationsProvider({ subscriber_id }: INotificationProviderProps) {
-    return (
-        <NotificationContextProvider subscriber_id={subscriber_id}>
-            <div className="relative">
-                <NotificationTrigger />
-                <NotificationContent className="absolute top-12 -left-[22rem] z-[70]" />
-            </div>
-        </NotificationContextProvider>
-    )
+export default function NotificationsProvider({
+  notification,
+}: INotificationProviderProps) {
+  return (
+    <NotificationContextProvider notification={notification}>
+      <div className="relative">
+        <NotificationTrigger />
+        <NotificationContent className="absolute top-12 -left-[10rem] md:-left-[22rem] z-[70]" />
+      </div>
+    </NotificationContextProvider>
+  );
 }

@@ -64,7 +64,6 @@ type TDirectPurchaseContext = {
   user_id: string | null;
   customer: {
     user: TUser | null;
-    loading: boolean;
 
     address: {
       chosenAddress: TAddress | null;

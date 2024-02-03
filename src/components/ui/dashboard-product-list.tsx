@@ -8,6 +8,7 @@ import ProductDelete from "./modals/product-delete";
 import { useToast } from "./use-toast";
 import SellerProductCard from "./seller-product-card";
 import ProductDetailModal from "./product-detail-modal";
+import { PlusIcon } from "lucide-react";
 
 export type TDeleteResponse = {
   status: "success" | "destructive";
@@ -84,21 +85,24 @@ export default function DashboardProductList({
       <div className="w-full flex flex-col gap-4">
         <div className="w-full flex flex-col gap-1">
           <div className="w-full flex flex-row items-center justify-between">
-            <p className="font-bold text-2xl text-primary">Daftar Produk</p>
+            <p className="font-bold text-base md:text-2xl text-primary">
+              Daftar Produk
+            </p>
             <Link
               href={ROUTES.PRODUCT.ADD}
-              className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md flex flex-row gap-2 items-center justify-center"
+              className="px-2 md:px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md flex flex-row gap-2 items-center justify-center"
             >
-              <p>Tambahkan Produk</p>
+              <p className="hidden md:block">Tambahkan Produk</p>
+              <PlusIcon className="w-4 h-4 block md:hidden" />
             </Link>
           </div>
-          <p className="text-sm">
+          <p className="text-xs md:text-sm">
             Berikut merupakan daftar produk yang telah anda tambahkan, dan telah
             di unggah pada halaman marketplace.
           </p>
         </div>
 
-        <div className="w-full grid grid-cols-4 gap-4">
+        <div className="w-full grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1 md:gap-2 lg:gap-4 mb-12 md:mb-8 lg:mb-0">
           {products.length > 0 &&
             products.map((product) => (
               <SellerProductCard

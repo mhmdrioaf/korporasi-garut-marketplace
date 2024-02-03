@@ -1,155 +1,218 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { db } from "../db";
 import { TNotification } from "../globals";
+import { ROUTES } from "../constants";
 
-export async function readNotificationHandler(
-    body: {
-        notification_id: string, 
-        notification_item_id: string
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_READ!, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
+export async function readNotificationHandler(body: {
+  notification_id: string;
+  contextURL: string;
+  notification_item_id: string;
+}) {
+  const readNotification = await db.notification.update({
+    where: {
+      notification_id: body.notification_id,
+    },
+    data: {
+      items: {
+        update: {
+          where: {
+            notification_item_id: body.notification_item_id,
+          },
+          data: {
+            status: "READ",
+            show_action_button: false,
+          },
         },
-        body: JSON.stringify({
-            notification_id: body.notification_id,
-            notification_item_id: body.notification_item_id
-        })
-    })
+      },
+    },
+    include: {
+      items: {
+        orderBy: {
+          status: "asc",
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (readNotification) {
+    revalidatePath(body.contextURL);
+    return readNotification as TNotification;
+  } else {
+    return undefined;
+  }
 }
 
-export async function deleteNotificationHandler(
-    body: {
-        notification_id: string, 
-        notification_item_id: string
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_DELETE!, {
-        method: "DELETE",
-        headers: {
-            "Content-Type": "application/json"
+export async function deleteNotificationHandler(body: {
+  notification_id: string;
+  contextURL: string;
+  notification_item_id: string;
+}) {
+  const deleteNotification = await db.notification.update({
+    where: {
+      notification_id: body.notification_id,
+    },
+    data: {
+      items: {
+        delete: {
+          notification_item_id: body.notification_item_id,
         },
-        body: JSON.stringify({
-            notification_id: body.notification_id,
-            notification_item_id: body.notification_item_id
-        })
-    })
+      },
+    },
+    include: {
+      items: {
+        orderBy: {
+          status: "asc",
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (deleteNotification) {
+    revalidatePath(body.contextURL);
+    return deleteNotification as TNotification;
+  } else {
+    return undefined;
+  }
 }
 
-export async function readAllNotificationsHandler(
-    body: {
-        notification_id: string
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_READ_ALL!, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
+export async function readAllNotificationsHandler(body: {
+  notification_id: string;
+  contextURL: string;
+}) {
+  const readAllNotifications = await db.notification.update({
+    where: {
+      notification_id: body.notification_id,
+    },
+    data: {
+      items: {
+        updateMany: {
+          where: {
+            status: "UNREAD",
+          },
+          data: {
+            status: "READ",
+          },
         },
-        body: JSON.stringify({
-            notification_id: body.notification_id
-        })
-    })
+      },
+    },
+    include: {
+      items: {
+        orderBy: {
+          notifiedAt: "desc",
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (readAllNotifications) {
+    revalidatePath(body.contextURL);
+    return readAllNotifications as TNotification;
+  } else {
+    return undefined;
+  }
 }
 
-export async function deleteAllNotificationsHandler(
-    body: {
-        notification_id: string
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_DELETE_ALL!, {
-        method: "PATCH",
-        headers: {
-            "Content-Type": "application/json"
+export async function deleteAllNotificationsHandler(body: {
+  notification_id: string;
+  contextURL: string;
+}) {
+  const deleteAllItems = await db.notification.update({
+    where: {
+      notification_id: body.notification_id,
+    },
+    data: {
+      items: {
+        deleteMany: {
+          notification_id: body.notification_id,
         },
-        body: JSON.stringify({
-            notification_id: body.notification_id
-        })
-    })
+      },
+    },
+    include: {
+      items: {
+        orderBy: {
+          notifiedAt: "desc",
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (deleteAllItems) {
+    revalidatePath(body.contextURL);
+    return deleteAllItems as TNotification;
+  } else {
+    return undefined;
+  }
 }
 
-export async function sendNotificationHandler(
-    body: {
-        subscriber_target: string;
-        notification_title: string;
-        notification_redirect_url: string;
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_SEND!, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
+export async function sendNotificationHandler(body: {
+  subscriber_target: string;
+  notification_title: string;
+  notification_redirect_url: string;
+}) {
+  const sendNotification = await db.notification.upsert({
+    where: {
+      subscriber_id: parseInt(body.subscriber_target),
+    },
+    create: {
+      subscriber_id: parseInt(body.subscriber_target),
+      items: {
+        create: {
+          title: body.notification_title,
+          redirect_url: body.notification_redirect_url,
         },
-        body: JSON.stringify({
-            subscriber_target: body.subscriber_target,
-            notification_title: body.notification_title,
-            notification_redirect_url: body.notification_redirect_url,
-        })
-    })
+      },
+    },
+    update: {
+      items: {
+        create: {
+          title: body.notification_title,
+          redirect_url: body.notification_redirect_url,
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (sendNotification) {
+    revalidatePath(body.notification_redirect_url);
+    return sendNotification as TNotification;
+  } else {
+    return undefined;
+  }
 }
 
-export async function sendSellerNotificationHandler(
-    body: {
-        seller_id: string;
-        order_id: string;
-    }
-) {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_NOTIFICATION_SEND_SELLER!, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
+export async function sendSellerNotificationHandler(body: {
+  seller_id: string;
+  order_id: string;
+}) {
+  const sendNotification = await db.notification.upsert({
+    where: {
+      subscriber_id: parseInt(body.seller_id),
+    },
+    create: {
+      subscriber_id: parseInt(body.seller_id),
+      items: {
+        create: {
+          title: `Pesanan baru dengan ID ${body.order_id} telah diterima.`,
+          redirect_url: "/user/dashboard/seller-orders?state=PAID",
         },
-        body: JSON.stringify({
-            seller_id: body.seller_id,
-            order_id: body.order_id
-        })
-    })
+      },
+    },
+    update: {
+      items: {
+        create: {
+          title: `Pesanan baru dengan ID ${body.order_id} telah diterima.`,
+          redirect_url: "/user/dashboard/seller-orders?state=PAID",
+        },
+      },
+    },
+  });
 
-    const response = await res.json();
-
-    if (response.ok) {
-        return response.result as TNotification
-    } else {
-        return undefined
-    }
+  if (sendNotification) {
+    revalidatePath(ROUTES.USER.ORDERS_MANAGEMENT);
+    return sendNotification as TNotification;
+  } else {
+    return undefined;
+  }
 }

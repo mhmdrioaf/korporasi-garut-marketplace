@@ -38,14 +38,14 @@ export default function ProductInput() {
         <p className="font-bold text-2xl text-primary">Informasi Produk</p>
 
         <div className="w-full flex flex-col gap-4 px-8 py-2">
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Foto Produk</p>
             <div className="col-span-2">
               <ProductImageAdd />
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Nama Produk</p>
             <div className="col-span-2">
               <Input
@@ -57,7 +57,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Unit Produk</p>
             <div className="col-span-2">
               <Input
@@ -69,7 +69,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Deskripsi Produk</p>
             <div className="col-span-2">
               <Textarea
@@ -81,7 +81,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium self-center">Kata Kunci Produk</p>
             <div className="col-span-2">
               <ProductTagsInput />
@@ -94,7 +94,7 @@ export default function ProductInput() {
         <p className="font-bold text-2xl text-primary">Informasi Pengiriman</p>
 
         <div className="w-full flex flex-col gap-4 px-8 py-2">
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Tanggal Kedaluwarsa</p>
             <div className="col-span-2">
               <Input
@@ -107,7 +107,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Masa Penyimpanan</p>
             <div className="col-span-2">
               <div className="w-full grid grid-cols-4 gap-2">
@@ -125,7 +125,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Berat Produk</p>
             <div className="col-span-2">
               <div className="w-full grid grid-cols-4 gap-2">
@@ -143,7 +143,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Dapat dikirimkan ke luar kota?</p>
             <div className="col-span-2">
               <div className="flex flex-row items-center gap-2">
@@ -192,7 +192,7 @@ export default function ProductInput() {
         <p className="text-2xl font-bold text-primary">Detail Produk</p>
 
         <div className="w-full flex flex-col gap-4 px-8 py-2">
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Harga Produk</p>
             <div className="col-span-2">
               <Input
@@ -206,7 +206,7 @@ export default function ProductInput() {
             </div>
           </div>
 
-          <div className="grid grid-cols-3">
+          <div className="grid grid-cols-1 gap-1 lg:gap-0 lg:grid-cols-3">
             <p className="font-medium">Aktifkan Varian?</p>
             <div className="col-span-2">
               <Select

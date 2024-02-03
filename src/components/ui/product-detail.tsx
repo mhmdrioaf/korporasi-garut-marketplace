@@ -108,10 +108,14 @@ export default function ProductDetail() {
           )}
         </div>
 
-        <div className="w-full flex flex-col gap-8">
+        <div className="w-full block lg:hidden">
+          <Separator />
+        </div>
+
+        <div className="w-full flex flex-col gap-4 lg:gap-8">
           <Link
             href={ROUTES.LANDING_PAGE}
-            className="text-primary font-bold flex flex-row items-center gap-2"
+            className="text-primary font-bold hidden lg:flex flex-row items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
             <p>Kembali ke Marketplace</p>
@@ -121,7 +125,7 @@ export default function ProductDetail() {
             <p className="text-sm text-stone-500 uppercase">
               {product.category?.category_name}
             </p>
-            <p className="text-3xl font-bold">{product.title}</p>
+            <p className="text-lg lg:text-2xl font-bold">{product.title}</p>
           </div>
 
           <Link
@@ -141,8 +145,8 @@ export default function ProductDetail() {
                 />
               </div>
             )}
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-bold">
+            <div className="text-sm lg:text-base flex flex-col gap-1">
+              <p className="text-xs lg:text-sm font-bold">
                 {product.seller.account.user_name}
               </p>
               <p className="text-xs">{getSellerAddress()}</p>
@@ -153,11 +157,12 @@ export default function ProductDetail() {
             type="single"
             collapsible
             defaultValue="product-descriptions"
+            className="text-xs lg:text-base"
           >
             <AccordionItem value="product-descriptions">
               <AccordionTrigger>Deskripsi Produk</AccordionTrigger>
               <AccordionContent className="whitespace-pre-wrap">
-                <div className="w-full flex flex-col gap-2">
+                <div className="text-xs lg:text-sm w-full flex flex-col gap-2">
                   <p>{product.description}</p>
 
                   <Separator />
@@ -197,7 +202,7 @@ export default function ProductDetail() {
           <Separator />
 
           <div className="flex flex-col gap-1">
-            <p className="text-sm uppercase text-stone-500">Total Harga</p>
+            <p className="text-xs lg:text-sm font-bold">Total Harga</p>
             <div className="flex flex-row gap-2 items-center">
               <p className="text-xl font-bold">
                 {rupiahConverter(price.totalPrice)}
@@ -213,7 +218,7 @@ export default function ProductDetail() {
           <div className="w-full flex flex-col gap-4">
             {state.isWarning && (
               <div className="w-full bg-yellow-300 text-stone-950 text-sm flex flex-row gap-2 items-center justify-center px-2 py-2 rounded-sm font-medium">
-                <AlertTriangleIcon className="w-4 h-4" />
+                <AlertTriangleIcon className="hidden md:block w-4 h-4" />
                 <p>
                   Harap pilih varian produk, jika tidak akan kami kirim secara
                   acak.
@@ -222,7 +227,7 @@ export default function ProductDetail() {
             )}
 
             {state.isPreorder && (
-              <div className="w-full bg-primary text-white text-sm grid place-items-center px-2 py-2 rounded-sm">
+              <div className="w-full bg-primary text-white text-xs lg:text-sm grid place-items-center px-2 py-2 rounded-sm">
                 <b>
                   Pesanan ini merupakan pesanan <b>pre-order</b>, sehingga
                   minimal pembelian untuk produk ini adalah 5 {product.unit}.
@@ -230,49 +235,53 @@ export default function ProductDetail() {
               </div>
             )}
 
-            <div className="w-fit rounded-md flex flex-row items-center gap-2">
-              <Button
-                variant="destructive"
-                size="icon"
-                onClick={() => quantity.handler.onQuantityChange("decrease")}
-                disabled={
-                  state.isPreorder
-                    ? quantity.productQuantity === 5
-                    : quantity.productQuantity === 1
-                }
-              >
-                <MinusIcon className="w-4 h-4" />
-              </Button>
-              <Input
-                type="number"
-                min={state.isPreorder ? 5 : 1}
-                max={
-                  product.variant
-                    ? variants.variantValue
-                      ? variants.variantValue.variant_stock
+            <div className="w-full md:w-fit rounded-md flex flex-col md:flex-row items-center gap-2 text-xs lg:text-base">
+              <div className="w-full md:w-fit flex flex-row items-center gap-2">
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => quantity.handler.onQuantityChange("decrease")}
+                  disabled={
+                    state.isPreorder
+                      ? quantity.productQuantity === 5
+                      : quantity.productQuantity === 1
+                  }
+                >
+                  <MinusIcon className="w-4 h-4" />
+                </Button>
+                <Input
+                  type="number"
+                  min={state.isPreorder ? 5 : 1}
+                  max={
+                    product.variant
+                      ? variants.variantValue
+                        ? variants.variantValue.variant_stock
+                        : product.stock
                       : product.stock
-                    : product.stock
-                }
-                value={quantity.productQuantity}
-                onChange={quantity.handler.onQuantityInputChange}
-                className="w-[9ch] text-center appearance-none"
-              />
-              <Button
-                variant="default"
-                size="icon"
-                onClick={() => quantity.handler.onQuantityChange("increase")}
-                disabled={
-                  state.isPreorder
-                    ? false
-                    : variants.variantValue
-                      ? variants.variantValue.variant_stock ===
-                        quantity.productQuantity
-                      : product.stock === quantity.productQuantity
-                }
-              >
-                <PlusIcon className="w-4 h-4" />
-              </Button>
-              <p className="text-sm font-bold">
+                  }
+                  value={quantity.productQuantity}
+                  onChange={quantity.handler.onQuantityInputChange}
+                  className="w-full md:w-[7ch] text-center appearance-none"
+                />
+                <Button
+                  variant="default"
+                  size="icon"
+                  className="shrink-0"
+                  onClick={() => quantity.handler.onQuantityChange("increase")}
+                  disabled={
+                    state.isPreorder
+                      ? false
+                      : variants.variantValue
+                        ? variants.variantValue.variant_stock ===
+                          quantity.productQuantity
+                        : product.stock === quantity.productQuantity
+                  }
+                >
+                  <PlusIcon className="w-4 h-4" />
+                </Button>
+              </div>
+              <p className="lg:text-sm font-bold">
                 Stok tersedia:{" "}
                 {variants.withVariants
                   ? variants.variantValue?.variant_stock

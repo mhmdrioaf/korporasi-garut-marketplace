@@ -1,22 +1,9 @@
 import { Container } from "@/components/ui/container";
 import ProductAddForm from "@/components/ui/product-input";
+import { getProductDetail } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
 import { ProductProvider } from "@/lib/hooks/context/useProduct";
 import { getServerSession } from "next-auth";
-
-async function getProductDetail(id: string) {
-  const res = await fetch(process.env.NEXT_PUBLIC_API_PRODUCT_GET! + id, {
-    method: "GET",
-    headers: { "Content-Type": "application/json" },
-    cache: "no-store",
-    next: {
-      tags: ["product-detail"],
-    },
-  });
-
-  const response = await res.json();
-  return response.result;
-}
 
 export default async function ProductEditPage({
   params,

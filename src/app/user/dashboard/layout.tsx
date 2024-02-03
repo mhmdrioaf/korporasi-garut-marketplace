@@ -12,7 +12,6 @@ import Link from "next/link";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  payment: React.ReactNode;
 }
 
 export const metadata: Metadata = {
@@ -22,7 +21,6 @@ export const metadata: Metadata = {
 
 export default async function DashboardLayout({
   children,
-  payment,
 }: DashboardLayoutProps) {
   const session = await getServerSession(authOptions);
   return (
@@ -67,13 +65,12 @@ export default async function DashboardLayout({
               title="List Produk"
             >
               <PackageIcon className="w-6 h-6" />
-              <p className="font-bold text-sm lg:hidden">Pesanan</p>
+              <p className="font-bold text-sm lg:hidden">Produk</p>
             </Link>
           )}
       </div>
 
       {children}
-      {payment}
     </div>
   );
 }
