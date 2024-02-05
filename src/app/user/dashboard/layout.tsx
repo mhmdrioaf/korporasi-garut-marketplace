@@ -1,10 +1,10 @@
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
 import {
-  LayoutDashboardIcon,
+  BoxesIcon,
   MapPinIcon,
-  PackageIcon,
   ShoppingBagIcon,
+  User2Icon,
 } from "lucide-react";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
@@ -31,43 +31,47 @@ export default async function DashboardLayout({
           href={ROUTES.USER.DASHBOARD}
           title="Detail Profil"
         >
-          <LayoutDashboardIcon className="w-6 h-6" />
-          <p className="font-bold text-sm lg:hidden">Dashboard</p>
+          <User2Icon className="w-6 h-6" />
+          <p className="font-bold text-sm lg:hidden">Akun</p>
         </Link>
 
-        <Link
-          className="w-full lg:w-fit grid place-items-center p-2"
-          href={
-            session?.user.role === "SELLER"
-              ? ROUTES.USER.ORDERS_MANAGEMENT
-              : ROUTES.USER.ORDERS
-          }
-          title="Pesanan"
-        >
-          <ShoppingBagIcon className="w-6 h-6" />
-          <p className="font-bold text-sm lg:hidden">Pesanan</p>
-        </Link>
-
-        <Link
-          className="w-full lg:w-fit grid place-items-center p-2"
-          href={ROUTES.USER.ADDRESSES}
-          title="Alamat"
-        >
-          <MapPinIcon className="w-6 h-6" />
-          <p className="font-bold text-sm lg:hidden">Alamat</p>
-        </Link>
-
-        {session &&
-          (session.user.role === "SELLER" || session.user.role === "ADMIN") && (
+        {(session?.user.role === "CUSTOMER" ||
+          session?.user.role === "SELLER") && (
+          <>
             <Link
               className="w-full lg:w-fit grid place-items-center p-2"
-              href={ROUTES.USER.PRODUCTS_LIST}
-              title="List Produk"
+              href={
+                session?.user.role === "SELLER"
+                  ? ROUTES.USER.ORDERS_MANAGEMENT
+                  : ROUTES.USER.ORDERS
+              }
+              title="Pesanan"
             >
-              <PackageIcon className="w-6 h-6" />
-              <p className="font-bold text-sm lg:hidden">Produk</p>
+              <ShoppingBagIcon className="w-6 h-6" />
+              <p className="font-bold text-sm lg:hidden">Pesanan</p>
             </Link>
-          )}
+
+            <Link
+              className="w-full lg:w-fit grid place-items-center p-2"
+              href={ROUTES.USER.ADDRESSES}
+              title="Alamat"
+            >
+              <MapPinIcon className="w-6 h-6" />
+              <p className="font-bold text-sm lg:hidden">Alamat</p>
+            </Link>
+          </>
+        )}
+
+        {session && session.user.role === "SELLER" && (
+          <Link
+            className="w-full lg:w-fit grid place-items-center p-2"
+            href={ROUTES.USER.PRODUCTS_LIST}
+            title="List Produk"
+          >
+            <BoxesIcon className="w-6 h-6" />
+            <p className="font-bold text-sm lg:hidden">Produk</p>
+          </Link>
+        )}
       </div>
 
       {children}
