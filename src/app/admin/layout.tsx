@@ -1,18 +1,11 @@
+import AdminDashboardWarning from "@/components/ui/admin-dashboard-warning";
 import AdminSidePanel from "@/components/ui/admin-side-panel";
 import NoAccess from "@/components/ui/no-access";
 import authOptions from "@/lib/authOptions";
-import { ROUTES } from "@/lib/constants";
 import { permissionHelper } from "@/lib/helper";
 import { AdminProvider } from "@/lib/hooks/context/useAdmin";
-import {
-  LayoutDashboardIcon,
-  Package2Icon,
-  UserPlus2Icon,
-  Users2Icon,
-} from "lucide-react";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";
-import Link from "next/link";
 import { ReactNode } from "react";
 
 interface IAdminDashboardLayoutProps {
@@ -47,10 +40,12 @@ export default async function AdminDashboardLayout({
     return <NoAccess />;
   } else {
     return (
-      <div className="w-full flex flex-col lg:flex-row items-start">
+      <div className="w-full flex flex-col lg:flex-row items-start relative">
         <AdminSidePanel />
 
         <AdminProvider token={session.user.token}>{children}</AdminProvider>
+
+        <AdminDashboardWarning />
       </div>
     );
   }

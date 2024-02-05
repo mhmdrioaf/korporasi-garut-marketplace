@@ -2,17 +2,18 @@
 import Link from "next/link";
 import logo from "../../../public/smk_logo.png";
 import {
+  BarChart3Icon,
   BellIcon,
-  BookKeyIcon,
   BoxesIcon,
   GanttChartSquareIcon,
   LayoutDashboardIcon,
-  Loader2Icon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
+  ShoppingBagIcon,
   ShoppingCartIcon,
   User2Icon,
+  Users2Icon,
 } from "lucide-react";
 import Image from "next/image";
 import SearchBar from "./search-bar";
@@ -155,8 +156,8 @@ export default function Header({
                       href={ROUTES.USER.DASHBOARD}
                       className="w-full flex flex-row"
                     >
-                      <LayoutDashboardIcon className="w-4 h-4 mr-2" />
-                      <span>Dashboard</span>
+                      <User2Icon className="w-4 h-4 mr-2" />
+                      <span>Akun</span>
                     </Link>
                   </DropdownMenuItem>
 
@@ -167,18 +168,38 @@ export default function Header({
                           href={ROUTES.ADMIN.DASHBOARD}
                           className="w-full flex flex-row"
                         >
-                          <BookKeyIcon className="w-4 h-4 mr-2" />
-                          <span>Admin Dashboard</span>
+                          <LayoutDashboardIcon className="w-4 h-4 mr-2" />
+                          <span>Dashboard</span>
                         </Link>
                       </DropdownMenuItem>
 
                       <DropdownMenuItem>
                         <Link
-                          href={ROUTES.USER.PRODUCTS_LIST}
+                          href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
                           className="w-full flex flex-row"
                         >
                           <BoxesIcon className="w-4 h-4 mr-2" />
-                          <span>Manajemen Produk</span>
+                          <span>Pengelola Produk</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
+                          className="w-full flex flex-row"
+                        >
+                          <Users2Icon className="w-4 h-4 mr-2" />
+                          <span>Pengelola Pengguna</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.ADMIN.REPORTS}
+                          className="w-full flex flex-row"
+                        >
+                          <BarChart3Icon className="w-4 h-4 mr-2" />
+                          <span>Laporan Penjualan</span>
                         </Link>
                       </DropdownMenuItem>
                     </>
@@ -193,6 +214,16 @@ export default function Header({
                         >
                           <BoxesIcon className="w-4 h-4 mr-2" />
                           <span>Manajemen Produk</span>
+                        </Link>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem>
+                        <Link
+                          href={ROUTES.USER.ORDERS_MANAGEMENT}
+                          className="w-full flex flex-row"
+                        >
+                          <ShoppingBagIcon className="w-4 h-4 mr-2" />
+                          <span>Manajemen Pesanan</span>
                         </Link>
                       </DropdownMenuItem>
                     </>
