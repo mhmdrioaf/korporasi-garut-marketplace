@@ -4,11 +4,9 @@ import logo from "../../../public/smk_logo.png";
 import {
   BarChart3Icon,
   BellIcon,
-  BookKeyIcon,
   BoxesIcon,
   GanttChartSquareIcon,
   LayoutDashboardIcon,
-  Loader2Icon,
   LogInIcon,
   LogOutIcon,
   MenuIcon,
