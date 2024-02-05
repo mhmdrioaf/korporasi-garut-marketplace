@@ -2,9 +2,9 @@
 
 import { ROUTES } from "@/lib/constants";
 import {
-  BookTextIcon,
+  BarChart3Icon,
+  BoxesIcon,
   LayoutDashboardIcon,
-  Package2Icon,
   UserPlus2Icon,
   Users2Icon,
 } from "lucide-react";
@@ -60,7 +60,7 @@ export default function AdminSidePanel() {
         href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
         title="Kelola Produk"
       >
-        <Package2Icon className="w-6 h-6" />
+        <BoxesIcon className="w-6 h-6" />
         <p className={labelStyle}>Kelola Produk</p>
       </Link>
 
@@ -69,7 +69,7 @@ export default function AdminSidePanel() {
         href={ROUTES.ADMIN.REPORTS}
         title="Laporan Penjualan"
       >
-        <BookTextIcon className="w-6 h-6" />
+        <BarChart3Icon className="w-6 h-6" />
         <p className={labelStyle}>Laporan Penjualan</p>
       </Link>
     </div>
