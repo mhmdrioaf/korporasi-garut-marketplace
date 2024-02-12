@@ -1,7 +1,6 @@
 "use client";
 
 import { ROUTES } from "@/lib/constants";
-import { TProduct } from "@/lib/globals";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import Link from "next/link";

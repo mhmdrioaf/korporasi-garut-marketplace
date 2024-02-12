@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/container";
 import CustomerOrderList from "@/components/ui/customer-order-list";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { TCustomerOrder } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -20,9 +19,9 @@ async function getUserOrders(id: string) {
   const ordersResponse = await fetchOrders.json();
 
   if (!ordersResponse.ok) {
-    return [] as TCustomerOrder[];
+    return [] as TOrder[];
   } else {
-    return ordersResponse.result as TCustomerOrder[];
+    return ordersResponse.result as TOrder[];
   }
 }
 

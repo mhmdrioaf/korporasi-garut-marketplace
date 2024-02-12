@@ -1,5 +1,3 @@
-import { TNotification } from "@/lib/globals";
-
 type TNotificationContext = {
   data: {
     notification: TNotification | null;

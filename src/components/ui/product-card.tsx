@@ -1,5 +1,4 @@
 import { ROUTES } from "@/lib/constants";
-import { TProduct } from "@/lib/globals";
 import {
   remoteImageSource,
   rupiahConverter,

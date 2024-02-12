@@ -34,7 +34,6 @@ import { Avatar, AvatarFallback } from "./avatar";
 import { useRouter } from "next/navigation";
 import { useToast } from "./use-toast";
 import { signOut } from "next-auth/react";
-import { TCustomerCart, TNotification } from "@/lib/globals";
 import NotificationsProvider from "./notifications-provider";
 
 interface IHeaderComponentProps {

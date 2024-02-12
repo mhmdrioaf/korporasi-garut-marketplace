@@ -1,7 +1,6 @@
 import NoAccess from "@/components/ui/no-access";
 import UsersList from "@/components/ui/user-list";
 import authOptions from "@/lib/authOptions";
-import { TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 
 export const metadata = {

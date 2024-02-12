@@ -2,7 +2,6 @@ import NoAccess from "@/components/ui/no-access";
 import UsersList from "@/components/ui/user-list";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 

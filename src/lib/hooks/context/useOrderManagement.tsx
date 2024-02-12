@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { sortOrders } from "@/lib/helper";
 import { Loader2Icon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -22,7 +21,7 @@ export function useOrderManagement() {
 }
 
 interface IOrderManagementContextProviderProps {
-  orders_data: TSellerOrder[];
+  orders_data: TOrder[];
   seller: {
     id: string;
     token: string;
@@ -40,7 +39,7 @@ export function OrderManagementContextProvider({
   const [updating, setUpdating] = useState<boolean>(false);
   const [isGivingReceipt, setIsGivingReceipt] = useState<boolean>(false);
 
-  const [orderToUpdate, setOrderToUpdate] = useState<TSellerOrder | null>(null);
+  const [orderToUpdate, setOrderToUpdate] = useState<TOrder | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
@@ -52,7 +51,7 @@ export function OrderManagementContextProvider({
   });
 
   const orders = {
-    ALL: sortOrders(orders_data) as TSellerOrder[],
+    ALL: sortOrders(orders_data) as TOrder[],
     PENDING: orders_data.filter((order) => order.order_status === "PENDING"),
     PAID: orders_data.filter((order) => order.order_status === "PAID"),
     PACKED: orders_data.filter((order) => order.order_status === "PACKED"),
@@ -94,7 +93,7 @@ export function OrderManagementContextProvider({
     },
   };
 
-  const showActionButton = (order: TSellerOrder) => {
+  const showActionButton = (order: TOrder) => {
     const getButtonTitle = () => {
       switch (order.order_status) {
         case "PENDING":
@@ -179,7 +178,7 @@ export function OrderManagementContextProvider({
     order_status: ORDER_STATUS | null,
     order_id: string,
     delivery_receipt: string | null,
-    order_items: Pick<TSellerOrder, "order_item"> | null
+    order_items: Pick<TOrder, "order_item"> | null
   ) {
     setUpdating(true);
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_UPDATE_STATUS!, {

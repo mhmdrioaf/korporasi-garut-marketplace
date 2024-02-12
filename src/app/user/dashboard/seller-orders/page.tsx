@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/container";
 import NoAccess from "@/components/ui/no-access";
 import SellerOrderList from "@/components/ui/seller-orders-list";
 import authOptions from "@/lib/authOptions";
-import { TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
 import { OrderManagementContextProvider } from "@/lib/hooks/context/useOrderManagement";
 import { getServerSession } from "next-auth";
@@ -28,13 +27,13 @@ async function getSellerOrders(seller_id: string, seller_token: string) {
     loading = false;
     return {
       loading: loading,
-      data: [] as TSellerOrder[],
+      data: [] as TOrder[],
     };
   } else {
     loading = false;
     return {
       loading: loading,
-      data: response.result as TSellerOrder[],
+      data: response.result as TOrder[],
     };
   }
 }

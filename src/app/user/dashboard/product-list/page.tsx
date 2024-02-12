@@ -2,7 +2,6 @@ import { Container } from "@/components/ui/container";
 import DashboardProductList from "@/components/ui/dashboard-product-list";
 import NoAccess from "@/components/ui/no-access";
 import authOptions from "@/lib/authOptions";
-import { TProduct } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 
 async function getProducts(id: string) {

@@ -1,6 +1,5 @@
 "use client";
 
-import { TAddress } from "@/lib/globals";
 import UserAddressCard from "./user-address-card";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";

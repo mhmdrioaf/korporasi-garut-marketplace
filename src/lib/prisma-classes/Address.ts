@@ -5,7 +5,6 @@ import {
   phoneNumberGenerator,
   properizeWords,
 } from "../helper";
-import { TCity } from "../globals";
 
 type TAddAddress = {
   user_id: string;

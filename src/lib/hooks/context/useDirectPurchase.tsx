@@ -9,16 +9,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { TDirectPurchaseContext } from "./directPurchaseContextType";
-import {
-  TAddress,
-  TProduct,
-  TProductVariantItem,
-  TSameDayShippingResult,
-  TShippingCost,
-  TShippingCostServiceCost,
-  TUser,
-} from "@/lib/globals";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR from "swr";
 import { getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";

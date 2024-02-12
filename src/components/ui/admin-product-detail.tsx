@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct, TProductVariantItem } from "@/lib/globals";
 import { Container } from "./container";
 import Image from "next/image";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";

@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useOptimistic,
-  useState,
-} from "react";
-import { TNotificationContext } from "./notificationContext";
-import useSWR from "swr";
-import { fetcher } from "@/lib/helper";
+import { createContext, useContext, useOptimistic, useState } from "react";
 import {
   deleteAllNotificationsHandler,
   deleteNotificationHandler,
@@ -17,7 +8,6 @@ import {
   readNotificationHandler,
 } from "@/lib/actions/notification";
 import { usePathname, useRouter } from "next/navigation";
-import { NOTIFICATION_STATUS, TNotification } from "@/lib/globals";
 
 export const NotificationContext = createContext<TNotificationContext | null>(
   null

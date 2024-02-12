@@ -1,4 +1,3 @@
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TOrderManagementContext = {

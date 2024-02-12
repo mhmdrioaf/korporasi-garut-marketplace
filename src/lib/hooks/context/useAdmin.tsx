@@ -11,7 +11,6 @@ import {
 import useSWR from "swr";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { fetcher, filterSalesByDateRange } from "@/lib/helper";
-import { TProduct } from "@/lib/globals";
 import { DateRange } from "react-day-picker";
 import { TAdminContextType, TAdminReportTabs } from "./adminContextType";
 

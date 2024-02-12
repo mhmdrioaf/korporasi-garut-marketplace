@@ -7,7 +7,6 @@ import AuthProvider from "@/lib/AuthProvider";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/authOptions";
 import { getUserCart, getUserNotification } from "@/lib/api";
-import { TCustomerCart, TNotification } from "@/lib/globals";
 
 const inter = Inter({ subsets: ["latin"] });
 

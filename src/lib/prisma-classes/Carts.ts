@@ -4,7 +4,6 @@ import {
   cartIdGenerator,
   cartItemIdGenerator,
 } from "../helper";
-import { TProduct, TProductVariantItem } from "../globals";
 
 type TAddCart = {
   user_id: string;

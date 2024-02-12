@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  TAddress,
-  TCustomerCart,
-  TCustomerCartItem,
-  TSameDayShippingResult,
-  TShippingCost,
-  TShippingCostServiceCost,
-} from "@/lib/globals";
-import {
   ReactNode,
   createContext,
   useCallback,

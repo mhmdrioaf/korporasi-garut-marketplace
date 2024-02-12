@@ -1,12 +1,3 @@
-import {
-  TAddress,
-  TProduct,
-  TProductVariantItem,
-  TShippingCost,
-  TShippingCostServiceCost,
-  TUser,
-} from "@/lib/globals";
-
 type TDirectPurchaseContext = {
   variants: {
     withVariants: boolean;

@@ -1,4 +1,3 @@
-import { TProvince } from "@/lib/globals";
 import { NextRequest, NextResponse } from "next/server";
 
 async function handler(request: NextRequest) {

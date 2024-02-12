@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { TSellerProfile } from "@/lib/globals";
 import { NextRequest, NextResponse } from "next/server";
 
 async function handler(

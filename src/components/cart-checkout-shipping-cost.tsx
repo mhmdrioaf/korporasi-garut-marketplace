@@ -1,6 +1,5 @@
 "use client";
 
-import { TAddress, TCustomerCartItem, TShippingCost } from "@/lib/globals";
 import { rupiahConverter, shippingEstimation } from "@/lib/helper";
 import { useCart } from "@/lib/hooks/context/useCart";
 import { CheckIcon } from "lucide-react";

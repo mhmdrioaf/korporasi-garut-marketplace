@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct } from "@/lib/globals";
 import { remoteImageSource, rupiahConverter } from "@/lib/helper";
 import Image from "next/image";
 import { Button } from "./button";

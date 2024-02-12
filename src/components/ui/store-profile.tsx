@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct, TSellerProfile } from "@/lib/globals";
 import { getStoreProducts, remoteImageSource } from "@/lib/helper";
 import { UserIcon } from "lucide-react";
 import Image from "next/image";

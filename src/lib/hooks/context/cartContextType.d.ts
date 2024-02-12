@@ -1,11 +1,3 @@
-import {
-  TAddress,
-  TCustomerCart,
-  TCustomerCartItem,
-  TShippingCost,
-  TShippingCostServiceCost,
-  TUser,
-} from "@/lib/globals";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { MutableRefObject } from "react";
 

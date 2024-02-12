@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct } from "@/lib/globals";
 import Modal from "../modal";
 import { ScrollArea } from "../scroll-area";
 import { Separator } from "../separator";

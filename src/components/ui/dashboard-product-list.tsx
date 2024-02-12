@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct } from "@/lib/globals";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
 import { useEffect, useState } from "react";

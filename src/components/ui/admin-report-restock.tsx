@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct } from "@/lib/globals";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import {
   Table,

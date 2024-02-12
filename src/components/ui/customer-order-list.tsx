@@ -1,6 +1,5 @@
 "use client";
 
-import { ORDER_STATUS, TCustomerOrder } from "@/lib/globals";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
 import { useSearchParams } from "next/navigation";
 import { sortOrders } from "@/lib/helper";
@@ -13,7 +12,7 @@ const OrderCard = dynamic(() => import("./order-card"), {
 });
 
 interface ICustomerOrdersListProps {
-  orders: TCustomerOrder[];
+  orders: TOrder[];
 }
 
 type TOrderShown = "ALL" | ORDER_STATUS;
@@ -71,7 +70,7 @@ export default function CustomerOrderList({
       </div>
 
       <TabsContent value="ALL">
-        <OrderCard ordersData={ordersData.ALL as TCustomerOrder[]} />
+        <OrderCard ordersData={ordersData.ALL as TOrder[]} />
       </TabsContent>
       <TabsContent value="PENDING">
         <OrderCard ordersData={ordersData.PENDING} />

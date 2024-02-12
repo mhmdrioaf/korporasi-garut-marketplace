@@ -1,4 +1,3 @@
-import { TProduct } from "@/lib/globals";
 import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TProductContext = {

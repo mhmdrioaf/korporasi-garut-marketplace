@@ -1,7 +1,6 @@
 import AdminDashboardComponent from "@/components/ui/admin-dashboard";
 import NoAccess from "@/components/ui/no-access";
 import authOptions from "@/lib/authOptions";
-import { TProduct, TUser } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 
 async function listAllUser(token: string) {

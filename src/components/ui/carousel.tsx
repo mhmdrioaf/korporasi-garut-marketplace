@@ -1,6 +1,6 @@
 "use client";
 
-import { TCarouselAssets } from "@/lib/globals";
+import { TCarouselAssets } from "@/lib/constants";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import { HTMLAttributes, useCallback, useEffect, useState } from "react";

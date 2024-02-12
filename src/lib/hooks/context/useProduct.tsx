@@ -2,7 +2,6 @@
 
 import { useToast } from "@/components/ui/use-toast";
 import { ROUTES } from "@/lib/constants";
-import { TProduct } from "@/lib/globals";
 import { fetcher, uploadImage } from "@/lib/helper";
 import imageCompression from "browser-image-compression";
 import { Session } from "next-auth";

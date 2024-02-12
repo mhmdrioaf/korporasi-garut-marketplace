@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { TCustomerCartItem } from "@/lib/globals";
 import { customerOrderIdGenerator } from "@/lib/helper";
 import { NextRequest, NextResponse } from "next/server";
 

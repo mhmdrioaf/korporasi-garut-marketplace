@@ -1,6 +1,5 @@
 "use client";
 
-import { TUser } from "@/lib/globals";
 import {
   Table,
   TableBody,
