@@ -10,14 +10,27 @@ import Image from "next/image";
 import { Button } from "./button";
 import CartCheckoutShippingCost from "../cart-checkout-shipping-cost";
 import { Loader2Icon } from "lucide-react";
+import CartCheckoutDisabledItems from "./cart-checkout-disabled-items";
 
 export default function CartCheckoutProductsDetail() {
   const { cart, checkout, state } = useCart();
 
-  const isCheckoutButtonDisabled = state.sameDay
-    ? Object.keys(state.sameDayCourier).length !== checkout._sellers.length
-    : Object.keys(checkout.totalChosenCourier).length !==
-      checkout._sellers.length;
+  const isDisabledItems = Object.keys(checkout.disabledItems).length > 0;
+  const isSamedayCouriersSelected =
+    Object.keys(state.sameDayCourier).length +
+      Object.keys(checkout.chosenCourier).length ===
+    checkout._sellers.length;
+  const isCouriersSelected =
+    Object.keys(checkout.chosenCourier).length === checkout._sellers.length;
+
+  const isCheckoutButtonDisabled =
+    checkout._sellers.length > 0
+      ? state.sameDay
+        ? isDisabledItems
+          ? !isCouriersSelected
+          : !isSamedayCouriersSelected
+        : !isCouriersSelected
+      : true;
 
   return checkout.step === 2 ? (
     <div className="w-full flex flex-col gap-2 text-sm">
@@ -108,6 +121,8 @@ export default function CartCheckoutProductsDetail() {
             </div>
           );
         })}
+
+        <CartCheckoutDisabledItems disabledItems={checkout.disabledItems} />
 
         <div className="w-full flex flex-col gap-2 py-2">
           {checkout._sellers.map((sellerID) => {
