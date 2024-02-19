@@ -1,6 +1,5 @@
 "use client";
 
-import { TAddress, TCustomerCartItem, TShippingCost } from "@/lib/globals";
 import { rupiahConverter, shippingEstimation } from "@/lib/helper";
 import { useCart } from "@/lib/hooks/context/useCart";
 import { CheckIcon } from "lucide-react";
@@ -52,7 +51,7 @@ export default function CartCheckoutShippingCost({
     getShippingData();
   }, [checkout.handler, sellerAddress, totalWeight]);
 
-  if (state.orderable && !state.sameDay) {
+  if (items.filter((item) => item.product.capable_out_of_town).length > 0) {
     if (shippingCost) {
       return (
         <div className="w-full rounded-md flex flex-col gap-4">
@@ -118,8 +117,9 @@ export default function CartCheckoutShippingCost({
         </div>
       );
     }
-  } else if (state.sameDay) {
-    return state.orderable ? (
+  } else if (state.sameDay && checkout.chosenAddress) {
+    return state.orderable &&
+      checkout.chosenAddress.city_id === sellerAddress.city.city_id ? (
       <div className="w-full flex flex-row items-center gap-2 justify-between">
         <div className="flex flex-col gap-2">
           <p className="font-bold">Korporasi Delivery</p>

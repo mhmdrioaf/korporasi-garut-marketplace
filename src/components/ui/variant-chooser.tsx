@@ -1,6 +1,5 @@
 "use client";
 
-import { TProductVariant } from "@/lib/globals";
 import Modal from "./modal";
 import { useDirectPurchase } from "@/lib/hooks/context/useDirectPurchase";
 import { Button } from "./button";

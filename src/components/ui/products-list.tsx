@@ -1,4 +1,3 @@
-import { TProduct } from "@/lib/globals";
 import ProductCard from "./product-card";
 
 interface IProductListComponentProps {

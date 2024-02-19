@@ -2,12 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "../db";
-import {
-  TCustomerCart,
-  TCustomerCartItem,
-  TProduct,
-  TProductVariantItem,
-} from "../globals";
 import Carts from "../prisma-classes/Carts";
 
 export async function cartItemsQuantityChangeHandler(cart: TCustomerCart) {

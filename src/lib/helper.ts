@@ -1,13 +1,3 @@
-import {
-  TAddress,
-  TProduct,
-  ORDER_STATUS,
-  TProductVariantItem,
-  TCustomerOrder,
-  TSellerOrder,
-  TSameDayShippingResult,
-  TUser,
-} from "./globals";
 import supabase from "./supabase";
 
 export const getAvatarInitial = (name: string): string => {
@@ -425,7 +415,7 @@ export const showProductSoldCount = (sold_count: number) => {
   }
 };
 
-export const sortOrders = (orders: TSellerOrder[] | TCustomerOrder[]) => {
+export const sortOrders = (orders: TOrder[]) => {
   const firstOrdersStatus: ORDER_STATUS = "PENDING";
 
   const sortedOrders = orders.sort((a, b) => {

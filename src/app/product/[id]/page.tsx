@@ -1,7 +1,6 @@
 import Loading from "@/app/loading";
 import { getProductDetail, getUserDetail } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
-import { TUser } from "@/lib/globals";
 import { DirectPurchaseProvider } from "@/lib/hooks/context/useDirectPurchase";
 import { Metadata } from "next";
 import { getServerSession } from "next-auth";

@@ -1,7 +1,6 @@
 import Xendit from "xendit-node";
 import Carts from "./prisma-classes/Carts";
 import { db } from "./db";
-import { TCustomerCart, TNotification, TProduct, TUser } from "./globals";
 import Product from "./prisma-classes/Product";
 import Users from "./prisma-classes/User";
 

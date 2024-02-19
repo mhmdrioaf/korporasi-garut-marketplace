@@ -1,6 +1,5 @@
 "use client";
 
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import {
   getDateString,
   getOrderType,
@@ -16,7 +15,7 @@ import Image from "next/image";
 import { ROUTES } from "@/lib/constants";
 
 interface ISellerOrderCardProps {
-  ordersData: TSellerOrder[];
+  ordersData: TOrder[];
 }
 
 export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {

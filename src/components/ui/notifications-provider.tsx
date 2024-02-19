@@ -2,7 +2,6 @@
 
 import { NotificationContextProvider } from "@/lib/hooks/context/useNotifications";
 import { NotificationContent, NotificationTrigger } from "./notifications";
-import { TNotification } from "@/lib/globals";
 
 interface INotificationProviderProps {
   notification: TNotification | null;

@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "../db";
-import { TNotification } from "../globals";
 import { ROUTES } from "../constants";
 
 export async function readNotificationHandler(body: {

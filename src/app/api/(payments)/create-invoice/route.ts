@@ -1,5 +1,4 @@
 import { db } from "@/lib/db";
-import { TOrder } from "@/lib/globals";
 import { NextRequest, NextResponse } from "next/server";
 import Xendit from "xendit-node";
 import { CreateInvoiceRequest } from "xendit-node/invoice/models";

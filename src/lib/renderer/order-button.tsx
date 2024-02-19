@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ORDER_STATUS } from "../globals";
 
 interface IOrderButtonProps {
   status: ORDER_STATUS;

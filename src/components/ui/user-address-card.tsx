@@ -1,6 +1,5 @@
 "use client";
 
-import { TAddress } from "@/lib/globals";
 import { phoneNumberGenerator, properizeWords } from "@/lib/helper";
 import { CheckIcon, MoreVerticalIcon } from "lucide-react";
 import { useRouter } from "next/navigation";

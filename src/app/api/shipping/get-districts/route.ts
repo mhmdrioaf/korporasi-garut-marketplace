@@ -1,4 +1,3 @@
-import { TCity } from "@/lib/globals";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IRequestBody {

@@ -1,6 +1,5 @@
 "use client";
 
-import { TProduct, TUser } from "@/lib/globals";
 import { Container } from "./container";
 import AdminDashboardMenu from "./admin-dashboard-menu";
 import { ROUTES } from "@/lib/constants";

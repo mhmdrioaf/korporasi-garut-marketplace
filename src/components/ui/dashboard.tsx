@@ -1,6 +1,5 @@
 "use client";
 
-import { TUser } from "@/lib/globals";
 import { Loader2Icon, Trash2Icon, User2Icon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "./button";

@@ -1,7 +1,6 @@
 import AdminProductList from "@/components/ui/admin-product-list";
 import NoAccess from "@/components/ui/no-access";
 import authOptions from "@/lib/authOptions";
-import { TProduct } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
 import { getServerSession } from "next-auth";
 

@@ -1,6 +1,5 @@
 import { sendNotificationHandler } from "@/lib/actions/notification";
 import { db } from "@/lib/db";
-import { ORDER_STATUS, TSellerOrder } from "@/lib/globals";
 import { permissionHelper } from "@/lib/helper";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
@@ -8,7 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface IUpdateStatusBody {
   order_id: string;
   order_status: ORDER_STATUS | null;
-  order_items: Pick<TSellerOrder, "order_item">;
+  order_items: Pick<TOrder, "order_item">;
   delivery_receipt: string | null;
 }
 

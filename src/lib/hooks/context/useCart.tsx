@@ -1,14 +1,6 @@
 "use client";
 
 import {
-  TAddress,
-  TCustomerCart,
-  TCustomerCartItem,
-  TSameDayShippingResult,
-  TShippingCost,
-  TShippingCostServiceCost,
-} from "@/lib/globals";
-import {
   ReactNode,
   createContext,
   useCallback,
@@ -51,6 +43,7 @@ export function CartProvider({
   cartData,
 }: ICartContextProps) {
   const [checkedItems, setCheckedItems] = useState<IProductsBySeller>({});
+  const [disabledItems, setDisabledItems] = useState<IProductsBySeller>({});
   const [isDelete, setIsDelete] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<TCustomerCartItem | null>(
@@ -128,7 +121,10 @@ export function CartProvider({
       if (!checked) {
         delete sellerItems[cartItemId];
       } else {
-        sellerItems[cartItemId] = item;
+        sellerItems[cartItemId] = {
+          ...item,
+          orderable: true,
+        };
       }
 
       return { ...prevCheckedItems, [sellerId]: sellerItems };
@@ -265,7 +261,10 @@ export function CartProvider({
         );
 
         if (sellerItem[cartItemId]) {
-          sellerItem[cartItemId] = item;
+          sellerItem[cartItemId] = {
+            ...item,
+            orderable: true,
+          };
         }
 
         return { ...prev, [sellerId]: sellerItem };
@@ -348,6 +347,34 @@ export function CartProvider({
   const onAddressChoose = (chosenAddress: TAddress) => {
     setChosenAddress(chosenAddress);
     setCheckoutStep(2);
+
+    const sellerIDs = Object.keys(checkedItems);
+    sellerIDs.forEach((seller) => {
+      const sellerItems = checkedItems[parseInt(seller)];
+      const items = Object.keys(sellerItems);
+
+      items.forEach((item) => {
+        const cartItem = sellerItems[parseInt(item)];
+        const product = cartItem.product;
+
+        const sellerPrimaryAddressID = product.seller.primary_address_id;
+        const sellerPrimaryAddress = product.seller.address.find(
+          (address) => address.address_id === sellerPrimaryAddressID
+        );
+
+        if (sellerPrimaryAddress) {
+          if (
+            chosenAddress.city.city_id !== sellerPrimaryAddress.city.city_id &&
+            !product.capable_out_of_town
+          ) {
+            setDisabledItems((prev) => ({
+              ...prev,
+              [parseInt(seller)]: sellerItems,
+            }));
+          }
+        }
+      });
+    });
   };
 
   const checkoutItems = useCallback(() => {
@@ -362,16 +389,32 @@ export function CartProvider({
           cartItems[seller] = [];
         }
 
+        if (!disabledItems[seller]) {
+          _cartItem.orderable = false;
+        }
+
         cartItems[seller].push(_cartItem);
       }
     }
 
     return cartItems;
-  }, [checkedItems]);
+  }, [checkedItems, disabledItems]);
+
+  const checkedItemsSellers = useCallback(() => {
+    const sellers = Object.keys(checkoutItems());
+    let sellerIds = [];
+    for (const seller of sellers) {
+      if (!disabledItems[Number(seller)]) {
+        sellerIds.push(seller);
+      }
+    }
+
+    return sellerIds;
+  }, [checkoutItems, disabledItems]);
 
   const totalCost = useCallback(() => {
     const items = checkoutItems();
-    const sellers = Object.keys(items);
+    const sellers = checkedItemsSellers();
     let total = 0;
 
     sellers.forEach((sellerID) => {
@@ -403,14 +446,13 @@ export function CartProvider({
     });
 
     return total;
-  }, [chosenCourier, checkoutItems, sameDayCourier]);
-
-  const checkedItemsSellers = Object.keys(checkoutItems());
+  }, [chosenCourier, checkoutItems, sameDayCourier, checkedItemsSellers]);
 
   const totalSellerCost = () => {
     const items = checkoutItems();
     let _totalSellerCost: ITotalCostBySeller = {};
-    for (const sellerID of checkedItemsSellers) {
+    const sellers = checkedItemsSellers();
+    for (const sellerID of sellers) {
       const sellerName = getSellerName(parseInt(sellerID));
       const sellerItems = items[parseInt(sellerID)];
       const itemsPrice = sellerItems.reduce(
@@ -495,25 +537,25 @@ export function CartProvider({
   const resetCheckoutState = () => {
     setChosenAddress(null);
     setChosenCourier({});
+    setSameDayCourier({});
     setCheckoutStep(null);
+    setDisabledItems({});
   };
 
   const onCheckoutStepChanges = (value: number | null) => {
     if (value === 1) {
       setChosenCourier({});
+      setSameDayCourier({});
+      setDisabledItems({});
     }
 
     setCheckoutStep(value);
   };
 
   const totalChosenCourier = useCallback(() => {
-    if (chosenCourier) {
-      return Object.keys(chosenCourier).length;
-    } else if (sameDayCourier) {
-      return Object.keys(sameDayCourier).length;
-    } else {
-      return 0;
-    }
+    return (
+      Object.keys(chosenCourier).length + Object.keys(sameDayCourier).length
+    );
   }, [chosenCourier, sameDayCourier]);
 
   const totalCheckedSeller = useCallback(() => {
@@ -547,7 +589,7 @@ export function CartProvider({
     let totalShippingCost: number = 0;
     let items: TCustomerCartItem[] = [];
 
-    checkedItemsSellers.forEach((sellerID) => {
+    checkedItemsSellers().forEach((sellerID) => {
       const _items = checkoutItems();
       const sellerItems = _items[parseInt(sellerID)];
       const courier = chosenCourier && chosenCourier[parseInt(sellerID)];
@@ -563,7 +605,9 @@ export function CartProvider({
           : 0;
 
       totalShippingCost += shippingPrice;
-      sellerItems.forEach((item) => items.push(item));
+      if (!disabledItems[Number(sellerID)]) {
+        sellerItems.forEach((item) => items.push(item));
+      }
     });
 
     try {
@@ -666,7 +710,9 @@ export function CartProvider({
 
           if (chosenAddress && sellerPrimaryAddress) {
             if (
-              chosenAddress.city.city_id !== sellerPrimaryAddress.city.city_id
+              chosenAddress.city.city_id !==
+                sellerPrimaryAddress.city.city_id &&
+              !product.capable_out_of_town
             ) {
               isOrderable.push(false);
             }
@@ -738,7 +784,6 @@ export function CartProvider({
 
                 const response = await res.json();
                 const result = response.result as TSameDayShippingResult;
-
                 const _sameDayData = getSameDayShippingDetail(result);
 
                 setSameDayData((prev) => ({
@@ -788,6 +833,7 @@ export function CartProvider({
     checkout: {
       step: checkoutStep,
       items: checkedItems,
+      disabledItems: disabledItems,
       chosenAddress: chosenAddress,
       customer: {
         data: userData ? userData.result : null,
@@ -798,7 +844,7 @@ export function CartProvider({
       _items: checkoutItems(),
       _totalCost: totalCost(),
       _totalSellerCost: totalSellerCost(),
-      _sellers: checkedItemsSellers,
+      _sellers: checkedItemsSellers(),
 
       totalChosenCourier: totalChosenCourier(),
       totalProductSellers: totalCheckedSeller(),

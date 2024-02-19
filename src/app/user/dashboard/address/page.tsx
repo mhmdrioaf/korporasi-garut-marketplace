@@ -3,7 +3,6 @@ import UserAddressList from "@/components/ui/user-address";
 import { getUserDetail } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
 import { ROUTES } from "@/lib/constants";
-import { TAddress } from "@/lib/globals";
 import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { redirect } from "next/navigation";

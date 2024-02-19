@@ -1,6 +1,5 @@
 "use client";
 
-import { ORDER_STATUS, TCustomerOrder } from "@/lib/globals";
 import Image from "next/image";
 import Link from "next/link";
 import { ROUTES } from "@/lib/constants";
@@ -19,7 +18,7 @@ import { Loader2Icon } from "lucide-react";
 import ShippingTracking from "./modals/shipping-tracking";
 
 interface IOrderCardProps {
-  ordersData: TCustomerOrder[];
+  ordersData: TOrder[];
 }
 
 export default function OrderCard({ ordersData }: IOrderCardProps) {
@@ -29,7 +28,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
 
   const router = useRouter();
   const { toast } = useToast();
-  const onPaymentClick = async (order: TCustomerOrder) => {
+  const onPaymentClick = async (order: TOrder) => {
     setButtonLoading(true);
     const res = await fetch(process.env.NEXT_PUBLIC_API_CREATE_INVOICE!, {
       method: "POST",

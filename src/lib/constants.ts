@@ -1,4 +1,10 @@
-import { TCarouselAssets } from "./globals";
+import { StaticImageData } from "next/image";
+
+export type TCarouselAssets = {
+  image: StaticImageData | string;
+  title: string;
+  descriptions: string | null;
+};
 
 export const CarouselAssets: TCarouselAssets[] = [
   {

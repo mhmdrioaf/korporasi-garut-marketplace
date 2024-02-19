@@ -1,6 +1,5 @@
 "use client";
 
-import { TAddress, TCity, TDistrict, TProvince, TVillage } from "@/lib/globals";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import useSWR, { useSWRConfig } from "swr";

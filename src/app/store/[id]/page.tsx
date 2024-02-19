@@ -1,6 +1,5 @@
 import { Container } from "@/components/ui/container";
 import StoreProfileComponent from "@/components/ui/store-profile";
-import { TSellerProfile } from "@/lib/globals";
 
 async function getSellerProfile(id: string) {
   const res = await fetch(process.env.NEXT_PUBLIC_API_STORE_GET_PROFILE! + id, {

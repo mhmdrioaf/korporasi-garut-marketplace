@@ -1,16 +1,12 @@
-import {
-  TAddress,
-  TCustomerCart,
-  TCustomerCartItem,
-  TShippingCost,
-  TShippingCostServiceCost,
-  TUser,
-} from "@/lib/globals";
 import { CheckedState } from "@radix-ui/react-checkbox";
 import { MutableRefObject } from "react";
 
 export interface IProductsBySeller {
-  [sellerId: number]: { [cartItemId: string]: TCustomerCartItem };
+  [sellerId: number]: {
+    [cartItemId: string]: TCustomerCartItem & {
+      orderable: boolean;
+    };
+  };
 }
 
 export interface ICourierBySeller {
@@ -90,6 +86,7 @@ type TCartContext = {
     };
 
     items: IProductsBySeller;
+    disabledItems: IProductsBySeller;
 
     chosenAddress: TAddress | null;
     chosenCourier: ICourierBySeller;
