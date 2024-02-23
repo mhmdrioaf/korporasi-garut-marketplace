@@ -9,6 +9,16 @@ import { CheckIcon } from "lucide-react";
 export default function DirectPurchaseShippingCost() {
   const { shipping: shippingData, state, product } = useDirectPurchase();
 
+  const isButtonDisabled = (etd: number) => {
+    const currentDate = new Date();
+    const itemExpirationDate = new Date(product.expire_date);
+    const deliveredDate = state.isPreorder
+      ? new Date(currentDate.getTime() + (7 + etd) * 24 * 60 * 60 * 1000)
+      : new Date(currentDate.getTime() + etd * 24 * 60 * 60 * 1000);
+
+    return deliveredDate >= itemExpirationDate;
+  };
+
   const shippingCostStyle =
     "w-full flex flex-col gap-2 md:flex-row items-start justify-normal md:items-center md:justify-between";
 
@@ -27,24 +37,25 @@ export default function DirectPurchaseShippingCost() {
               <p className="font-bold">
                 {shipping.code.toUpperCase()} - {shipping.name}
               </p>
-              {shipping.costs.map((service) => (
-                <div
-                  key={service.service}
-                  className="w-full flex flex-col gap-2"
-                >
-                  <div className="flex flex-col gap-1">
-                    <p className="font-bold text-xs md:text-base">
-                      {service.service}
-                    </p>
-                    <p className="text-xs">{service.description}</p>
-                  </div>
+              {shipping.costs
+                .filter((service) =>
+                  service.cost.some(
+                    (cost) => !isButtonDisabled(shippingEstimation(cost.etd))
+                  )
+                )
+                .map((service) => (
+                  <div
+                    key={service.service}
+                    className="w-full flex flex-col gap-2"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <p className="font-bold text-xs md:text-base">
+                        {service.service}
+                      </p>
+                      <p className="text-xs">{service.description}</p>
+                    </div>
 
-                  {service.cost
-                    .filter(
-                      (cost) =>
-                        shippingEstimation(cost.etd) < product.storage_period
-                    )
-                    .map((cost) => (
+                    {service.cost.map((cost) => (
                       <div key={cost.value} className={shippingCostStyle}>
                         <div className="w-fit flex flex-col gap-2">
                           <div className="w-full flex flex-col gap-1">
@@ -72,25 +83,19 @@ export default function DirectPurchaseShippingCost() {
                             onClick={() =>
                               shippingData.handler.onCourierChange(cost)
                             }
-                            disabled={
-                              !state.orderable ||
-                              shippingEstimation(cost.etd) >=
-                                product.storage_period
-                            }
+                            disabled={!state.orderable}
                             className="w-full md:w-fit"
                           >
-                            {state.orderable &&
-                            shippingEstimation(cost.etd) <=
-                              product.storage_period
+                            {state.orderable
                               ? "Pilih Kurir"
-                              : "Pengiriman tidak didukung"}
+                              : "Pengiriman tidak tersedia"}
                           </Button>
                         )}
                       </div>
                     ))}
-                  <Separator />
-                </div>
-              ))}
+                    <Separator />
+                  </div>
+                ))}
             </div>
           ))}
 
