@@ -81,3 +81,14 @@ export async function getUserNotification(subscriber_id: string) {
 
   return userNotification as TNotification | null;
 }
+
+export async function getIncomes() {
+  const incomes = await db.income.findMany({
+    include: {
+      seller: true,
+      order: true,
+    },
+  });
+
+  return incomes as unknown as TIncome[];
+}

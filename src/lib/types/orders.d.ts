@@ -17,6 +17,7 @@ type TOrder = {
   order_item: TOrderItem[];
   address: TAddress;
   user: TCustomer;
+  income: TIncome;
 };
 
 type TOrderItem = {
@@ -29,6 +30,18 @@ type TOrderItem = {
   variant: TProductVariantItem | null;
 };
 
+type TIncome = {
+  income_id: string;
+  total_income: number;
+  income_date: Date;
+  seller_id: number;
+  order_id: string;
+  income_status: INCOME_STATUS;
+
+  seller: TSeller;
+  order: TOrder;
+};
+
 type ORDER_STATUS =
   | "PENDING"
   | "PAID"
@@ -37,3 +50,4 @@ type ORDER_STATUS =
   | "DELIVERED"
   | "FINISHED";
 type ORDER_TYPE = "NORMAL" | "PREORDER";
+type INCOME_STATUS = "PENDING" | "PAID";

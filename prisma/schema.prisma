@@ -26,6 +26,7 @@ model user {
   products      product[]
   carts         customer_cart?
   notifications notification?
+  incomes       income[]
 }
 
 model account {
@@ -85,6 +86,7 @@ model orders {
   address    address?     @relation(fields: [shipping_address], references: [address_id], onDelete: SetNull)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   order_item order_item[]
+  income     income?
 }
 
 model order_item {
@@ -199,6 +201,18 @@ model notification_item {
   notification notification @relation(fields: [notification_id], references: [notification_id], onDelete: Cascade)
 }
 
+model income {
+  income_id     String        @id @default(cuid())
+  seller_id     Int
+  order_id      String        @unique
+  total_income  Int
+  income_date   DateTime      @default(now())
+  income_status INCOME_STATUS @default(PENDING)
+
+  seller user   @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
+  order  orders @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+}
+
 enum USER_ROLE {
   ADMIN
   SELLER
@@ -228,4 +242,9 @@ enum NOTIFICATION_STATUS {
 enum ORDER_TYPE {
   NORMAL
   PREORDER
+}
+
+enum INCOME_STATUS {
+  PENDING
+  PAID
 }
