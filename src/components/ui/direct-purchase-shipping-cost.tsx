@@ -75,13 +75,18 @@ export default function DirectPurchaseShippingCost() {
                         </div>
 
                         {shippingData.chosenCourier &&
-                        shippingData.chosenCourier === cost ? (
+                        shippingData.chosenCourier.value === cost.value ? (
                           <CheckIcon className="w-8 h-8 text-primary" />
                         ) : (
                           <Button
                             variant="default"
                             onClick={() =>
-                              shippingData.handler.onCourierChange(cost)
+                              shippingData.handler.onCourierChange({
+                                etd: cost.etd,
+                                value: cost.value,
+                                note: cost.note,
+                                service: service.service,
+                              })
                             }
                             disabled={!state.orderable}
                             className="w-full md:w-fit"

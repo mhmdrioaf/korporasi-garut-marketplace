@@ -31,8 +31,10 @@ type TDirectPurchaseContext = {
     setActiveImage: (index: number) => void;
   };
   shipping: {
-    chosenCourier: TShippingCostServiceCost | null;
-    setChosenCourier: (courier: TShippingCostServiceCost | null) => void;
+    chosenCourier: (TShippingCostServiceCost & { service: string }) | null;
+    setChosenCourier: (
+      courier: (TShippingCostServiceCost & { service: string }) | null
+    ) => void;
     sellerAddress: TAddress;
     sameDay: {
       isSameDay: boolean;
@@ -47,7 +49,11 @@ type TDirectPurchaseContext = {
     };
 
     handler: {
-      onCourierChange: (courier: TShippingCostServiceCost) => void;
+      onCourierChange: (
+        courier: TShippingCostServiceCost & {
+          service: string;
+        }
+      ) => void;
       onSamedayCourierChange: () => void;
     };
   };

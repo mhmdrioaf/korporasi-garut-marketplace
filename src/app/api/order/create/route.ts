@@ -13,6 +13,7 @@ interface IOrderCreateBody {
   isPreorder: boolean;
   eta: number;
   isSameday: boolean;
+  service: string;
 }
 
 async function handler(request: NextRequest) {
@@ -43,6 +44,7 @@ async function handler(request: NextRequest) {
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
         order_type: body.isPreorder ? "PREORDER" : "NORMAL",
+        shipping_service: body.service,
         eta:
           body.isPreorder && body.isSameday
             ? body.eta + 3

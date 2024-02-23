@@ -80,6 +80,7 @@ model orders {
   order_type           ORDER_TYPE   @default(NORMAL)
   eta                  Int
   isSameday            Boolean      @default(false)
+  shipping_service     String
 
   address    address?     @relation(fields: [shipping_address], references: [address_id], onDelete: SetNull)
   user       user         @relation(fields: [user_id], references: [user_id], onDelete: Cascade)

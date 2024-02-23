@@ -11,6 +11,7 @@ type TOrder = {
   order_type: ORDER_TYPE;
   eta: number;
   isSameday: boolean;
+  shipping_service: string;
 
   user_id: number;
   order_item: TOrderItem[];
