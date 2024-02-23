@@ -524,7 +524,7 @@ export function CartProvider({
 
   const onCourierChangeHandler = (
     sellerId: number,
-    courier: TShippingCostServiceCost
+    courier: TShippingCostServiceCost & { service: string }
   ) => {
     setChosenCourier((prev) => ({
       ...prev,
@@ -588,6 +588,7 @@ export function CartProvider({
 
     let totalShippingCost: number = 0;
     let items: TCustomerCartItem[] = [];
+    let shippingServices: string[] = [];
 
     checkedItemsSellers().forEach((sellerID) => {
       const _items = checkoutItems();
@@ -605,6 +606,7 @@ export function CartProvider({
           : 0;
 
       totalShippingCost += shippingPrice;
+      shippingServices.push(courier[shippingPrice].service);
       if (!disabledItems[Number(sellerID)]) {
         sellerItems.forEach((item) => items.push(item));
       }
@@ -622,6 +624,7 @@ export function CartProvider({
           isPreorder: isPreOrder,
           eta: sameDayData.eta,
           isSameday: sameDay,
+          shipping_service: shippingServices.join(", "),
         }),
       });
 

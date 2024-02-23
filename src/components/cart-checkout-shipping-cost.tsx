@@ -110,7 +110,10 @@ export default function CartCheckoutShippingCost({
                           <Button
                             variant="default"
                             onClick={() =>
-                              checkout.handler.changeCourier(sellerID, cost)
+                              checkout.handler.changeCourier(sellerID, {
+                                ...cost,
+                                service: service.service,
+                              })
                             }
                           >
                             Pilih Kurir
