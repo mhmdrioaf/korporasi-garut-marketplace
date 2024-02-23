@@ -54,17 +54,53 @@ export default function CustomerOrderList({
     >
       <div className="w-full overflow-auto">
         <TabsList>
-          <TabsTrigger value="ALL">{orderShownLabel("ALL")}</TabsTrigger>
-          <TabsTrigger value="PENDING">
-            {orderShownLabel("PENDING")}
+          <TabsTrigger value="ALL">
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("ALL")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.ALL.length}
+              </div>
+            </div>
           </TabsTrigger>
-          <TabsTrigger value="PAID">{orderShownLabel("PAID")}</TabsTrigger>
-          <TabsTrigger value="PACKED">{orderShownLabel("PACKED")}</TabsTrigger>
+          <TabsTrigger value="PENDING">
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("PENDING")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.PENDING.length}
+              </div>
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="PAID">
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("PAID")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.PAID.length}
+              </div>
+            </div>
+          </TabsTrigger>
+          <TabsTrigger value="PACKED">
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("PACKED")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.PACKED.length}
+              </div>
+            </div>
+          </TabsTrigger>
           <TabsTrigger value="SHIPPED">
-            {orderShownLabel("SHIPPED")}
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("SHIPPED")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.SHIPPED.length}
+              </div>
+            </div>
           </TabsTrigger>
           <TabsTrigger value="DELIVERED">
-            {orderShownLabel("DELIVERED")}
+            <div className="inline-flex gap-2 items-center">
+              <p>{orderShownLabel("DELIVERED")}</p>
+              <div className="rounded-full bg-destructive text-destructive-foreground text-xs p-1 w-6 h-6 grid place-items-center text-center">
+                {ordersData.DELIVERED.length}
+              </div>
+            </div>
           </TabsTrigger>
         </TabsList>
       </div>
