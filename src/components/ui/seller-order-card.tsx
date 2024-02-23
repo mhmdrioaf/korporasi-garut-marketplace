@@ -84,6 +84,15 @@ export default function SellerOrderCard({ ordersData }: ISellerOrderCardProps) {
                         {getOrderType(order.order_type)}
                       </p>
                     </div>
+
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm md:text-base font-bold">
+                        Layanan Pengiriman
+                      </p>
+                      <p className="text-xs md:text-sm">
+                        {order.shipping_service}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
