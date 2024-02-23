@@ -2,6 +2,7 @@
 
 import {
   getCurrentDateString,
+  getIncomesDetail,
   getSellerIncomes,
   rupiahConverter,
 } from "@/lib/helper";
@@ -20,21 +21,20 @@ import generatePDF, { Margin } from "react-to-pdf";
 import { Button } from "./button";
 
 interface IAdminReportIncomesPDFProps {
-  reportsData: TSalesReportData[];
   period?: {
     month: string;
     year: string;
   };
   adminName: string;
+  incomes: TIncome[];
 }
 
 export default function AdminReportIncomesPDF({
-  reportsData,
   period,
   adminName,
+  incomes,
 }: IAdminReportIncomesPDFProps) {
   const divRef = useRef<HTMLDivElement>(null);
-  const sellerIncomes = getSellerIncomes(reportsData);
 
   const exportPDF = () => {
     generatePDF(divRef, {
@@ -88,9 +88,9 @@ export default function AdminReportIncomesPDF({
           {period?.month} tahun {period?.year} :
         </p>
 
-        {sellerIncomes.sellerIds.length > 0 && (
+        {incomes.length > 0 && (
           <Table>
-            <TableCaption></TableCaption>
+            <TableCaption>Detail Pendapatan</TableCaption>
             <TableHeader>
               <TableRow>
                 <TableHead>No.</TableHead>
@@ -103,31 +103,22 @@ export default function AdminReportIncomesPDF({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sellerIncomes.sellerIds.map((sellerId, idx) => (
-                <TableRow key={sellerId}>
+              {incomes.map((income, idx) => (
+                <TableRow key={income.income_id}>
                   <TableCell>{idx + 1}.</TableCell>
-                  <TableCell>{sellerIncomes.incomes[sellerId].name}</TableCell>
-                  <TableCell>
-                    {sellerIncomes.incomes[sellerId].products.length} Produk
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(sellerIncomes.incomes[sellerId].income)}
-                  </TableCell>
+                  <TableCell>{income.seller.account.user_name}</TableCell>
+                  <TableCell>{income.order.order_item.length} Produk</TableCell>
+                  <TableCell>{rupiahConverter(income.total_income)}</TableCell>
                   <TableCell>
                     {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId]
-                        .product_development
+                      getIncomesDetail(income).productDevelopment
                     )}
                   </TableCell>
                   <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].student_savings
-                    )}
+                    {rupiahConverter(getIncomesDetail(income).studentSavings)}
                   </TableCell>
                   <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].seller_income
-                    )}
+                    {rupiahConverter(getIncomesDetail(income).sellerIncome)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -137,21 +128,33 @@ export default function AdminReportIncomesPDF({
                 Total
               </TableCell>
               <TableCell className="bg-primary text-white font-bold">
-                {sellerIncomes.totalIncomes.product_sold} Produk
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.rawIncomes)}
+                {incomes.flatMap((income) =>
+                  income.order.order_item.reduce(
+                    (a, b) => a + b.order_quantity,
+                    0
+                  )
+                )}{" "}
+                Produk
               </TableCell>
               <TableCell className="bg-primary text-white font-bold">
                 {rupiahConverter(
-                  sellerIncomes.totalIncomes.product_development
+                  incomes.reduce((a, b) => a + b.total_income, 0)
                 )}
               </TableCell>
               <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.student_savings)}
+                {rupiahConverter(
+                  incomes.reduce((a, b) => a + b.total_income * 0.5, 0)
+                )}
               </TableCell>
               <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.seller_income)}
+                {rupiahConverter(
+                  incomes.reduce((a, b) => a + b.total_income * 0.2, 0)
+                )}
+              </TableCell>
+              <TableCell className="bg-primary text-white font-bold">
+                {rupiahConverter(
+                  incomes.reduce((a, b) => a + b.total_income * 0.3, 0)
+                )}
               </TableCell>
             </TableBody>
           </Table>

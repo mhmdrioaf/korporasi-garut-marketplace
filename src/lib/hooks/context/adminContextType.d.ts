@@ -52,4 +52,8 @@ type TAdminContextType = {
       onOpen: (product: TProduct) => void;
     };
   };
+
+  incomes: {
+    data: TIncome[];
+  };
 };

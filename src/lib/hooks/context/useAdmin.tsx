@@ -16,6 +16,7 @@ import { TAdminContextType, TAdminReportTabs } from "./adminContextType";
 
 interface IAdminProviderProps {
   token: string;
+  incomes: TIncome[];
   children: ReactNode;
 }
 
@@ -25,7 +26,11 @@ export function useAdmin() {
   return useContext(AdminContext) as TAdminContextType;
 }
 
-export function AdminProvider({ token, children }: IAdminProviderProps) {
+export function AdminProvider({
+  token,
+  incomes,
+  children,
+}: IAdminProviderProps) {
   const [date, setDate] = useState<DateRange | undefined>();
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
   const [productDetail, setProductDetail] = useState<{
@@ -70,6 +75,25 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
 
   function changeTab(tab: TAdminReportTabs) {
     setTab(tab);
+  }
+
+  function getIncomesData() {
+    if (incomes) {
+      const incomesData = incomes.filter((income) => {
+        if (date && date.from && date.to) {
+          return (
+            new Date(income.income_date) >= date.from &&
+            new Date(income.income_date) <= date.to
+          );
+        } else {
+          return income;
+        }
+      });
+
+      return incomesData;
+    } else {
+      return [];
+    }
   }
 
   function getSalesData() {
@@ -137,6 +161,10 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     products: {
       loading: productsDataLoading,
       data: productsData ? productsData.result.products : null,
+    },
+
+    incomes: {
+      data: getIncomesData(),
     },
 
     state: {

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  getIncomesDetail,
   getPeriodTime,
   getSalesYears,
   getSellerIncomes,
@@ -24,7 +25,7 @@ interface IReportProps {
 }
 
 export default function AdminReportIncomes({ adminName }: IReportProps) {
-  const { reports } = useAdmin();
+  const { reports, incomes } = useAdmin();
 
   const startDate = reports.sales.date?.from;
   const endDate = reports.sales.date?.to;
@@ -50,88 +51,94 @@ export default function AdminReportIncomes({ adminName }: IReportProps) {
     endDate?.getMonth() ?? 12
   );
 
-  if (reports.sales.data) {
-    const sellerIncomes = getSellerIncomes(reports.sales.data);
+  if (incomes.data.length > 0) {
     return (
       <div className="w-full flex flex-col gap-4">
-        {sellerIncomes.sellerIds.length > 0 && (
-          <Table>
-            <TableCaption>Detail Pendapatan</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>No.</TableHead>
-                <TableHead>Nama Penjual</TableHead>
-                <TableHead>Produk Terjual</TableHead>
-                <TableHead>Pendapatan</TableHead>
-                <TableHead>Pengembangan Produk {"(50%)"}</TableHead>
-                <TableHead>Tabungan Siswa {"(20%)"}</TableHead>
-                <TableHead>Pendapatan Bersih {"(30%)"}</TableHead>
+        <Table>
+          <TableCaption>Detail Pendapatan</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead>No.</TableHead>
+              <TableHead>Nama Penjual</TableHead>
+              <TableHead>Produk Terjual</TableHead>
+              <TableHead>Pendapatan</TableHead>
+              <TableHead>Pengembangan Produk {"(50%)"}</TableHead>
+              <TableHead>Tabungan Siswa {"(20%)"}</TableHead>
+              <TableHead>Pendapatan Bersih {"(30%)"}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {incomes.data.map((income, idx) => (
+              <TableRow key={income.income_id}>
+                <TableCell>{idx + 1}.</TableCell>
+                <TableCell>{income.seller.account.user_name}</TableCell>
+                <TableCell>{income.order.order_item.length} Produk</TableCell>
+                <TableCell>{rupiahConverter(income.total_income)}</TableCell>
+                <TableCell>
+                  {rupiahConverter(getIncomesDetail(income).productDevelopment)}
+                </TableCell>
+                <TableCell>
+                  {rupiahConverter(getIncomesDetail(income).studentSavings)}
+                </TableCell>
+                <TableCell>
+                  {rupiahConverter(getIncomesDetail(income).sellerIncome)}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sellerIncomes.sellerIds.map((sellerId, idx) => (
-                <TableRow key={sellerId}>
-                  <TableCell>{idx + 1}.</TableCell>
-                  <TableCell>{sellerIncomes.incomes[sellerId].name}</TableCell>
-                  <TableCell>
-                    {sellerIncomes.incomes[sellerId].products.length} Produk
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(sellerIncomes.incomes[sellerId].income)}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId]
-                        .product_development
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].student_savings
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {rupiahConverter(
-                      sellerIncomes.detailedIncomes[sellerId].seller_income
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+            ))}
 
-              <TableCell className="bg-primary text-white font-bold" />
-              <TableCell className="bg-primary text-white font-bold">
-                Total
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {sellerIncomes.totalIncomes.product_sold} Produk
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.rawIncomes)}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(
-                  sellerIncomes.totalIncomes.product_development
-                )}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.student_savings)}
-              </TableCell>
-              <TableCell className="bg-primary text-white font-bold">
-                {rupiahConverter(sellerIncomes.totalIncomes.seller_income)}
-              </TableCell>
-            </TableBody>
-          </Table>
-        )}
+            <TableCell className="bg-primary text-white font-bold" />
+            <TableCell className="bg-primary text-white font-bold">
+              Total
+            </TableCell>
+            <TableCell className="bg-primary text-white font-bold">
+              {incomes.data.flatMap((income) =>
+                income.order.order_item.reduce(
+                  (a, b) => a + b.order_quantity,
+                  0
+                )
+              )}{" "}
+              Produk
+            </TableCell>
+            <TableCell className="bg-primary text-white font-bold">
+              {rupiahConverter(
+                incomes.data.reduce((a, b) => a + b.total_income, 0)
+              )}
+            </TableCell>
+            <TableCell className="bg-primary text-white font-bold">
+              {rupiahConverter(
+                incomes.data.reduce((a, b) => a + b.total_income * 0.5, 0)
+              )}
+            </TableCell>
+            <TableCell className="bg-primary text-white font-bold">
+              {rupiahConverter(
+                incomes.data.reduce((a, b) => a + b.total_income * 0.2, 0)
+              )}
+            </TableCell>
+            <TableCell className="bg-primary text-white font-bold">
+              {rupiahConverter(
+                incomes.data.reduce((a, b) => a + b.total_income * 0.3, 0)
+              )}
+            </TableCell>
+          </TableBody>
+        </Table>
 
         <Separator />
         <AdminReportIncomesPDF
-          reportsData={reports.sales.data}
+          incomes={incomes.data}
           period={{
             month: `${periodMonths.start} sampai dengan ${periodMonths.end}`,
             year: periodYears(),
           }}
           adminName={adminName}
         />
+      </div>
+    );
+  } else {
+    return (
+      <div className="w-full flex flex-col gap-4">
+        <p className="text-center text-lg font-bold">
+          Data pendapatan penjual tidak ditemukan
+        </p>
       </div>
     );
   }

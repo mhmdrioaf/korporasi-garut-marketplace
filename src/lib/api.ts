@@ -85,8 +85,24 @@ export async function getUserNotification(subscriber_id: string) {
 export async function getIncomes() {
   const incomes = await db.income.findMany({
     include: {
-      seller: true,
-      order: true,
+      seller: {
+        select: {
+          account: {
+            select: {
+              user_name: true,
+            },
+          },
+        },
+      },
+      order: {
+        select: {
+          order_item: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      },
     },
   });
 

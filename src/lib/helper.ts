@@ -1013,3 +1013,15 @@ export function getStoreProducts(products: Partial<TProduct>[]) {
     all: allProducts,
   };
 }
+
+export function getIncomesDetail(income: TIncome) {
+  const productDevelopment = income.total_income * 0.5;
+  const studentSavings = income.total_income * 0.2;
+  const sellerIncome = income.total_income * 0.3;
+
+  return {
+    productDevelopment: productDevelopment,
+    studentSavings: studentSavings,
+    sellerIncome: sellerIncome,
+  };
+}
