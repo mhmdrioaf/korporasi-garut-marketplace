@@ -19,6 +19,26 @@ export default function DirectPurchaseShippingCost() {
     return deliveredDate >= itemExpirationDate;
   };
 
+  const getOrderShippingDate = () => {
+    const currentDate = new Date();
+    const currentTime = currentDate.getHours();
+    const isDaytime = currentTime >= 7 && currentTime <= 17;
+    const deliveredDate = state.isPreorder
+      ? new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      : !isDaytime
+        ? new Date(currentDate.getTime() + 1 * 24 * 60 * 60 * 1000)
+        : currentDate;
+    return deliveredDate;
+  };
+
+  const getOrderDeliveredDate = (etd: number) => {
+    const currentDate = new Date();
+    const deliveredDate = !state.isPreorder
+      ? new Date(currentDate.getTime() + etd * 24 * 60 * 60 * 1000)
+      : new Date(currentDate.getTime() + (7 + etd) * 24 * 60 * 60 * 1000);
+    return deliveredDate;
+  };
+
   const shippingCostStyle =
     "w-full flex flex-col gap-2 md:flex-row items-start justify-normal md:items-center md:justify-between";
 
@@ -65,11 +85,26 @@ export default function DirectPurchaseShippingCost() {
 
                           <div className="w-full flex flex-col gap-1">
                             <p className="font-bold">Estimasi Pengiriman</p>
-                            <p>
-                              {state.isPreorder
-                                ? shippingEstimation(cost.etd) + 7
-                                : shippingEstimation(cost.etd)}{" "}
-                              Hari
+                            <p className="text-xs">
+                              Estimasi tanggal pengiriman:{" "}
+                              {getOrderShippingDate().toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                            <p className="text-xs">
+                              Estimasi tanggal pesanan diterima:{" "}
+                              {getOrderDeliveredDate(
+                                shippingEstimation(cost.etd)
+                              ).toLocaleDateString("id-ID", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })}
                             </p>
                           </div>
                         </div>
