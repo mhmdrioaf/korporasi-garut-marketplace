@@ -55,6 +55,16 @@ export default function AdminReportIncomesPDF({
     });
   };
 
+  function checkReportStatus() {
+    if (!incomes.some((income) => income.income_status === "PENDING")) {
+      return "yang telah disetorkan";
+    } else if (!incomes.some((income) => income.income_status === "PAID")) {
+      return "yang belum dibayarkan";
+    } else {
+      return "";
+    }
+  }
+
   return (
     <>
       <Button variant="outline" onClick={exportPDF}>
@@ -84,8 +94,8 @@ export default function AdminReportIncomesPDF({
         </p>
 
         <p>
-          Berikut ini merupakan detail pendapatan penjualan pada periode{" "}
-          {period?.month} tahun {period?.year} :
+          Berikut ini merupakan detail pendapatan {checkReportStatus()} pada
+          periode {period?.month} tahun {period?.year} :
         </p>
 
         {incomes.length > 0 && (

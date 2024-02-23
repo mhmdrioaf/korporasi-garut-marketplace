@@ -1025,3 +1025,17 @@ export function getIncomesDetail(income: TIncome) {
     sellerIncome: sellerIncome,
   };
 }
+
+export function getIncomeYears(incomes: TIncome[]) {
+  let years: string[] = [];
+  const dates = incomes.map((income) => new Date(income.income_date));
+  const incomeYears = dates.map((date) => date.getFullYear());
+
+  incomeYears.forEach((year) => {
+    if (!years.includes(year.toString())) {
+      years.push(year.toString());
+    }
+  });
+
+  return years;
+}

@@ -33,6 +33,9 @@ export function AdminProvider({
 }: IAdminProviderProps) {
   const [date, setDate] = useState<DateRange | undefined>();
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
+  const [activeIncomesData, setActiveIncomesData] = useState<
+    "PENDING" | "PAID" | "ALL"
+  >("ALL");
   const [productDetail, setProductDetail] = useState<{
     product: TProduct | null;
     open: boolean;
@@ -124,6 +127,10 @@ export function AdminProvider({
     chart?.update();
   }
 
+  function onActiveIncomesDataChange(activeData: "PENDING" | "PAID" | "ALL") {
+    setActiveIncomesData(activeData);
+  }
+
   useEffect(() => {
     ChartJS.register(...registerables);
   }, []);
@@ -165,6 +172,14 @@ export function AdminProvider({
 
     incomes: {
       data: getIncomesData(),
+
+      state: {
+        activeData: activeIncomesData,
+      },
+
+      handler: {
+        changeActiveData: onActiveIncomesDataChange,
+      },
     },
 
     state: {
