@@ -59,12 +59,6 @@ async function handler(request: NextRequest) {
             product_variant_id: body.product_variant?.variant_item_id ?? null,
           },
         },
-        income: {
-          create: {
-            total_income: body.total_price - body.shipping_cost,
-            seller_id: body.product.seller_id,
-          },
-        },
       },
     });
 

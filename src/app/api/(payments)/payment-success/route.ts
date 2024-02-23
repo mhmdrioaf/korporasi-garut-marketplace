@@ -41,6 +41,13 @@ async function handler(request: NextRequest) {
           },
           data: {
             order_status: "PAID",
+            income: {
+              create: {
+                total_income:
+                  productOrder.total_price - productOrder.shipping_cost,
+                seller_id: productOrder.order_item[0].product.seller_id,
+              },
+            },
           },
         });
 
@@ -112,6 +119,8 @@ async function handler(request: NextRequest) {
         revalidatePath(ROUTES.USER.PAYMENT_PROOF(productOrder.payment_proof!));
         return redirect(ROUTES.USER.ORDERS);
       }
+
+      revalidatePath("/admin/reports");
     } else {
       return redirect(ROUTES.USER.ORDERS);
     }
