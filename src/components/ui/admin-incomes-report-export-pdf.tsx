@@ -110,6 +110,7 @@ export default function AdminReportIncomesPDF({
                 <TableHead>Pengembangan Produk {"(50%)"}</TableHead>
                 <TableHead>Tabungan Siswa {"(20%)"}</TableHead>
                 <TableHead>Pendapatan Bersih {"(30%)"}</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -129,6 +130,11 @@ export default function AdminReportIncomesPDF({
                   </TableCell>
                   <TableCell>
                     {rupiahConverter(getIncomesDetail(income).sellerIncome)}
+                  </TableCell>
+                  <TableCell>
+                    {income.income_status === "PENDING"
+                      ? "Belum di Setor"
+                      : "Telah di Setor"}
                   </TableCell>
                 </TableRow>
               ))}
@@ -166,6 +172,7 @@ export default function AdminReportIncomesPDF({
                   incomes.reduce((a, b) => a + b.total_income * 0.3, 0)
                 )}
               </TableCell>
+              <TableCell className="bg-primary text-white font-bold"></TableCell>
             </TableBody>
           </Table>
         )}
