@@ -121,6 +121,7 @@ model product {
   visitor             Int            @default(0)
   cart_count          Int            @default(0)
   search_count        Int            @default(0)
+  message             String?
 
   category    product_category?    @relation(fields: [category_id], references: [category_id], onDelete: SetNull)
   seller      user                 @relation(fields: [seller_id], references: [user_id], onDelete: Cascade)
