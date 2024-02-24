@@ -7,6 +7,7 @@ import AuthProvider from "@/lib/AuthProvider";
 import { getServerSession } from "next-auth";
 import authOptions from "@/lib/authOptions";
 import { getUserCart, getUserNotification } from "@/lib/api";
+import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,6 +37,7 @@ export default async function RootLayout({
           <main>
             <Header session={session} cart={cart} notification={notification} />
             {children}
+            <Footer />
           </main>
           {modal}
         </AuthProvider>
