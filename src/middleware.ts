@@ -1,17 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-// export { default } from "next-auth/middleware";
-
-// export const config = {
-//   matcher: [
-//     "/user/:path*",
-//     "/product/add",
-//     "/product/edit/:path*",
-//     "/admin/:path*",
-//   ],
-// };
-
 export function middleware(request: NextRequest) {
   const {
     nextUrl: { searchParams },
