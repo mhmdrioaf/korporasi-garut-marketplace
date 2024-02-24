@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { customerOrderIdGenerator } from "@/lib/helper";
+import { customerOrderIdGenerator, properizeWords } from "@/lib/helper";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IOrderCreateBody {
@@ -18,6 +19,8 @@ interface IOrderCreateBody {
 
 async function handler(request: NextRequest) {
   const body: IOrderCreateBody = await request.json();
+  const cookiesList = cookies();
+  const referrer = cookiesList.get("marketplace.referral");
   try {
     const maxId = await db.orders.aggregate({
       where: {
@@ -59,10 +62,18 @@ async function handler(request: NextRequest) {
             product_variant_id: body.product_variant?.variant_item_id ?? null,
           },
         },
+        income: {
+          create: {
+            total_income: body.total_price - body.shipping_cost,
+            seller_id: referrer ? null : body.product.seller_id,
+            referrer_name: referrer ? properizeWords(referrer.value) : null,
+          },
+        },
       },
     });
 
     if (createOrder) {
+      cookiesList.delete("marketplace.referral");
       if (body.product_variant) {
         await db.product_variant_item.update({
           where: {

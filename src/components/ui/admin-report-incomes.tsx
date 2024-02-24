@@ -4,8 +4,6 @@ import {
   getIncomeYears,
   getIncomesDetail,
   getPeriodTime,
-  getSalesYears,
-  getSellerIncomes,
   rupiahConverter,
 } from "@/lib/helper";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
@@ -106,9 +104,17 @@ export default function AdminReportIncomes({ adminName }: IReportProps) {
                 {incomesData[incomes.state.activeData].map((income, idx) => (
                   <TableRow key={income.income_id}>
                     <TableCell>{idx + 1}.</TableCell>
-                    <TableCell>{income.seller.account.user_name}</TableCell>
                     <TableCell>
-                      {income.order.order_item.length} Produk
+                      {income.seller?.account.user_name ??
+                        income.referrer_name ??
+                        "Tidak diketahui"}
+                    </TableCell>
+                    <TableCell>
+                      {income.order.order_item.reduce(
+                        (a, b) => a + b.order_quantity,
+                        0
+                      )}{" "}
+                      Produk
                     </TableCell>
                     <TableCell>
                       {rupiahConverter(income.total_income)}
@@ -139,11 +145,14 @@ export default function AdminReportIncomes({ adminName }: IReportProps) {
                   Total
                 </TableCell>
                 <TableCell className="bg-primary text-white font-bold">
-                  {incomesData[incomes.state.activeData].flatMap((income) =>
-                    income.order.order_item.reduce(
-                      (a, b) => a + b.order_quantity,
-                      0
-                    )
+                  {incomesData[incomes.state.activeData].reduce(
+                    (a, b) =>
+                      a +
+                      b.order.order_item.reduce(
+                        (c, d) => c + d.order_quantity,
+                        0
+                      ),
+                    0
                   )}{" "}
                   Produk
                 </TableCell>

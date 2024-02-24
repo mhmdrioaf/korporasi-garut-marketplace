@@ -117,7 +117,11 @@ export default function AdminReportIncomesPDF({
               {incomes.map((income, idx) => (
                 <TableRow key={income.income_id}>
                   <TableCell>{idx + 1}.</TableCell>
-                  <TableCell>{income.seller.account.user_name}</TableCell>
+                  <TableCell>
+                    {income.seller?.account.user_name ??
+                      income.referrer_name ??
+                      "Tidak diketahui"}
+                  </TableCell>
                   <TableCell>{income.order.order_item.length} Produk</TableCell>
                   <TableCell>{rupiahConverter(income.total_income)}</TableCell>
                   <TableCell>

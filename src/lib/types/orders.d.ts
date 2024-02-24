@@ -34,11 +34,12 @@ type TIncome = {
   income_id: string;
   total_income: number;
   income_date: Date;
-  seller_id: number;
+  seller_id: number | null;
   order_id: string;
   income_status: INCOME_STATUS;
+  referrer_name: string | null;
 
-  seller: TSeller;
+  seller: TSeller | null;
   order: TOrder;
 };
 

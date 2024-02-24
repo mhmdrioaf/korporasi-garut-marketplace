@@ -4,7 +4,9 @@ import {
 } from "@/lib/actions/notification";
 import { ROUTES } from "@/lib/constants";
 import { db } from "@/lib/db";
+import { properizeWords } from "@/lib/helper";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
@@ -41,13 +43,6 @@ async function handler(request: NextRequest) {
           },
           data: {
             order_status: "PAID",
-            income: {
-              create: {
-                total_income:
-                  productOrder.total_price - productOrder.shipping_cost,
-                seller_id: productOrder.order_item[0].product.seller_id,
-              },
-            },
           },
         });
 
@@ -113,6 +108,7 @@ async function handler(request: NextRequest) {
           revalidatePath(
             ROUTES.USER.PAYMENT_PROOF(productOrder.payment_proof!)
           );
+          revalidatePath("/admin/reports");
           redirect(ROUTES.USER.ORDERS);
         });
       } else {
