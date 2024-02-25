@@ -21,6 +21,17 @@ async function handler(request: NextRequest) {
   const body: IOrderCreateBody = await request.json();
   const cookiesList = cookies();
   const referrer = cookiesList.get("marketplace.referral");
+
+  const eta = () => {
+    if (body.isPreorder) {
+      return body.eta + 7;
+    } else if (body.isSameday) {
+      return 1;
+    } else {
+      return body.eta;
+    }
+  };
+
   try {
     const maxId = await db.orders.aggregate({
       where: {
@@ -48,12 +59,7 @@ async function handler(request: NextRequest) {
         shipping_cost: body.shipping_cost,
         order_type: body.isPreorder ? "PREORDER" : "NORMAL",
         shipping_service: body.service,
-        eta:
-          body.isPreorder && body.isSameday
-            ? body.eta + 3
-            : body.isPreorder
-              ? body.eta + 5
-              : body.eta,
+        eta: eta(),
         isSameday: body.isSameday,
         order_item: {
           create: {

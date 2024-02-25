@@ -11,7 +11,11 @@ import {
 } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR from "swr";
-import { getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
+import {
+  getSameDayShippingDetail,
+  invoiceMaker,
+  shippingEstimation,
+} from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 import { addToCart } from "@/lib/actions/cart";
@@ -402,7 +406,7 @@ export function DirectPurchaseProvider({
       } else {
         const estimatedTimeArrival = samedayData.isSameDay
           ? 1
-          : parseInt(chosenCourier?.etd ?? "3");
+          : shippingEstimation(chosenCourier?.etd ?? "3");
         const makeOrder = await invoiceMaker(
           user_id,
           product,

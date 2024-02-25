@@ -4,15 +4,19 @@ import {
 } from "@/lib/actions/notification";
 import { ROUTES } from "@/lib/constants";
 import { db } from "@/lib/db";
-import { properizeWords } from "@/lib/helper";
 import { revalidatePath } from "next/cache";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 async function handler(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const orderID = searchParams.get("id");
+
+  const preorderEstimationDate = (eta: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + eta);
+    return date;
+  };
 
   if (orderID) {
     const productOrder = await db.orders.findUnique({
@@ -98,6 +102,17 @@ async function handler(request: NextRequest) {
               },
             });
           }
+        }
+
+        if (productOrder.order_type === "PREORDER") {
+          await db.orders.update({
+            where: {
+              order_id: productOrder.order_id,
+            },
+            data: {
+              preorder_estimation: preorderEstimationDate(productOrder.eta),
+            },
+          });
         }
 
         await Promise.all([

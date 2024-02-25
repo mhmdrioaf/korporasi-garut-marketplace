@@ -181,6 +181,45 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
     setIsSameday(false);
   };
 
+  const isOverdue = (order: TOrder) => {
+    if (order.order_status === "PAID" || order.order_status === "PACKED") {
+      if (order.order_type === "NORMAL") {
+        return false;
+      } else {
+        const currentDate = new Date();
+        if (order.preorder_estimation) {
+          const deliveredEstimationDate = new Date(order.preorder_estimation);
+          const preorderEstimation = new Date(
+            deliveredEstimationDate.setDate(
+              deliveredEstimationDate.getDate() - 8
+            )
+          );
+          return currentDate >= preorderEstimation;
+        } else {
+          return false;
+        }
+      }
+    } else {
+      return false;
+    }
+  };
+
+  const estimationArrival = (order: TOrder) => {
+    const orderDate = new Date(order.order_date);
+
+    if (order.order_type === "NORMAL") {
+      const estimatedArrival = new Date(
+        orderDate.setDate(orderDate.getDate() + order.eta)
+      );
+      return estimatedArrival;
+    } else {
+      const preorderEstimation = order.preorder_estimation
+        ? new Date(order.preorder_estimation)
+        : new Date(orderDate.setDate(orderDate.getDate() + order.eta));
+      return preorderEstimation;
+    }
+  };
+
   return (
     <div className="mb-10 lg:md-0 flex flex-col gap-8">
       {ordersData.length > 0 ? (
@@ -189,7 +228,7 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
             className="w-full rounded-sm overflow-hidden flex flex-col gap-2 lg:gap-4 p-2 border border-input text-xs md:text-sm lg:text-base"
             key={order.order_id}
           >
-            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
               <div className="col-span-2 flex flex-col gap-2">
                 <div className="w-full flex flex-col gap-1">
                   <p className="font-bold">ID Pesanan</p>
@@ -199,6 +238,17 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                 <div className="w-full flex flex-col gap-1">
                   <p className="font-bold">Tanggal Pesanan</p>
                   <p>{getDateString(order.order_date)}</p>
+                </div>
+
+                <div className="w-full flex flex-col gap-1">
+                  <p className="font-bold">Estimasi Pesanan Diterima</p>
+                  <p>
+                    {estimationArrival(order).toLocaleDateString("id-ID", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
                 </div>
 
                 <div className="w-full flex flex-col gap-1">
@@ -245,6 +295,17 @@ export default function OrderCard({ ordersData }: IOrderCardProps) {
                   showDeliveredDate(order.order_delivered_date)}
               </div>
             </div>
+
+            {isOverdue(order) && (
+              <div className="w-full bg-yellow-300 text-stone-950 text-sm flex flex-col gap-1 p-2 rounded-sm">
+                <p className="font-bold">Keterlambatan Pengiriman</p>
+                <p>
+                  Produksi untuk pesanan ini masih dilakukan, dan mungkin akan
+                  terjadi keterlambatan pengiriman. Mohon maaf atas
+                  ketidaknyamanannya.
+                </p>
+              </div>
+            )}
 
             {order.order_item.map((orderItem) => (
               <div
