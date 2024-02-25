@@ -18,6 +18,7 @@ interface IProductStatusChangeModalProps {
       message: string;
     } | null>
   >;
+  onReject: () => void;
 }
 
 export default function ProductStatusChangeModal({
@@ -26,6 +27,7 @@ export default function ProductStatusChangeModal({
   product_id,
   options,
   token,
+  onReject,
   setStatusUpdateResponse,
 }: IProductStatusChangeModalProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -41,6 +43,7 @@ export default function ProductStatusChangeModal({
         body: JSON.stringify({
           productId: product_id,
           status: options,
+          message: null,
         }),
       }
     );
@@ -77,7 +80,7 @@ export default function ProductStatusChangeModal({
           <Button
             className="w-full"
             variant="default"
-            onClick={() => onProductStatusChange()}
+            onClick={options === "REJECTED" ? onReject : onProductStatusChange}
             disabled={isLoading}
           >
             {isLoading ? (

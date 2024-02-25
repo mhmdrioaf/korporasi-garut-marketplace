@@ -1,3 +1,4 @@
+import { productStatusChangeNotificationHandler } from "@/lib/actions/notification";
 import { db } from "@/lib/db";
 import { permissionHelper } from "@/lib/helper";
 import Product from "@/lib/prisma-classes/Product";
@@ -6,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 interface IProductStatusUpdateBody {
   productId: string;
   status: "APPROVED" | "REJECTED";
+  message: string | null;
 }
 
 async function handler(request: NextRequest) {
@@ -21,9 +23,15 @@ async function handler(request: NextRequest) {
       const updateProductStatus = await products.chageProductStatus(
         body.status,
         authorization,
-        body.productId
+        body.productId,
+        body.message
       );
       if (updateProductStatus) {
+        await productStatusChangeNotificationHandler({
+          product_name: updateProductStatus.title,
+          seller_id: updateProductStatus.seller_id,
+          status: body.status,
+        });
         return NextResponse.json({
           ok: true,
           message:

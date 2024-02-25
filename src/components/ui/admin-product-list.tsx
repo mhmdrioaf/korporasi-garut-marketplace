@@ -8,6 +8,8 @@ import ProductStatusChangeModal from "./modals/product-status-change";
 import { useToast } from "./use-toast";
 import { useAdmin } from "@/lib/hooks/context/useAdmin";
 import AdminProductDetailModal from "./modals/admin-product-detail";
+import ProductRejectionMessage from "./modals/admin-product-rejection-message";
+import { reject } from "@/lib/actions/product";
 
 interface IAdminProductListComponentProps {
   products: TProduct[];
@@ -19,6 +21,7 @@ export default function AdminProductList({
   token,
 }: IAdminProductListComponentProps) {
   const [isStatusUpdate, setIsStatusUpdate] = useState<boolean>(false);
+  const [isRejecting, setIsRejecting] = useState<boolean>(false);
   const [productToUpdate, setProductToUpdate] = useState<string | null>(null);
   const [productStatusUpdateOption, setProductStatusUpdateOption] = useState<
     "APPROVED" | "REJECTED" | null
@@ -42,8 +45,30 @@ export default function AdminProductList({
 
   const onModalCloses = () => {
     setIsStatusUpdate(false);
+    setIsRejecting(false);
     setProductStatusUpdateOption(null);
     setProductToUpdate(null);
+  };
+
+  const onRejectProduct = () => {
+    setIsRejecting(true);
+  };
+
+  const rejectProduct = async (formData: FormData) => {
+    const message = formData.get("message") as string;
+
+    if (productToUpdate) {
+      const response = await reject({
+        product_id: Number(productToUpdate),
+        message: message,
+        token: token,
+      });
+      setProductStatusUpdateResponse({
+        status: response.status as "destructive" | "success",
+        message: response.message,
+      });
+      onModalCloses();
+    }
   };
 
   const { state } = useAdmin();
@@ -66,6 +91,7 @@ export default function AdminProductList({
         product_id={productToUpdate ?? ""}
         setStatusUpdateResponse={setProductStatusUpdateResponse}
         token={token}
+        onReject={onRejectProduct}
       />
 
       <AdminProductDetailModal
@@ -73,6 +99,12 @@ export default function AdminProductList({
         open={state.product_detail.isOpen}
         product={state.product_detail.product}
         onStatusChange={openProductStatusChangeModal}
+      />
+
+      <ProductRejectionMessage
+        open={isRejecting}
+        onClose={onModalCloses}
+        onSubmit={rejectProduct}
       />
 
       <div className="w-full flex flex-col gap-4">

@@ -480,7 +480,8 @@ export default class Product {
   async chageProductStatus(
     status: "APPROVED" | "REJECTED",
     token: string,
-    productId: string
+    productId: string,
+    message: string | null
   ) {
     if (permissionHelper(token, process.env.NEXT_PUBLIC_ADMIN_TOKEN!)) {
       return await this.prismaProduct.update({
@@ -489,6 +490,14 @@ export default class Product {
         },
         data: {
           status: status,
+          message: message,
+        },
+        include: {
+          seller: {
+            select: {
+              user_id: true,
+            },
+          },
         },
       });
     } else {
