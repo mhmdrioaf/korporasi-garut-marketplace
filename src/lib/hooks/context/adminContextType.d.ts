@@ -52,4 +52,16 @@ type TAdminContextType = {
       onOpen: (product: TProduct) => void;
     };
   };
+
+  incomes: {
+    data: TIncome[];
+
+    state: {
+      activeData: "PENDING" | "PAID" | "ALL";
+    };
+
+    handler: {
+      changeActiveData: (status: "PENDING" | "PAID" | "ALL") => void;
+    };
+  };
 };

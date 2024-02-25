@@ -1,6 +1,7 @@
 import AdminDashboardWarning from "@/components/ui/admin-dashboard-warning";
 import AdminSidePanel from "@/components/ui/admin-side-panel";
 import NoAccess from "@/components/ui/no-access";
+import { getIncomes } from "@/lib/api";
 import authOptions from "@/lib/authOptions";
 import { permissionHelper } from "@/lib/helper";
 import { AdminProvider } from "@/lib/hooks/context/useAdmin";
@@ -34,7 +35,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function AdminDashboardLayout({
   children,
 }: IAdminDashboardLayoutProps) {
-  const session = await getServerSession(authOptions);
+  const sessionPromise = getServerSession(authOptions);
+  const incomesPromise = getIncomes();
+
+  const [session, incomes] = await Promise.all([
+    sessionPromise,
+    incomesPromise,
+  ]);
 
   if (!session) {
     return <NoAccess />;
@@ -43,7 +50,9 @@ export default async function AdminDashboardLayout({
       <div className="w-full flex flex-col lg:flex-row items-start relative">
         <AdminSidePanel />
 
-        <AdminProvider token={session.user.token}>{children}</AdminProvider>
+        <AdminProvider token={session.user.token} incomes={incomes}>
+          {children}
+        </AdminProvider>
 
         <AdminDashboardWarning />
       </div>

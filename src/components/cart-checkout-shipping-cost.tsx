@@ -26,10 +26,44 @@ export default function CartCheckoutShippingCost({
   const { checkout, state, handler } = useCart();
 
   const isButtonDisabled = (etd: number) => {
-    const itemsStoragePeriod = items.map((item) => item.product.storage_period);
+    const currentDate = new Date();
+    const itemsExpirationDate = items.map((item) => {
+      const date = new Date(item.product.expire_date);
+      return date;
+    });
     return state.isPreOrder
-      ? itemsStoragePeriod.some((period) => period + 7 <= etd)
-      : itemsStoragePeriod.some((period) => period <= etd);
+      ? itemsExpirationDate.some((period) => {
+          const deliveredDate = new Date(
+            currentDate.getTime() + (7 + etd) * 24 * 60 * 60 * 1000
+          );
+          return deliveredDate >= period;
+        })
+      : itemsExpirationDate.some((period) => {
+          const deliveredDate = new Date(
+            currentDate.getTime() + etd * 24 * 60 * 60 * 1000
+          );
+          return deliveredDate >= period;
+        });
+  };
+
+  const getOrderShippingDate = () => {
+    const currentDate = new Date();
+    const currentTime = currentDate.getHours();
+    const isDaytime = currentTime >= 7 && currentTime <= 17;
+    const deliveredDate = state.isPreOrder
+      ? new Date(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000)
+      : !isDaytime
+        ? new Date(currentDate.getTime() + 1 * 24 * 60 * 60 * 1000)
+        : currentDate;
+    return deliveredDate;
+  };
+
+  const getOrderDeliveredDate = (etd: number) => {
+    const currentDate = new Date();
+    const deliveredDate = !state.isPreOrder
+      ? new Date(currentDate.getTime() + etd * 24 * 60 * 60 * 1000)
+      : new Date(currentDate.getTime() + (7 + etd) * 24 * 60 * 60 * 1000);
+    return deliveredDate;
   };
 
   const shippingCostStyle = "w-full flex flex-row items-center justify-between";
@@ -60,58 +94,73 @@ export default function CartCheckoutShippingCost({
               <p className="font-bold">
                 {shipping.code.toUpperCase()} - {shipping.name}
               </p>
-              {shipping.costs.map((service) => (
-                <div
-                  key={service.service}
-                  className="w-full flex flex-col gap-2"
-                >
-                  <div className="flex flex-col gap-1">
-                    <p className="text-lg">{service.service}</p>
-                    <p className="text-xs">{service.description}</p>
-                  </div>
-
-                  {service.cost.map((cost) => (
-                    <div key={cost.value} className={shippingCostStyle}>
-                      <div className="grid grid-cols-2 gap-2">
-                        <p className="font-bold">Harga</p>
-                        <p>{rupiahConverter(cost.value)}</p>
-                        <p className="font-bold">Estimasi Pengiriman</p>
-                        <p>
-                          {state.isPreOrder
-                            ? shippingEstimation(cost.etd) + 7
-                            : shippingEstimation(cost.etd)}{" "}
-                          Hari
-                        </p>
-                      </div>
-
-                      {isChosen(cost.value) ? (
-                        <CheckIcon className="w-8 h-8 text-primary" />
-                      ) : (
-                        <Button
-                          variant="default"
-                          onClick={() =>
-                            checkout.handler.changeCourier(sellerID, cost)
-                          }
-                          disabled={isButtonDisabled(
-                            state.isPreOrder
-                              ? shippingEstimation(cost.etd) + 7
-                              : shippingEstimation(cost.etd)
-                          )}
-                        >
-                          {isButtonDisabled(
-                            state.isPreOrder
-                              ? shippingEstimation(cost.etd) + 7
-                              : shippingEstimation(cost.etd)
-                          )
-                            ? "Tidak dapat dikirimkan ke alamat ini"
-                            : "Pilih Kurir"}
-                        </Button>
-                      )}
+              {shipping.costs
+                .filter((service) =>
+                  service.cost.some(
+                    (cost) => !isButtonDisabled(shippingEstimation(cost.etd))
+                  )
+                )
+                .map((service) => (
+                  <div
+                    key={service.service}
+                    className="w-full flex flex-col gap-2"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <p className="text-lg">{service.service}</p>
+                      <p className="text-xs">{service.description}</p>
                     </div>
-                  ))}
-                  <Separator />
-                </div>
-              ))}
+
+                    {service.cost.map((cost) => (
+                      <div key={cost.value} className={shippingCostStyle}>
+                        <div className="grid grid-cols-2 gap-2">
+                          <p className="font-bold">Harga</p>
+                          <p>{rupiahConverter(cost.value)}</p>
+                          <div className="col-span-2 flex flex-col gap-2">
+                            <p className="font-bold">Estimasi Pengiriman</p>
+                            <p className="text-xs">
+                              Estimasi tanggal pengiriman:{" "}
+                              {getOrderShippingDate().toLocaleDateString(
+                                "id-ID",
+                                {
+                                  day: "2-digit",
+                                  month: "long",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                            <p className="text-xs">
+                              Estimasi tanggal pesanan diterima:{" "}
+                              {getOrderDeliveredDate(
+                                shippingEstimation(cost.etd)
+                              ).toLocaleDateString("id-ID", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+
+                        {isChosen(cost.value) ? (
+                          <CheckIcon className="w-8 h-8 text-primary" />
+                        ) : (
+                          <Button
+                            variant="default"
+                            onClick={() =>
+                              checkout.handler.changeCourier(sellerID, {
+                                ...cost,
+                                service: service.service,
+                              })
+                            }
+                          >
+                            Pilih Kurir
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    <Separator />
+                  </div>
+                ))}
             </div>
           ))}
         </div>

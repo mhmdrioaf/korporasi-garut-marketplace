@@ -12,6 +12,12 @@ async function handler(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const orderID = searchParams.get("id");
 
+  const preorderEstimationDate = (eta: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() + eta);
+    return date;
+  };
+
   if (orderID) {
     const productOrder = await db.orders.findUnique({
       where: {
@@ -98,6 +104,17 @@ async function handler(request: NextRequest) {
           }
         }
 
+        if (productOrder.order_type === "PREORDER") {
+          await db.orders.update({
+            where: {
+              order_id: productOrder.order_id,
+            },
+            data: {
+              preorder_estimation: preorderEstimationDate(productOrder.eta),
+            },
+          });
+        }
+
         await Promise.all([
           updateOrderStatus,
           sendCustomerNotification,
@@ -106,12 +123,15 @@ async function handler(request: NextRequest) {
           revalidatePath(
             ROUTES.USER.PAYMENT_PROOF(productOrder.payment_proof!)
           );
+          revalidatePath("/admin/reports");
           redirect(ROUTES.USER.ORDERS);
         });
       } else {
         revalidatePath(ROUTES.USER.PAYMENT_PROOF(productOrder.payment_proof!));
         return redirect(ROUTES.USER.ORDERS);
       }
+
+      revalidatePath("/admin/reports");
     } else {
       return redirect(ROUTES.USER.ORDERS);
     }

@@ -11,11 +11,14 @@ type TOrder = {
   order_type: ORDER_TYPE;
   eta: number;
   isSameday: boolean;
+  shipping_service: string;
+  preorder_estimation: Date | null;
 
   user_id: number;
   order_item: TOrderItem[];
   address: TAddress;
   user: TCustomer;
+  income: TIncome;
 };
 
 type TOrderItem = {
@@ -28,6 +31,19 @@ type TOrderItem = {
   variant: TProductVariantItem | null;
 };
 
+type TIncome = {
+  income_id: string;
+  total_income: number;
+  income_date: Date;
+  seller_id: number | null;
+  order_id: string;
+  income_status: INCOME_STATUS;
+  referrer_name: string | null;
+
+  seller: TSeller | null;
+  order: TOrder;
+};
+
 type ORDER_STATUS =
   | "PENDING"
   | "PAID"
@@ -36,3 +52,4 @@ type ORDER_STATUS =
   | "DELIVERED"
   | "FINISHED";
 type ORDER_TYPE = "NORMAL" | "PREORDER";
+type INCOME_STATUS = "PENDING" | "PAID";

@@ -10,7 +10,9 @@ export interface IProductsBySeller {
 }
 
 export interface ICourierBySeller {
-  [sellerId: number]: { [value: number]: TShippingCostServiceCost };
+  [sellerId: number]: {
+    [value: number]: TShippingCostServiceCost & { service: string };
+  };
 }
 
 export interface ITotalCostBySeller {
@@ -111,7 +113,7 @@ type TCartContext = {
 
       changeCourier: (
         sellerId: number,
-        courier: TShippingCostServiceCost
+        courier: TShippingCostServiceCost & { service: string }
       ) => void;
 
       resetCheckoutState: () => void;

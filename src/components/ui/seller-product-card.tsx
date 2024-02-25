@@ -98,11 +98,25 @@ export default function SellerProductCard({
         </p>
       </div>
 
-      <Button className="w-full" variant="default" asChild>
-        <Link href={ROUTES.PRODUCT.DETAIL(product.id.toString())}>
-          Lihat Produk
-        </Link>
-      </Button>
+      {product.status === "APPROVED" && (
+        <Button className="w-full" variant="default" asChild>
+          <Link href={ROUTES.PRODUCT.DETAIL(product.id.toString())}>
+            Lihat Produk
+          </Link>
+        </Button>
+      )}
+
+      {product.status === "PENDING" && (
+        <Button variant="ghost" disabled>
+          Menunggu Persetujuan Produk
+        </Button>
+      )}
+
+      {product.status === "REJECTED" && (
+        <Button variant="destructive" disabled>
+          Produk Ditolak
+        </Button>
+      )}
     </div>
   );
 }

@@ -331,7 +331,8 @@ export const invoiceMaker = async (
   total_price: number,
   isPreorder: boolean = false,
   eta: number,
-  isSameday: boolean
+  isSameday: boolean,
+  shipping_service: string
 ) => {
   try {
     const res = await fetch(process.env.NEXT_PUBLIC_API_ORDER_CREATE!, {
@@ -348,6 +349,7 @@ export const invoiceMaker = async (
         isPreorder: isPreorder,
         eta: eta,
         isSameday: isSameday,
+        service: shipping_service,
       }),
     });
 
@@ -1010,4 +1012,30 @@ export function getStoreProducts(products: Partial<TProduct>[]) {
     mostSearched: mostSearchedProducts,
     all: allProducts,
   };
+}
+
+export function getIncomesDetail(income: TIncome) {
+  const productDevelopment = income.total_income * 0.5;
+  const studentSavings = income.total_income * 0.2;
+  const sellerIncome = income.total_income * 0.3;
+
+  return {
+    productDevelopment: productDevelopment,
+    studentSavings: studentSavings,
+    sellerIncome: sellerIncome,
+  };
+}
+
+export function getIncomeYears(incomes: TIncome[]) {
+  let years: string[] = [];
+  const dates = incomes.map((income) => new Date(income.income_date));
+  const incomeYears = dates.map((date) => date.getFullYear());
+
+  incomeYears.forEach((year) => {
+    if (!years.includes(year.toString())) {
+      years.push(year.toString());
+    }
+  });
+
+  return years;
 }

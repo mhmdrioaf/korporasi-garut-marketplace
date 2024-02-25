@@ -215,3 +215,54 @@ export async function sendSellerNotificationHandler(body: {
     return undefined;
   }
 }
+
+export async function productStatusChangeNotificationHandler(body: {
+  seller_id: number;
+  product_name: string;
+  status: "APPROVED" | "REJECTED";
+}) {
+  try {
+    const sendNotification = await db.notification.upsert({
+      where: {
+        subscriber_id: body.seller_id,
+      },
+      create: {
+        subscriber_id: body.seller_id,
+        items: {
+          create: {
+            title: `Produk ${body.product_name} telah di ${
+              body.status === "APPROVED" ? "setujui" : "tolak"
+            }`,
+            redirect_url: "/user/dashboard/product-list",
+          },
+        },
+      },
+      update: {
+        items: {
+          create: {
+            title: `Produk ${body.product_name} telah di ${
+              body.status === "APPROVED" ? "setujui" : "tolak"
+            }`,
+            redirect_url: "/user/dashboard/product-list",
+          },
+        },
+      },
+    });
+
+    if (sendNotification) {
+      revalidatePath("/", "layout");
+      return {
+        ok: true,
+      };
+    } else {
+      return {
+        ok: false,
+      };
+    }
+  } catch (error) {
+    console.error("An error occurred when sending notification: ", error);
+    return {
+      ok: false,
+    };
+  }
+}

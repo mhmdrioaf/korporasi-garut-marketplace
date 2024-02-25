@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
-import { customerOrderIdGenerator } from "@/lib/helper";
+import { customerOrderIdGenerator, properizeWords } from "@/lib/helper";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 interface IOrderCreateBody {
@@ -13,10 +14,24 @@ interface IOrderCreateBody {
   isPreorder: boolean;
   eta: number;
   isSameday: boolean;
+  service: string;
 }
 
 async function handler(request: NextRequest) {
   const body: IOrderCreateBody = await request.json();
+  const cookiesList = cookies();
+  const referrer = cookiesList.get("marketplace.referral");
+
+  const eta = () => {
+    if (body.isPreorder) {
+      return body.eta + 7;
+    } else if (body.isSameday) {
+      return 1;
+    } else {
+      return body.eta;
+    }
+  };
+
   try {
     const maxId = await db.orders.aggregate({
       where: {
@@ -43,12 +58,8 @@ async function handler(request: NextRequest) {
         shipping_address: body.shipping_address.address_id,
         shipping_cost: body.shipping_cost,
         order_type: body.isPreorder ? "PREORDER" : "NORMAL",
-        eta:
-          body.isPreorder && body.isSameday
-            ? body.eta + 3
-            : body.isPreorder
-              ? body.eta + 5
-              : body.eta,
+        shipping_service: body.service,
+        eta: eta(),
         isSameday: body.isSameday,
         order_item: {
           create: {
@@ -57,10 +68,18 @@ async function handler(request: NextRequest) {
             product_variant_id: body.product_variant?.variant_item_id ?? null,
           },
         },
+        income: {
+          create: {
+            total_income: body.total_price - body.shipping_cost,
+            seller_id: referrer ? null : body.product.seller_id,
+            referrer_name: referrer ? properizeWords(referrer.value) : null,
+          },
+        },
       },
     });
 
     if (createOrder) {
+      cookiesList.delete("marketplace.referral");
       if (body.product_variant) {
         await db.product_variant_item.update({
           where: {

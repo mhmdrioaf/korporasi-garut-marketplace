@@ -16,6 +16,7 @@ import { TAdminContextType, TAdminReportTabs } from "./adminContextType";
 
 interface IAdminProviderProps {
   token: string;
+  incomes: TIncome[];
   children: ReactNode;
 }
 
@@ -25,9 +26,16 @@ export function useAdmin() {
   return useContext(AdminContext) as TAdminContextType;
 }
 
-export function AdminProvider({ token, children }: IAdminProviderProps) {
+export function AdminProvider({
+  token,
+  incomes,
+  children,
+}: IAdminProviderProps) {
   const [date, setDate] = useState<DateRange | undefined>();
   const [tab, setTab] = useState<TAdminReportTabs>("sales");
+  const [activeIncomesData, setActiveIncomesData] = useState<
+    "PENDING" | "PAID" | "ALL"
+  >("ALL");
   const [productDetail, setProductDetail] = useState<{
     product: TProduct | null;
     open: boolean;
@@ -72,6 +80,25 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     setTab(tab);
   }
 
+  function getIncomesData() {
+    if (incomes) {
+      const incomesData = incomes.filter((income) => {
+        if (date && date.from && date.to) {
+          return (
+            new Date(income.income_date) >= date.from &&
+            new Date(income.income_date) <= date.to
+          );
+        } else {
+          return income;
+        }
+      });
+
+      return incomesData;
+    } else {
+      return [];
+    }
+  }
+
   function getSalesData() {
     if (salesData) {
       return filterSalesByDateRange(salesData, date?.from, date?.to);
@@ -98,6 +125,10 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     setDate(date);
     const chart = ChartJS.getChart("report-chart");
     chart?.update();
+  }
+
+  function onActiveIncomesDataChange(activeData: "PENDING" | "PAID" | "ALL") {
+    setActiveIncomesData(activeData);
   }
 
   useEffect(() => {
@@ -137,6 +168,18 @@ export function AdminProvider({ token, children }: IAdminProviderProps) {
     products: {
       loading: productsDataLoading,
       data: productsData ? productsData.result.products : null,
+    },
+
+    incomes: {
+      data: getIncomesData(),
+
+      state: {
+        activeData: activeIncomesData,
+      },
+
+      handler: {
+        changeActiveData: onActiveIncomesDataChange,
+      },
     },
 
     state: {

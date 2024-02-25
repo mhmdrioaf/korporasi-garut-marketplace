@@ -11,7 +11,11 @@ import {
 } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import useSWR from "swr";
-import { getSameDayShippingDetail, invoiceMaker } from "@/lib/helper";
+import {
+  getSameDayShippingDetail,
+  invoiceMaker,
+  shippingEstimation,
+} from "@/lib/helper";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/lib/constants";
 import { addToCart } from "@/lib/actions/cart";
@@ -40,8 +44,12 @@ export function DirectPurchaseProvider({
   const [totalPrice, setTotalPrice] = useState<number>(product.price);
   const [productQuantity, setProductQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-  const [chosenCourier, setChosenCourier] =
-    useState<TShippingCostServiceCost | null>(null);
+  const [chosenCourier, setChosenCourier] = useState<
+    | (TShippingCostServiceCost & {
+        service: string;
+      })
+    | null
+  >(null);
   const [chosenAddress, setChosenAddress] = useState<TAddress | null>(null);
   const [orderLoading, setOrderLoading] = useState(false);
   const [orderStep, setOrderStep] = useState<number | null>(null);
@@ -339,7 +347,11 @@ export function DirectPurchaseProvider({
     [product.price, productQuantity, variantsValue]
   );
 
-  const onCourierChangeHandler = (courier: TShippingCostServiceCost) => {
+  const onCourierChangeHandler = (
+    courier: TShippingCostServiceCost & {
+      service: string;
+    }
+  ) => {
     setChosenCourier(courier);
     setTotalPrice(defaultPrice + courier.value);
     setShippingCost(courier.value);
@@ -394,7 +406,7 @@ export function DirectPurchaseProvider({
       } else {
         const estimatedTimeArrival = samedayData.isSameDay
           ? 1
-          : parseInt(chosenCourier?.etd ?? "3");
+          : shippingEstimation(chosenCourier?.etd ?? "3");
         const makeOrder = await invoiceMaker(
           user_id,
           product,
@@ -405,7 +417,8 @@ export function DirectPurchaseProvider({
           totalPrice,
           isPreorder,
           estimatedTimeArrival,
-          samedayData.isSameDay
+          samedayData.isSameDay,
+          chosenCourier?.service ?? ""
         );
         if (!makeOrder.ok) {
           setOrderLoading(false);

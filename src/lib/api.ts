@@ -81,3 +81,46 @@ export async function getUserNotification(subscriber_id: string) {
 
   return userNotification as TNotification | null;
 }
+
+export async function getIncomes() {
+  const incomes = await db.income.findMany({
+    where: {
+      order: {
+        OR: [
+          {
+            order_status: {
+              equals: "DELIVERED",
+            },
+          },
+          {
+            order_status: {
+              equals: "FINISHED",
+            },
+          },
+        ],
+      },
+    },
+    include: {
+      seller: {
+        select: {
+          account: {
+            select: {
+              user_name: true,
+            },
+          },
+        },
+      },
+      order: {
+        select: {
+          order_item: {
+            include: {
+              product: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return incomes as unknown as TIncome[];
+}
