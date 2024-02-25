@@ -233,7 +233,7 @@ export async function productStatusChangeNotificationHandler(body: {
             title: `Produk ${body.product_name} telah di ${
               body.status === "APPROVED" ? "setujui" : "tolak"
             }`,
-            redirect_url: "/user/dashboard/seller-products",
+            redirect_url: "/user/dashboard/product-list",
           },
         },
       },
@@ -243,7 +243,7 @@ export async function productStatusChangeNotificationHandler(body: {
             title: `Produk ${body.product_name} telah di ${
               body.status === "APPROVED" ? "setujui" : "tolak"
             }`,
-            redirect_url: "/user/dashboard/seller-products",
+            redirect_url: "/user/dashboard/product-list",
           },
         },
       },
