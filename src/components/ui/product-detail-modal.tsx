@@ -234,15 +234,28 @@ export default function ProductDetailModal({
             </div>
           </div>
 
-          <Button asChild className="w-full" variant="default">
-            <Link
-              target="_blank"
-              href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
-            >
-              <span className="mr-2">Lihat Produk Live</span>
-              <ArrowUpRightFromCircleIcon className="w-4 h-4" />
-            </Link>
-          </Button>
+          {product.message && (
+            <div className="w-full flex flex-col gap-1 bg-destructive px-4 py-2 rounded-sm">
+              <b className="text-sm text-destructive-foreground font-bold">
+                Alasan Penolakan
+              </b>
+              <p className="text-xs text-destructive-foreground">
+                {product.message}
+              </p>
+            </div>
+          )}
+
+          {product.status === "APPROVED" && (
+            <Button asChild className="w-full" variant="default">
+              <Link
+                target="_blank"
+                href={ROUTES.PRODUCT.DETAIL(product.id.toString())}
+              >
+                <span className="mr-2">Lihat Produk Live</span>
+                <ArrowUpRightFromCircleIcon className="w-4 h-4" />
+              </Link>
+            </Button>
+          )}
         </div>
       </ScrollArea>
     </Modal>

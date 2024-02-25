@@ -16,6 +16,7 @@ type TProduct = {
   visitor: number;
   cart_count: number;
   search_count: number;
+  message: string | null;
 
   seller_id: number;
   category_id: string | null;
