@@ -1,14 +1,15 @@
+import { getToken } from "next-auth/jwt";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const {
     nextUrl: { searchParams },
   } = request;
   const paramsRef = searchParams.get("ref");
   const referrer = paramsRef;
   const cookiesList = cookies();
-  const session = cookiesList.get("next-auth.session-token");
+  const session = await getToken({ req: request });
 
   function isProtectedRoute() {
     let isProtected = [false];
