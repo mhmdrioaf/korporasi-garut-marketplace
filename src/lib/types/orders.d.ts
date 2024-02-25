@@ -12,6 +12,7 @@ type TOrder = {
   eta: number;
   isSameday: boolean;
   shipping_service: string;
+  preorder_estimation: Date | null;
 
   user_id: number;
   order_item: TOrderItem[];

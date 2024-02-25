@@ -72,6 +72,7 @@ model orders {
   order_status         ORDER_STATUS @default(PENDING)
   order_date           DateTime     @default(now())
   order_delivered_date DateTime?
+  preorder_estimation  DateTime?
   user_id              Int
   total_price          Int
   shipping_address     String?
