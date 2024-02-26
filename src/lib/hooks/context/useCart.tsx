@@ -17,7 +17,11 @@ import {
   TCartContext,
 } from "./cartContextType";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { fetcher, getSameDayShippingDetail } from "@/lib/helper";
+import {
+  fetcher,
+  getSameDayShippingDetail,
+  shippingEstimation,
+} from "@/lib/helper";
 import useSWR from "swr";
 import {
   cartItemDeleteHandler,
@@ -590,6 +594,7 @@ export function CartProvider({
     let totalShippingCost: number = 0;
     let items: TCustomerCartItem[] = [];
     let shippingServices: string[] = [];
+    let estimatedTimeArrivals: number = 0;
 
     checkedItemsSellers().forEach((sellerID) => {
       const _items = checkoutItems();
@@ -611,6 +616,9 @@ export function CartProvider({
       if (!disabledItems[Number(sellerID)]) {
         sellerItems.forEach((item) => items.push(item));
       }
+      estimatedTimeArrivals += isPreOrder
+        ? shippingEstimation(courier[shippingPrice].etd) + 7
+        : shippingEstimation(courier[shippingPrice].etd);
     });
 
     try {
@@ -623,7 +631,7 @@ export function CartProvider({
           customer_id: user_id,
           shipping_address: chosenAddress.address_id,
           isPreorder: isPreOrder,
-          eta: sameDayData.eta,
+          eta: sameDay ? 1 : estimatedTimeArrivals,
           isSameday: sameDay,
           shipping_service: shippingServices.join(", "),
         }),
