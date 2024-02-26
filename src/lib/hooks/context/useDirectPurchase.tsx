@@ -97,7 +97,7 @@ export function DirectPurchaseProvider({
       body: JSON.stringify({
         origin: sellerAddress?.city.city_id,
         destination: chosenAddress?.city.city_id,
-        weight: product.weight,
+        weight: product.weight * productQuantity,
       }),
     })
       .then((res) => res.json())
