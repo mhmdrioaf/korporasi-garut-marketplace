@@ -234,6 +234,7 @@ export async function productStatusChangeNotificationHandler(body: {
               body.status === "APPROVED" ? "setujui" : "tolak"
             }`,
             redirect_url: "/user/dashboard/product-list",
+            show_action_button: false,
           },
         },
       },
@@ -244,6 +245,7 @@ export async function productStatusChangeNotificationHandler(body: {
               body.status === "APPROVED" ? "setujui" : "tolak"
             }`,
             redirect_url: "/user/dashboard/product-list",
+            show_action_button: false,
           },
         },
       },
