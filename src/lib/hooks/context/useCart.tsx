@@ -644,16 +644,6 @@ export function CartProvider({
           description: response.message,
         });
         onCheckoutStepChanges(3);
-
-        try {
-          items.forEach(async (item) => {
-            let _checkedItems = checkedItems;
-            delete _checkedItems[item.product.seller.user_id];
-            await cartItemDeleteHandler(item);
-          });
-        } catch (error) {
-          console.error("An error occurred while deleting cart item: ", error);
-        }
       }
     } catch (error) {
       setIsOrdering(false);
