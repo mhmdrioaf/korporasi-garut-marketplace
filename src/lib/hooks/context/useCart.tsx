@@ -3,6 +3,7 @@
 import {
   ReactNode,
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -242,8 +243,23 @@ export function CartProvider({
             break;
           }
         case "increase":
-          currentItem.quantity += 1;
-          break;
+          if (currentItem.variant) {
+            if (currentItem.quantity < currentItem.variant.variant_stock) {
+              currentItem.quantity += 1;
+              break;
+            } else {
+              currentItem.quantity = currentItem.variant.variant_stock;
+              break;
+            }
+          } else {
+            if (currentItem.quantity < currentItem.product.stock) {
+              currentItem.quantity += 1;
+              break;
+            } else {
+              currentItem.quantity = currentItem.product.stock;
+              break;
+            }
+          }
       }
 
       const itemIndex = cartData!.cart_items.findIndex(
@@ -282,7 +298,7 @@ export function CartProvider({
         //   rollbackOnError: true,
         //   revalidate: false,
         // });
-        addOptimisticCart(_currentCart);
+        startTransition(() => addOptimisticCart(_currentCart));
         await cartItemsQuantityChangeHandler(_currentCart);
         calculateCheckedItemsPrice();
       } catch (error) {
@@ -313,7 +329,7 @@ export function CartProvider({
       setCheckedItems(_checkedItems);
 
       try {
-        addOptimisticCart(currentCart);
+        startTransition(() => addOptimisticCart(currentCart));
         await cartItemDeleteHandler(itemToDelete);
         setIsLoading(false);
         setIsDelete(false);
@@ -656,7 +672,7 @@ export function CartProvider({
 
         const newCart = await cartItemsDeleteOnCheckout(items, Number(user_id));
         if (newCart) {
-          addOptimisticCart(newCart);
+          startTransition(() => addOptimisticCart(newCart));
         }
       }
     } catch (error) {
