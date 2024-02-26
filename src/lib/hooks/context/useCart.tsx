@@ -3,6 +3,7 @@
 import {
   ReactNode,
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -17,10 +18,15 @@ import {
   TCartContext,
 } from "./cartContextType";
 import { CheckedState } from "@radix-ui/react-checkbox";
-import { fetcher, getSameDayShippingDetail } from "@/lib/helper";
+import {
+  fetcher,
+  getSameDayShippingDetail,
+  shippingEstimation,
+} from "@/lib/helper";
 import useSWR from "swr";
 import {
   cartItemDeleteHandler,
+  cartItemsDeleteOnCheckout,
   cartItemsQuantityChangeHandler,
 } from "@/lib/actions/cart";
 import { useToast } from "@/components/ui/use-toast";
@@ -237,8 +243,23 @@ export function CartProvider({
             break;
           }
         case "increase":
-          currentItem.quantity += 1;
-          break;
+          if (currentItem.variant) {
+            if (currentItem.quantity < currentItem.variant.variant_stock) {
+              currentItem.quantity += 1;
+              break;
+            } else {
+              currentItem.quantity = currentItem.variant.variant_stock;
+              break;
+            }
+          } else {
+            if (currentItem.quantity < currentItem.product.stock) {
+              currentItem.quantity += 1;
+              break;
+            } else {
+              currentItem.quantity = currentItem.product.stock;
+              break;
+            }
+          }
       }
 
       const itemIndex = cartData!.cart_items.findIndex(
@@ -277,7 +298,7 @@ export function CartProvider({
         //   rollbackOnError: true,
         //   revalidate: false,
         // });
-        addOptimisticCart(_currentCart);
+        startTransition(() => addOptimisticCart(_currentCart));
         await cartItemsQuantityChangeHandler(_currentCart);
         calculateCheckedItemsPrice();
       } catch (error) {
@@ -308,7 +329,7 @@ export function CartProvider({
       setCheckedItems(_checkedItems);
 
       try {
-        addOptimisticCart(currentCart);
+        startTransition(() => addOptimisticCart(currentCart));
         await cartItemDeleteHandler(itemToDelete);
         setIsLoading(false);
         setIsDelete(false);
@@ -589,6 +610,7 @@ export function CartProvider({
     let totalShippingCost: number = 0;
     let items: TCustomerCartItem[] = [];
     let shippingServices: string[] = [];
+    let estimatedTimeArrivals: number = 0;
 
     checkedItemsSellers().forEach((sellerID) => {
       const _items = checkoutItems();
@@ -610,6 +632,9 @@ export function CartProvider({
       if (!disabledItems[Number(sellerID)]) {
         sellerItems.forEach((item) => items.push(item));
       }
+      estimatedTimeArrivals += isPreOrder
+        ? shippingEstimation(courier[shippingPrice].etd) + 7
+        : shippingEstimation(courier[shippingPrice].etd);
     });
 
     try {
@@ -622,7 +647,7 @@ export function CartProvider({
           customer_id: user_id,
           shipping_address: chosenAddress.address_id,
           isPreorder: isPreOrder,
-          eta: sameDayData.eta,
+          eta: sameDay ? 1 : estimatedTimeArrivals,
           isSameday: sameDay,
           shipping_service: shippingServices.join(", "),
         }),
@@ -645,14 +670,9 @@ export function CartProvider({
         });
         onCheckoutStepChanges(3);
 
-        try {
-          items.forEach(async (item) => {
-            let _checkedItems = checkedItems;
-            delete _checkedItems[item.product.seller.user_id];
-            await cartItemDeleteHandler(item);
-          });
-        } catch (error) {
-          console.error("An error occurred while deleting cart item: ", error);
+        const newCart = await cartItemsDeleteOnCheckout(items, Number(user_id));
+        if (newCart) {
+          startTransition(() => addOptimisticCart(newCart));
         }
       }
     } catch (error) {

@@ -12,7 +12,9 @@ export default async function Home() {
 
       {products && (
         <ProductsList
-          products={products.filter((product) => product.status === "APPROVED")}
+          products={products
+            .filter((product) => product.status === "APPROVED")
+            .filter((product) => new Date(product.expire_date) > new Date())}
         />
       )}
 

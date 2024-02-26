@@ -24,7 +24,7 @@ export default function UserCartList() {
     const items = cart.items;
 
     return (
-      <div className="w-full relative flex flex-col gap-4 md:gap-8">
+      <div className="w-full relative flex flex-col gap-4 md:gap-8 min-h-screen">
         <div className="w-full flex flex-col gap-1 lg:gap-2 divide-y">
           {cartData.length > 0 ? (
             cartData.map((sellerID, index) =>

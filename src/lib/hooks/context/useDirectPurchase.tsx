@@ -97,7 +97,7 @@ export function DirectPurchaseProvider({
       body: JSON.stringify({
         origin: sellerAddress?.city.city_id,
         destination: chosenAddress?.city.city_id,
-        weight: product.weight,
+        weight: product.weight * productQuantity,
       }),
     })
       .then((res) => res.json())
@@ -541,8 +541,16 @@ export function DirectPurchaseProvider({
         setProductQuantity(1);
         setTotalPrice(variantsValue.variant_price);
       }
+    } else {
+      if (product.stock < 1) {
+        setProductQuantity(5);
+        setTotalPrice(product.price * 5);
+      } else {
+        setProductQuantity(1);
+        setTotalPrice(product.price);
+      }
     }
-  }, [variantsValue]);
+  }, [variantsValue, product]);
 
   useEffect(() => {
     if (isPreorder) {

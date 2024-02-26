@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { customerOrderIdGenerator } from "@/lib/helper";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 interface ICartCheckoutBody {
@@ -16,6 +17,8 @@ interface ICartCheckoutBody {
 
 async function handler(request: NextRequest) {
   const body: ICartCheckoutBody = await request.json();
+  const cookiesList = cookies();
+  const referrer = cookiesList.get("marketplace.referral");
 
   try {
     const maxId = await db.orders.aggregate({
@@ -61,20 +64,20 @@ async function handler(request: NextRequest) {
     });
 
     if (newOrder) {
-      await db.customer_cart.update({
-        where: {
-          user_id: parseInt(body.customer_id),
-        },
+      const generateIncomes = await db.income.create({
         data: {
-          cart_items: {
-            deleteMany: {
-              cart_item_id: {
-                in: body.items.map((item) => item.cart_item_id),
-              },
-            },
-          },
+          order_id: newOrder.order_id,
+          total_income: body.total_price - body.total_shipping_cost,
+          seller_id: referrer ? null : body.items[0].product.seller_id,
+          referrer_name: referrer ? referrer.value : null,
         },
       });
+
+      if (generateIncomes) {
+        if (referrer) {
+          cookiesList.delete("marketplace.referral");
+        }
+      }
       return NextResponse.json({
         ok: true,
         message:
