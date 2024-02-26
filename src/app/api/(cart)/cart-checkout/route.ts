@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { customerOrderIdGenerator } from "@/lib/helper";
-import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -65,15 +64,7 @@ async function handler(request: NextRequest) {
     });
 
     if (newOrder) {
-      const updateCart = db.customer_cart_item.deleteMany({
-        where: {
-          cart_item_id: {
-            in: body.items.map((item) => item.cart_item_id),
-          },
-        },
-      });
-
-      const generateIncomes = db.income.create({
+      const generateIncomes = await db.income.create({
         data: {
           order_id: newOrder.order_id,
           total_income: body.total_price - body.total_shipping_cost,
@@ -82,9 +73,11 @@ async function handler(request: NextRequest) {
         },
       });
 
-      await db
-        .$transaction([updateCart, generateIncomes])
-        .then(() => revalidatePath("/", "layout"));
+      if (generateIncomes) {
+        if (referrer) {
+          cookiesList.delete("marketplace.referral");
+        }
+      }
       return NextResponse.json({
         ok: true,
         message:

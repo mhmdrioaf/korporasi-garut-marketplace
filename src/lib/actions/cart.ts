@@ -140,3 +140,64 @@ export async function addToCart(props: {
     };
   }
 }
+
+export async function cartItemsDeleteOnCheckout(
+  cartItems: TCustomerCartItem[],
+  customerId: number
+) {
+  try {
+    const deleteItems = db.customer_cart_item.deleteMany({
+      where: {
+        cart_item_id: {
+          in: cartItems.map((item) => item.cart_item_id),
+        },
+      },
+    });
+
+    const getCart = db.customer_cart.findFirst({
+      where: {
+        user_id: customerId,
+      },
+      include: {
+        cart_items: {
+          include: {
+            product: {
+              include: {
+                seller: {
+                  select: {
+                    address: {
+                      select: {
+                        city: true,
+                        address_id: true,
+                      },
+                    },
+                    account: {
+                      select: {
+                        user_name: true,
+                      },
+                    },
+                    user_id: true,
+                    primary_address_id: true,
+                  },
+                },
+              },
+            },
+            variant: true,
+          },
+        },
+      },
+    });
+
+    const [deletedItems, cart] = await db.$transaction([deleteItems, getCart]);
+
+    if (deletedItems && cart) {
+      revalidatePath("/user/cart");
+      return cart as unknown as TCustomerCart;
+    } else {
+      return undefined;
+    }
+  } catch (error) {
+    console.error("An error occurred when deleting cart items: ", error);
+    return undefined;
+  }
+}

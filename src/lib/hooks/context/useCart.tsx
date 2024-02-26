@@ -21,6 +21,7 @@ import { fetcher, getSameDayShippingDetail } from "@/lib/helper";
 import useSWR from "swr";
 import {
   cartItemDeleteHandler,
+  cartItemsDeleteOnCheckout,
   cartItemsQuantityChangeHandler,
 } from "@/lib/actions/cart";
 import { useToast } from "@/components/ui/use-toast";
@@ -644,6 +645,11 @@ export function CartProvider({
           description: response.message,
         });
         onCheckoutStepChanges(3);
+
+        const newCart = await cartItemsDeleteOnCheckout(items, Number(user_id));
+        if (newCart) {
+          addOptimisticCart(newCart);
+        }
       }
     } catch (error) {
       setIsOrdering(false);
