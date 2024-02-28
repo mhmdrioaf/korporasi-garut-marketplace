@@ -27,6 +27,7 @@ model user {
   carts         customer_cart?
   notifications notification?
   incomes       income[]
+  refferer      referrer?
 }
 
 model account {
@@ -216,10 +217,18 @@ model income {
   order  orders @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
 }
 
+model referrer {
+  referrer_id String @id
+  user_id     Int?   @unique
+
+  user user? @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
+}
+
 enum USER_ROLE {
   ADMIN
   SELLER
   CUSTOMER
+  REFERRER
 }
 
 enum ORDER_STATUS {
