@@ -38,9 +38,10 @@ type TIncome = {
   seller_id: number | null;
   order_id: string;
   income_status: INCOME_STATUS;
-  referrer_name: string | null;
+  referrer_id: string | null;
 
   seller: TSeller | null;
+  referrer: TReferrer | null;
   order: TOrder;
 };
 
