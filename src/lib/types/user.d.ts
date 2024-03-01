@@ -14,6 +14,7 @@ type TUser = {
   notifications: TNotification | null;
   carts: TCustomerCart | null;
   orders: TOrder[];
+  referrer: TReferrer | null;
 };
 
 type TCustomer = TUser;
