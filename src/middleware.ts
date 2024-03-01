@@ -13,7 +13,13 @@ export async function middleware(request: NextRequest) {
 
   function isProtectedRoute() {
     let isProtected = [false];
-    const matcher = ["/user", "/product/add", "/product/edit", "/admin/"];
+    const matcher = [
+      "/user",
+      "/product/add",
+      "/product/edit",
+      "/admin/",
+      "/referral",
+    ];
 
     matcher.forEach((route) => {
       if (request.nextUrl.pathname.startsWith(route)) {
@@ -30,9 +36,23 @@ export async function middleware(request: NextRequest) {
 
   if (isProtectedRoute() && !session) {
     const loginUrl = request.nextUrl.clone();
+    const callbackUrl = request.nextUrl.clone();
     loginUrl.pathname = "/auth/login";
+    loginUrl.searchParams.set("callbackUrl", callbackUrl.toString());
 
-    return NextResponse.rewrite(loginUrl);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (session) {
+    const clonedUrl = request.nextUrl.clone();
+    console.log(clonedUrl);
+    const callbackUrl = clonedUrl.searchParams.get("callbackUrl");
+    if (callbackUrl) {
+      const url = new URL(callbackUrl);
+      return NextResponse.redirect(url);
+    } else {
+      return NextResponse.next();
+    }
   }
 
   if (referrer) {

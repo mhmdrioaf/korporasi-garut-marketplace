@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -35,6 +35,7 @@ export default function AuthLogin() {
 
   const { toast } = useToast();
   const router = useRouter();
+  const callbackUrl = useSearchParams().get("callbackUrl");
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -135,11 +136,19 @@ export default function AuthLogin() {
 
   useEffect(() => {
     if (session) {
-      form.reset();
-      router.replace(ROUTES.LANDING_PAGE);
-      router.refresh();
+      if (callbackUrl) {
+        const url = new URL(callbackUrl);
+        const pathname = url.pathname;
+        form.reset();
+        router.replace(pathname);
+        router.refresh();
+      } else {
+        form.reset();
+        router.replace(ROUTES.LANDING_PAGE);
+        router.refresh();
+      }
     }
-  }, [session, form, router]);
+  }, [session, form, router, callbackUrl]);
 
   return (
     <Form {...form}>

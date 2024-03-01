@@ -20,7 +20,7 @@ import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
 import { Separator } from "../separator";
 import { useToast } from "../use-toast";
 import Modal from "../modal";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ScrollArea } from "../scroll-area";
 import { ROUTES } from "@/lib/constants";
 import Link from "next/link";
@@ -34,11 +34,12 @@ export default function LoginModal() {
 
   const { toast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
+  const callbackUrl = useSearchParams().get("callbackUrl");
 
   const onModalCloses = () => {
     form.reset();
     router.refresh();
-    router.back();
   };
 
   const loginMethodChangeHandler = () => {
@@ -69,7 +70,7 @@ export default function LoginModal() {
     setLoading(true);
 
     return await signIn("credentials", {
-      redirect: false,
+      redirect: true,
       username: username ? username : email,
       password: password,
     })
@@ -87,9 +88,12 @@ export default function LoginModal() {
             description: "Selamat datang kembali.",
             variant: "success",
           });
-          onModalCloses();
         }
         setLoading(false);
+        onModalCloses();
+        if (!callbackUrl) {
+          router.back();
+        }
       })
       .catch((err) => {
         setLoading(false);
@@ -103,8 +107,14 @@ export default function LoginModal() {
       });
   };
 
-  return (
-    <Modal defaultOpen onClose={onModalCloses}>
+  return pathname.includes("auth") ? (
+    <Modal
+      defaultOpen
+      onClose={() => {
+        onModalCloses();
+        router.back();
+      }}
+    >
       <ScrollArea className="w-full h-[calc(75vh-2rem)]">
         <Form {...form}>
           <form
@@ -226,5 +236,5 @@ export default function LoginModal() {
         </Form>
       </ScrollArea>
     </Modal>
-  );
+  ) : null;
 }
