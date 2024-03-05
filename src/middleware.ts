@@ -34,27 +34,6 @@ export async function middleware(request: NextRequest) {
     return !!cookiesList.get(cookie);
   }
 
-  if (isProtectedRoute() && !session) {
-    const loginUrl = request.nextUrl.clone();
-    const callbackUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/auth/login";
-    loginUrl.searchParams.set("callbackUrl", callbackUrl.toString());
-
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (session) {
-    const clonedUrl = request.nextUrl.clone();
-    console.log(clonedUrl);
-    const callbackUrl = clonedUrl.searchParams.get("callbackUrl");
-    if (callbackUrl) {
-      const url = new URL(callbackUrl);
-      return NextResponse.redirect(url);
-    } else {
-      return NextResponse.next();
-    }
-  }
-
   if (referrer) {
     const expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 1);
@@ -79,6 +58,24 @@ export async function middleware(request: NextRequest) {
       return response;
     }
   } else {
-    return NextResponse.next();
+    if (isProtectedRoute() && !session) {
+      const loginUrl = request.nextUrl.clone();
+      const callbackUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/auth/login";
+      loginUrl.searchParams.set("callbackUrl", callbackUrl.toString());
+
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (session) {
+      const clonedUrl = request.nextUrl.clone();
+      const callbackUrl = clonedUrl.searchParams.get("callbackUrl");
+      if (callbackUrl) {
+        const url = new URL(callbackUrl);
+        return NextResponse.redirect(url);
+      } else {
+        return NextResponse.next();
+      }
+    }
   }
 }
