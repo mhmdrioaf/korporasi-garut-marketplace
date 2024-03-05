@@ -72,7 +72,7 @@ async function handler(request: NextRequest) {
           create: {
             total_income: body.total_price - body.shipping_cost,
             seller_id: referrer ? null : body.product.seller_id,
-            referrer_name: referrer ? properizeWords(referrer.value) : null,
+            referrer_id: referrer ? referrer.value : null,
           },
         },
       },

@@ -1,9 +1,14 @@
 import { Container } from "@/components/ui/container";
 import ReferralGenerator from "@/components/ui/referral/referral-generator";
 import { listProducts } from "@/lib/api";
+import authOptions from "@/lib/authOptions";
+import { getServerSession } from "next-auth";
 
 export default async function ReferralPage() {
-  const products = await listProducts();
+  const productsData = listProducts();
+  const sessionData = getServerSession(authOptions);
+
+  const [products, session] = await Promise.all([productsData, sessionData]);
 
   return products ? (
     <div className="w-full h-screen relative">
@@ -16,7 +21,12 @@ export default async function ReferralPage() {
             Silakan isi form berikut untuk membuat tautan referral
           </p>
         </div>
-        <ReferralGenerator products={products} />
+        {session && (
+          <ReferralGenerator
+            products={products}
+            user_id={Number(session.user.id)}
+          />
+        )}
       </div>
     </div>
   ) : (
