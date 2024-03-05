@@ -13,7 +13,13 @@ export async function middleware(request: NextRequest) {
 
   function isProtectedRoute() {
     let isProtected = [false];
-    const matcher = ["/user", "/product/add", "/product/edit", "/admin/"];
+    const matcher = [
+      "/user",
+      "/product/add",
+      "/product/edit",
+      "/admin/",
+      "/referral",
+    ];
 
     matcher.forEach((route) => {
       if (request.nextUrl.pathname.startsWith(route)) {
@@ -26,13 +32,6 @@ export async function middleware(request: NextRequest) {
 
   function validCookie(cookie: string) {
     return !!cookiesList.get(cookie);
-  }
-
-  if (isProtectedRoute() && !session) {
-    const loginUrl = request.nextUrl.clone();
-    loginUrl.pathname = "/auth/login";
-
-    return NextResponse.rewrite(loginUrl);
   }
 
   if (referrer) {
@@ -59,6 +58,24 @@ export async function middleware(request: NextRequest) {
       return response;
     }
   } else {
-    return NextResponse.next();
+    if (isProtectedRoute() && !session) {
+      const loginUrl = request.nextUrl.clone();
+      const callbackUrl = request.nextUrl.clone();
+      loginUrl.pathname = "/auth/login";
+      loginUrl.searchParams.set("callbackUrl", callbackUrl.toString());
+
+      return NextResponse.redirect(loginUrl);
+    }
+
+    if (session) {
+      const clonedUrl = request.nextUrl.clone();
+      const callbackUrl = clonedUrl.searchParams.get("callbackUrl");
+      if (callbackUrl) {
+        const url = new URL(callbackUrl);
+        return NextResponse.redirect(url);
+      } else {
+        return NextResponse.next();
+      }
+    }
   }
 }

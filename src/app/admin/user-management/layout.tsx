@@ -1,7 +1,5 @@
 import UserManagementNav from "@/components/ui/admin-user-management-nav";
 import { Container } from "@/components/ui/container";
-import { ROUTES } from "@/lib/constants";
-import Link from "next/link";
 
 interface IUserManagementLayoutProps {
   children: React.ReactNode;

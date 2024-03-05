@@ -69,7 +69,7 @@ async function handler(request: NextRequest) {
           order_id: newOrder.order_id,
           total_income: body.total_price - body.total_shipping_cost,
           seller_id: referrer ? null : body.items[0].product.seller_id,
-          referrer_name: referrer ? referrer.value : null,
+          referrer_id: referrer ? referrer.value : null,
         },
       });
 

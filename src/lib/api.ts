@@ -3,6 +3,7 @@ import Carts from "./prisma-classes/Carts";
 import { db } from "./db";
 import Product from "./prisma-classes/Product";
 import Users from "./prisma-classes/User";
+import { permissionHelper } from "./helper";
 
 export async function getInvoice(invoice_id: string) {
   const xendit = new Xendit({
@@ -119,8 +120,45 @@ export async function getIncomes() {
           },
         },
       },
+      referrer: {
+        select: {
+          user: {
+            select: {
+              account: {
+                select: {
+                  user_name: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
   return incomes as unknown as TIncome[];
+}
+
+export async function listReferrer(token: string) {
+  const adminToken = process.env.NEXT_PUBLIC_ADMIN_TOKEN!;
+  const isGranted = permissionHelper(token, adminToken);
+
+  if (!isGranted) {
+    return null;
+  } else {
+    const referrer = await db.referrer.findMany({
+      include: {
+        user: {
+          select: {
+            account: {
+              select: {
+                user_name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+    return referrer as TReferrer[];
+  }
 }

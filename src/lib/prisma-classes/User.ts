@@ -78,6 +78,24 @@ export default class Users {
             city: true,
           },
         },
+        refferer: {
+          include: {
+            incomes: {
+              include: {
+                order: {
+                  include: {
+                    order_item: {
+                      include: {
+                        variant: true,
+                        product: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -121,12 +139,12 @@ export default class Users {
       dataToChange === "name"
         ? "nama"
         : dataToChange === "username"
-        ? "nama pengguna"
-        : dataToChange === "phone_number"
-        ? "nomor telepon"
-        : dataToChange === "profile_picture"
-        ? "foto profil"
-        : "alamat utama";
+          ? "nama pengguna"
+          : dataToChange === "phone_number"
+            ? "nomor telepon"
+            : dataToChange === "profile_picture"
+              ? "foto profil"
+              : "alamat utama";
     try {
       const updateUser = await this.prismaUser.update({
         where: {
@@ -142,16 +160,16 @@ export default class Users {
                 },
               }
             : dataToChange === "profile_picture"
-            ? {
-                account: {
-                  update: {
-                    profile_picture: value,
+              ? {
+                  account: {
+                    update: {
+                      profile_picture: value,
+                    },
                   },
+                }
+              : {
+                  [dataToChange]: value,
                 },
-              }
-            : {
-                [dataToChange]: value,
-              },
         // dataToChange !== "name"
         //   ? {
         //       [dataToChange]: value,

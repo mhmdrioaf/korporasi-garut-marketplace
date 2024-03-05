@@ -47,6 +47,7 @@ export const ROUTES = {
     STORE_PROFILE: (sellerID: string) => "/store/" + sellerID,
     PAYMENT_PROOF: (invoiceID: string) =>
       "/user/dashboard/payment/" + invoiceID,
+    REFERRAL_INCOMES: "/user/dashboard/referral-incomes",
   },
   PRODUCT: {
     DETAIL: (id: string) => `/product/${id}`,
@@ -59,7 +60,9 @@ export const ROUTES = {
       MAIN: "/admin/user-management",
       USERS: "/admin/user-management/users",
       SELLERS: "/admin/user-management/sellers",
+      REFERRERS: "/admin/user-management/referrers",
       ADD_SELLER: "/admin/seller-add",
+      ADD_REFERRER: "/admin/referrer-add",
     },
     PRODUCT_MANAGEMENT: {
       MAIN: "/admin/product-management",

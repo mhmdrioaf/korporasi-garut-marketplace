@@ -380,7 +380,12 @@ export function DirectPurchaseProvider({
     if (user) {
       setOrderStep(1);
     } else {
-      router.push(ROUTES.AUTH.LOGIN);
+      const { origin, pathname } = window.location;
+      const currentUrl = `${origin}${pathname}`;
+      const callbackUrl = new URL(currentUrl).toString();
+      const loginUrl = new URL(ROUTES.AUTH.LOGIN, origin);
+      loginUrl.searchParams.set("callbackUrl", callbackUrl);
+      router.push(loginUrl.toString());
     }
   };
 
