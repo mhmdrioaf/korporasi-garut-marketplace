@@ -106,7 +106,7 @@ export default function AdminReportIncomes({ adminName }: IReportProps) {
                     <TableCell>{idx + 1}.</TableCell>
                     <TableCell>
                       {income.seller?.account.user_name ??
-                        income.referrer_name ??
+                        income.referrer?.user?.account.user_name ??
                         "Tidak diketahui"}
                     </TableCell>
                     <TableCell>
