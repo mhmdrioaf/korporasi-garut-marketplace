@@ -2,7 +2,7 @@ import { SubmitHandler, UseFormReturn } from "react-hook-form";
 
 type TProductContext = {
   form: {
-    productForm: UseFormReturn<IProductInput, any, IProductInput>;
+    productForm: UseFormReturn<IProductInput, any, undefined>;
     variant: {
       items: TVariantItemsInput[];
       withVariants: boolean;

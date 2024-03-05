@@ -40,7 +40,7 @@ type TOrderManagementContext = {
       deliveryReceiptForm: UseFormReturn<
         IOrderDeliveryReceiptInput,
         any,
-        IOrderDeliveryReceiptInput
+        undefined
       >;
       giveOrderDeliveryReceipt: SubmitHandler<IOrderDeliveryReceiptInput>;
     };
