@@ -82,7 +82,16 @@ export default class Users {
           include: {
             incomes: {
               include: {
-                order: true,
+                order: {
+                  include: {
+                    order_item: {
+                      include: {
+                        variant: true,
+                        product: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },

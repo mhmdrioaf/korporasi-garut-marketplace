@@ -3,4 +3,5 @@ type TReferrer = {
   user_id: number | null;
 
   user: TUser | null;
+  incomes: TIncome[];
 };
