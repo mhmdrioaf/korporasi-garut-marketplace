@@ -184,7 +184,7 @@ export default function Header({
 
                       <DropdownMenuItem>
                         <Link
-                          href={ROUTES.ADMIN.PRODUCT_MANAGEMENT.MAIN}
+                          href={ROUTES.ADMIN.USER_MANAGEMENT.MAIN}
                           className="w-full flex flex-row"
                         >
                           <Users2Icon className="w-4 h-4 mr-2" />
