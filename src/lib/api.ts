@@ -120,6 +120,19 @@ export async function getIncomes() {
           },
         },
       },
+      referrer: {
+        select: {
+          user: {
+            select: {
+              account: {
+                select: {
+                  user_name: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
   });
 
